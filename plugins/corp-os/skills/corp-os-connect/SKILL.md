@@ -9,6 +9,14 @@ Configures and audits what feeds the OS. This skill establishes the contract; `c
 
 Read the connector registry section of `${CLAUDE_PLUGIN_ROOT}/reference/data-model.md` and the plugin's `CONNECTORS.md` for how tool categories work.
 
+## Pre-flight
+
+Confirm the OS is actually accessible right now — mounted, current, readable — not recalled from an earlier session. A stale export or a folder that did not mount produces confident output about files that do not exist. If it is not there, stop and ask.
+
+The files outrank memory. Where anything recalled conflicts with what is written in the OS, the files win and the memory gets corrected.
+
+Read `config.json` first — it is the authority on this OS's layers, vocabulary, decay windows, retention policy, and gate strictness. Fall back to the shipped defaults only where it is silent, and speak the person's own labels back to them rather than this plugin's.
+
 ## Step 0 — enumerate what is actually available
 
 Before asking the person anything, check what connectors, MCP servers, and tools exist in this environment. Then confirm against that list rather than asking them to recall it — this environment knows its own tool inventory better than the person does, and a wrong guess here produces a registry entry that silently never works.
@@ -52,6 +60,8 @@ When asked "what's feeding my OS" or "why isn't this working," check each entry 
 
 If a source has a recurring cadence, offer to set up a scheduled run of `corp-os-pull` for it. Recurring pulls plus a scheduled brief are what keep a low-upkeep OS alive, and they are the specific fix for the person whose last system died of neglect.
 
+Follow `${CLAUDE_PLUGIN_ROOT}/reference/scheduling.md` for which mechanism to use and what a scheduled run has to carry to stand on its own. The failure it prevents is silent: a schedule that never fires looks exactly like a schedule that fired and found nothing.
+
 Do not schedule anything without asking.
 
 ## The write gate
@@ -59,6 +69,16 @@ Do not schedule anything without asking.
 `connectors.md` is derived-layer: propose, confirm, then write. Update `meta.json`'s `cutoff` map when adding a source that supports incremental pulls.
 
 ## Every run ends with
+
+Close the run with `scripts/log_run.py` in the OS rather than editing the files by hand — it writes the `usage/log.md` row and the dated `meta.json` history entry in one call, and refuses a blank friction field:
+
+```bash
+python3 scripts/log_run.py --skill corp-os-connect --scope "<what this run covered>" \
+    --friction "<where it hurt, or 'none'>" \
+    --event "<what changed>"
+```
+
+These are the two writes measurement says get dropped, because they sit after the interesting work is done. A step that has to happen every time and that nothing else will catch belongs in code, not in a reminder.
 
 - A row in `usage/log.md`.
 - A plain statement of what is now connected, what is deliberately not, and — if anything is `broken` or `stale` — the one specific thing to fix first.

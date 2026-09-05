@@ -1,0 +1,354 @@
+{
+  "_note": "Queries a real person would type. `expect` is the single skill that should win; `none` means no skill should fire. `probes` names what the query is testing so results group by the collision the audit predicted. Keep queries specific and slightly messy -- clean abstract phrasings route correctly for reasons that do not survive contact with real use. Iteration 3 added the hard cases evals/README.md called for: renamed vocabulary, no Corp-OS words at all, mid-conversation fragments, and queries that legitimately touch two skills where `expect` is the one that should go FIRST.",
+  "queries": [
+    {
+      "id": "audit-1",
+      "expect": "corp-os-reality-check",
+      "probes": "pair:reality-check-vs-audit",
+      "query": "i've got a bad feeling that half of what's in here about the Northwind account is out of date. can you go through and figure out what i shouldn't be trusting anymore"
+    },
+    {
+      "id": "audit-2",
+      "expect": "corp-os-audit",
+      "probes": "pair:reality-check-vs-audit",
+      "query": "my buddy runs his whole consulting practice out of a big obsidian vault, like 400 notes. he asked me to look at it and tell him what he's missing. can you go through it and give him a real assessment"
+    },
+    {
+      "id": "audit-3",
+      "expect": "corp-os-reality-check",
+      "probes": "pair:reality-check-vs-audit",
+      "query": "audit what i know about pricing — i think some of it is wrong"
+    },
+    {
+      "id": "audit-4",
+      "expect": "corp-os-audit",
+      "probes": "pair:reality-check-vs-audit",
+      "query": "audit my knowledge base and tell me how it stacks up"
+    },
+    {
+      "id": "shape-1",
+      "expect": "corp-os-configure",
+      "probes": "pair:configure-vs-rebuild",
+      "query": "this whole thing is set up wrong for how i actually work. i don't have 'jobs', i have matters, and each one has a client and a filing deadline. can we change that"
+    },
+    {
+      "id": "shape-2",
+      "expect": "corp-os-rebuild",
+      "probes": "pair:configure-vs-rebuild",
+      "query": "the topic files have gotten out of hand — there's like 40 of them and half overlap. i'd rather you just redo the whole derived side from what's in raw and let the categories fall out of the actual material"
+    },
+    {
+      "id": "shape-3",
+      "expect": "corp-os-configure",
+      "probes": "pair:configure-vs-rebuild",
+      "query": "raw/ is at 900 files and it's getting unwieldy, can we put some kind of expiry on it"
+    },
+    {
+      "id": "shape-4",
+      "expect": "corp-os-rebuild",
+      "probes": "pair:configure-vs-rebuild",
+      "query": "my taxonomy doesn't fit anymore, this has drifted, redo it from source"
+    },
+    {
+      "id": "add-1",
+      "expect": "corp-os-intake",
+      "probes": "pair:add-this",
+      "query": "here's the transcript from this morning's call with the Vertex folks, add it\n\n[Dana] So the integration timeline...\n[Marcus] We'd need the sandbox by October at the latest."
+    },
+    {
+      "id": "add-2",
+      "expect": "corp-os-jobs",
+      "probes": "pair:add-this",
+      "query": "i just picked up a new thing at work — i need to figure out whether we should keep supporting the on-prem customers. add that"
+    },
+    {
+      "id": "add-3",
+      "expect": "corp-os-glossary",
+      "probes": "pair:add-this",
+      "query": "add this term: 'activation rate'. finance and growth define it differently and i keep getting burned in meetings"
+    },
+    {
+      "id": "add-4",
+      "expect": "corp-os-intake",
+      "probes": "pair:add-this",
+      "query": "quick note before i forget — ran into Wren at lunch, she said the helpdesk migration is dead for the year. save this"
+    },
+    {
+      "id": "add-5",
+      "expect": "corp-os-glossary",
+      "probes": "pair:add-this",
+      "query": "what does NRR actually mean here? i keep having to look it up and i'm not sure we all use it the same way"
+    },
+    {
+      "id": "update-1",
+      "expect": "corp-os-pull",
+      "probes": "pair:update-vs-improve",
+      "query": "catch me up, i've been out for a week"
+    },
+    {
+      "id": "update-2",
+      "expect": "corp-os-improve",
+      "probes": "pair:update-vs-improve",
+      "query": "honestly this is getting annoying to use. every time i process anything i end up hand-writing the same three fields. what should i change about how it's set up"
+    },
+    {
+      "id": "update-3",
+      "expect": "corp-os-pull",
+      "probes": "pair:update-vs-improve",
+      "query": "update my OS please, i think there's a bunch of meeting notes from last week that never got in"
+    },
+    {
+      "id": "update-4",
+      "expect": "corp-os-improve",
+      "probes": "pair:update-vs-improve",
+      "query": "is this actually working? i've been using it for four months and i want to know what i'm not using"
+    },
+    {
+      "id": "decide-1",
+      "expect": "corp-os-decide",
+      "probes": "new:decide",
+      "query": "i'm stuck between per-seat and usage pricing for the mid-market tier and i keep going back and forth. i need to actually track this instead of re-arguing it every two weeks"
+    },
+    {
+      "id": "decide-2",
+      "expect": "corp-os-decide",
+      "probes": "new:decide",
+      "query": "what am i waiting on right now? feels like there are a few things sitting open that i keep not resolving"
+    },
+    {
+      "id": "decide-3",
+      "expect": "corp-os-claims",
+      "probes": "new:decide",
+      "query": "we went with postgres in the end, mostly because the team already knew it. get that recorded so nobody re-opens it in six months"
+    },
+    {
+      "id": "decide-4",
+      "expect": "corp-os-jobs",
+      "probes": "new:decide",
+      "query": "i need to decide how we're going to handle renewals going forward — that's basically my whole quarter"
+    },
+    {
+      "id": "decide-5",
+      "expect": "corp-os-decide",
+      "probes": "new:decide",
+      "query": "log a decision: whether to keep the helpdesk through renewal or migrate before Q4. Wren owns it, needs to be settled by september 1, and it's blocking the support triage work"
+    },
+    {
+      "id": "cover-setup",
+      "expect": "corp-os-setup",
+      "probes": "coverage",
+      "query": "i want to build a second brain for my actual work, not another notes app. i'm a principal PM and i lose the same context every quarter. where do i start"
+    },
+    {
+      "id": "cover-guide",
+      "expect": "corp-os-guide",
+      "probes": "coverage",
+      "query": "ok i installed this thing. what does it actually do and what should i do first"
+    },
+    {
+      "id": "cover-connect",
+      "expect": "corp-os-connect",
+      "probes": "coverage",
+      "query": "i want my granola notes to feed into this automatically. how do i hook that up, and what's it not going to catch"
+    },
+    {
+      "id": "cover-claims",
+      "expect": "corp-os-claims",
+      "probes": "coverage",
+      "query": "there's a queue of like 14 unprocessed files sitting in there. work through them and turn them into something i can actually cite"
+    },
+    {
+      "id": "cover-recall",
+      "expect": "corp-os-recall",
+      "probes": "coverage",
+      "query": "i've got the Vertex QBR in 20 minutes. what do we know that bears on it, and what have we told them before"
+    },
+    {
+      "id": "cover-recall-2",
+      "expect": "corp-os-recall",
+      "probes": "coverage",
+      "query": "i'm drafting the board update — pull in whatever we actually know about churn drivers so i'm not writing from memory"
+    },
+    {
+      "id": "cover-dashboard",
+      "expect": "corp-os-dashboard",
+      "probes": "coverage",
+      "query": "build me something visual i can pull up on a monday — jobs, what's blocked, what's gone stale"
+    },
+    {
+      "id": "cover-brief",
+      "expect": "corp-os-brief",
+      "probes": "coverage",
+      "query": "set me up a weekly digest of what changed and what needs my attention"
+    },
+    {
+      "id": "cover-company",
+      "expect": "corp-os-company",
+      "probes": "coverage",
+      "query": "research Vertex for me before thursday — what they sell, who actually buys it, how they price, and where we lose to them"
+    },
+    {
+      "id": "cover-redact",
+      "expect": "corp-os-redact",
+      "probes": "coverage",
+      "query": "i want to send this brief to the wider org but there's comp stuff and some candid Marcus commentary in it. clean it up first"
+    },
+    {
+      "id": "cover-jobs",
+      "expect": "corp-os-jobs",
+      "probes": "coverage",
+      "query": "job-004 has gotten enormous, the evidence list is like 15 items and they're not really the same question anymore. split it"
+    },
+    {
+      "id": "cover-rebuild",
+      "expect": "corp-os-rebuild",
+      "probes": "coverage",
+      "query": "nobody's confident the claims still reflect what's in raw. regenerate the whole derived layer"
+    },
+    {
+      "id": "cover-configure",
+      "expect": "corp-os-configure",
+      "probes": "coverage",
+      "query": "call them findings instead of claims, that's the word we use here"
+    },
+    {
+      "id": "cover-improve",
+      "expect": "corp-os-improve",
+      "probes": "coverage",
+      "query": "read the usage log and tell me what structure i've built that i'm not actually using"
+    },
+    {
+      "id": "neg-1",
+      "expect": "none",
+      "probes": "negative",
+      "query": "what's a reasonable decay window for pricing claims in general? just asking conceptually, not about my setup"
+    },
+    {
+      "id": "neg-2",
+      "expect": "none",
+      "probes": "negative",
+      "query": "write me a python script that walks a folder of markdown files and prints any that are missing frontmatter"
+    },
+    {
+      "id": "neg-3",
+      "expect": "none",
+      "probes": "negative",
+      "query": "explain jobs-to-be-done to me like i'm new to product management"
+    },
+    {
+      "id": "neg-4",
+      "expect": "none",
+      "probes": "negative",
+      "query": "can you summarize this article i'm pasting about knowledge management? not saving it anywhere, i just want the gist"
+    },
+    {
+      "id": "neg-5",
+      "expect": "none",
+      "probes": "negative",
+      "query": "i need to redact the SSNs out of this csv before i send it to payroll"
+    },
+    {
+      "id": "neg-6",
+      "expect": "none",
+      "probes": "negative",
+      "query": "what's the difference between an assumption and a hypothesis"
+    },
+    {
+      "id": "neg-7",
+      "expect": "none",
+      "probes": "negative",
+      "query": "my obsidian vault sync keeps conflicting between my laptop and phone, any idea how to fix that"
+    },
+    {
+      "id": "neg-8",
+      "expect": "corp-os-recall",
+      "probes": "coverage",
+      "_relabelled": "Iteration 1 had this as expect:none and it routed to corp-os-recall 3/3. On review the model was right and the label was wrong -- recall's Step 4 covers exactly this (enrich what the person is working on, meeting prep from people and claims). Relabelled rather than counted as a miss, and the reason is written down here because silently flipping a label to make a number go up is how an eval stops meaning anything.",
+      "query": "draft the agenda for my 1:1 with Priya tomorrow"
+    },
+    {
+      "id": "vocab-1",
+      "expect": "corp-os-claims",
+      "probes": "hard:renamed-vocabulary",
+      "query": "go through the unprocessed stuff and pull out any findings worth keeping — we call them findings here, not claims"
+    },
+    {
+      "id": "vocab-2",
+      "expect": "corp-os-jobs",
+      "probes": "hard:renamed-vocabulary",
+      "query": "the Kestrel matter is way too broad, it's really two different questions. split it into two matters"
+    },
+    {
+      "id": "vocab-3",
+      "expect": "corp-os-configure",
+      "probes": "hard:renamed-vocabulary",
+      "query": "we don't have 'jobs', we have engagements, and each one has a client and a close date. can the system speak our language instead"
+    },
+    {
+      "id": "plain-1",
+      "expect": "corp-os-recall",
+      "probes": "hard:no-vocabulary",
+      "query": "what do I actually have on the Northwind situation? I know we talked about it a bunch but I can't remember what we concluded"
+    },
+    {
+      "id": "plain-2",
+      "expect": "corp-os-brief",
+      "probes": "hard:no-vocabulary",
+      "query": "give me the monday morning rundown from that thing you set up for me"
+    },
+    {
+      "id": "plain-3",
+      "expect": "corp-os-intake",
+      "probes": "hard:no-vocabulary",
+      "query": "stick this in my second brain — Wren says the helpdesk migration is off until volume normalizes"
+    },
+    {
+      "id": "plain-4",
+      "expect": "corp-os-reality-check",
+      "probes": "hard:no-vocabulary",
+      "query": "how much of my notes do you think is just wrong at this point? it's been a few months"
+    },
+    {
+      "id": "frag-1",
+      "expect": "corp-os-decide",
+      "probes": "hard:fragment",
+      "query": "ok but who actually owns that one, and when does it stop being reversible"
+    },
+    {
+      "id": "frag-2",
+      "expect": "corp-os-claims",
+      "probes": "hard:fragment",
+      "query": "yeah that's a real one, write it down properly with the quote"
+    },
+    {
+      "id": "frag-3",
+      "expect": "corp-os-redact",
+      "probes": "hard:fragment",
+      "query": "before that goes out, take the comp numbers and the bit about Marcus out of it"
+    },
+    {
+      "id": "seq-1",
+      "expect": "corp-os-intake",
+      "probes": "hard:sequence",
+      "query": "here's the Vertex call transcript — get it in and then tell me what it changes about the integration timeline\n\n[Marcus] Sandbox by October or we slip to Q1.\n[me] Is October firm?\n[Marcus] It's firm on our side."
+    },
+    {
+      "id": "seq-2",
+      "expect": "corp-os-connect",
+      "probes": "hard:sequence",
+      "query": "hook up my meeting notes tool and then pull everything from the last two weeks"
+    },
+    {
+      "id": "seq-3",
+      "expect": "corp-os-reality-check",
+      "probes": "hard:sequence",
+      "query": "a bunch of this looks stale — check it and then rebuild whatever needs rebuilding"
+    },
+    {
+      "id": "seq-4",
+      "expect": "corp-os-company",
+      "probes": "hard:sequence",
+      "query": "research Kestrel and then build me a one-pager I can bring into the meeting"
+    }
+  ]
+}

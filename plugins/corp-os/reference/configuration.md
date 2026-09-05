@@ -24,6 +24,7 @@ A config that contradicts the README is a bug to surface, not to resolve silentl
     "claim": "claim",
     "confidence": ["confirmed", "needs_review", "reconstructed", "disputed", "retired"],
     "sensitivity": ["public", "internal", "sensitive"],
+    "bearing": ["incidental", "load_bearing"],
     "kinds": ["fact", "decision", "theme", "assumption", "constraint", "metric", "preference", "identity"],
     "answer_status": ["open", "signal exists", "partial", "in motion", "answered"],
     "tags": [],
@@ -95,6 +96,7 @@ This matters more than it sounds. "Claim" is wrong in several fields — a litig
 Two rules:
 
 - **Renaming is free; removing a semantic is not.** Dropping `assumption` from `kinds` does not simplify the model, it removes the ability to distinguish what was observed from what is believed — which is the distinction that keeps the OS from lying to its owner. If someone wants it gone, say what it costs, then respect the answer.
+- **`sensitivity` and `bearing` are two axes and both are renameable, but neither collapses into the other.** `sensitivity` is the export class; `bearing` decides whether an entry stays in the scan path. Someone who wants a single flag is asking for the model that shipped before 0.9.0, and it fails in a specific way worth naming: quarantining load-bearing material does not produce a gap, it produces a confidently wrong answer with nothing to signal the omission. Rename both freely; do not merge them.
 - **A controlled `tags` list beats a free one past about fifty entries.** Empty means free-form. Populate it once the vocabulary stabilizes, and populate it from what is already in use rather than from an idea about what should be.
 
 ## Layers
@@ -106,6 +108,12 @@ Every layer declares a **role**, and this is the field most worth getting right:
 - **`record`** — an audit trail of things that happened. Neither regenerable nor a source of truth; appended to and eventually archived. `proposals` is the shipped example.
 
 Getting a role wrong is the one configuration error that destroys data. A `source` layer mislabeled `derived` gets overwritten by the next rebuild, and there is nothing to restore it from. **`corp-os-rebuild` refuses to touch any layer whose role is not `derived`,** and any new layer defaults to `source` until someone explicitly says otherwise — the safe direction to fail.
+
+### No layer is enabled without a schema
+
+**A layer may only be enabled if it declares an `entry_schema` and an `index_line`.** This applies to shipped layers and custom ones alike, and it is why `people` and `topics` are no longer scaffolded by default: both were being created, indexed, and read while no spec said what a person record or a topic record contains and no skill owned writing one. A layer in that state fills with whatever shape the session that happened to write it chose, which is precisely the drift the review gate and the scan contract exist to prevent.
+
+The rule has a useful side effect: it forces the question "what is one entry, and what does one line of it look like in `INDEX.md`" to be answered before the folder exists, rather than discovered at forty entries.
 
 ### Custom layers
 
@@ -142,7 +150,7 @@ Custom layers get provenance like anything else. A layer that opts out of source
 
 `enabled: false` turns decay off entirely. Say plainly what that costs — nothing will ever flag a stale entry, so correctness becomes wholly dependent on someone noticing — and then respect it. A short-lived OS built for one project genuinely does not need decay.
 
-`by_kind` is the setting that does the most work. Decisions and constraints are usually `none`: a decision that was made stays made, and what changes is whether it still applies, which is a new claim rather than a stale one. Metrics rot fastest. When everything ends up at the default, nobody set these thoughtfully and the monthly sweep will surface noise instead of signal — `improve-corp-os` checks for exactly that pattern.
+`by_kind` is the setting that does the most work. Decisions and constraints are usually `none`: a decision that was made stays made, and what changes is whether it still applies, which is a new claim rather than a stale one. Metrics rot fastest. When everything ends up at the default, nobody set these thoughtfully and the monthly sweep will surface noise instead of signal — `corp-os-improve` checks for exactly that pattern.
 
 `by_tag` overrides `by_kind`. A `pricing` tag at 30 days will do more for accuracy than any amount of care per claim.
 
@@ -205,17 +213,55 @@ Exceptions match on tag, source, or path, and always win over the policy:
 
 If someone asks for `trusted_sources`, say what it costs before setting it: every claim from that source enters the derived layer unreviewed, and the review gate is the reason the derived layer counts as knowledge rather than a second copy of raw/. Nothing conversational, summarized, or model-generated belongs on that list.
 
-`improve-corp-os` watches for the gate becoming theater — proposals confirmed unread. The fix for that is fewer, better proposals or `propose_batched`, never turning the gate off.
+`corp-os-improve` watches for the gate becoming theater — proposals confirmed unread. The fix for that is fewer, better proposals or `propose_batched`, never turning the gate off.
 
 ## Starter profiles
 
 Structural shapes only. No profile ships domain vocabulary, categories, or content — that comes from the person.
 
 - **`minimal`** — `raw`, `jobs`, `claims`, `proposals`. Decay on. The honest starting point for most people, and easy to grow.
-- **`default`** — adds `people`. What `corp-os-setup` writes unless the interrogation says otherwise.
-- **`relationship`** — `people` tiered and load-bearing, aliases on, short decay on role and status claims. For work that is mostly about knowing the state of a set of counterparties.
-- **`research`** — `topics` and `glossary` on, `claims` grouped by topic, longer decay, a `sources` layer for external material distinct from first-hand capture.
+- **`default`** — `minimal` plus `glossary`. What `corp-os-setup` writes unless the interrogation says otherwise. Note what it does *not* add: a person or topic layer, because neither earns a place until the interrogation says the work needs one.
+- **`relationship`** — declares a `people` layer, tiered and load-bearing, with aliases on and short decay on role and status claims. For work that is mostly about knowing the state of a set of counterparties. The declaration it writes:
+
+  ```json
+  "people": {
+    "enabled": true, "role": "derived", "gated": true, "path": "people/",
+    "entry_schema": {
+      "name":    { "type": "string", "required": true },
+      "role":    { "type": "string", "required": true },
+      "org":     { "type": "string" },
+      "tier":    { "type": "enum",   "values": ["core", "regular", "peripheral"] },
+      "status":  { "type": "enum",   "values": ["active", "dormant", "departed"] },
+      "aliases": { "type": "list" }
+    },
+    "index_line": "{name} — {role} · {tier}",
+    "decay": "365d"
+  }
+  ```
+
+  Person records are a **readable view**; correctness still lives in claims, the same way a company record does. Anything asserted on a person record exists as a claim with its own citation, or it is invisible to `corp-os-reality-check` and will rot unnoticed.
+- **`research`** — `glossary` on, `claims` grouped by topic, longer decay, and a `sources` layer for external material distinct from first-hand capture. A separate `topics` layer is available as a custom declaration, but grouping claims by topic already does most of that work, and running both is the most common way the same fact ends up in two places with different wording.
 - **`archive`** — `raw` plus an index, no derived layer, decay off. A searchable record with no curation. Legitimate, and worth naming what it gives up: no summary layer, nothing queryable without reading the material.
+- **`decision`** — declares a `decisions` layer alongside jobs and claims. For work where the recurring unit is a fork someone has to pick between rather than a fact to accumulate. The declaration it writes:
+
+  ```json
+  "decisions": {
+    "enabled": true, "role": "derived", "gated": true, "path": "decisions/",
+    "entry_schema": {
+      "id":            { "type": "string", "required": true },
+      "statement":     { "type": "string", "required": true },
+      "owner":         { "type": "string", "required": true },
+      "status":        { "type": "enum",   "values": ["open", "blocked", "decided", "lapsed", "moot"] },
+      "decide_by":     { "type": "date",   "required": true },
+      "reversibility": { "type": "enum",   "values": ["reversible", "costly", "one-way"] },
+      "blocks":        { "type": "list" }
+    },
+    "index_line": "{id} — {statement} · {owner} · by {decide_by}",
+    "decay": "none"
+  }
+  ```
+
+  `owner` and `decide_by` are required on purpose. Both are the fields people skip, and a decision missing either is the one still open next quarter — see `corp-os-decide`.
 - **`register`** — `jobs` off; an open-items layer tiered by urgency carries the priority signal instead, with decay providing the removal rule. The right shape when the work is reference accumulation rather than a handful of recurring decisions. See "Turning jobs off" below before choosing it.
 
 ### Turning jobs off

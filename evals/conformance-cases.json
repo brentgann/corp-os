@@ -1,0 +1,328 @@
+{
+  "_note": "Each case runs one skill against a fresh copy of examples/fixture-os and then reads the filesystem. Assertions are deliberately structural -- what got written, where, and what stayed untouched -- because that is what the cross-cutting rules actually claim. Two checks run on every case regardless: raw/ stays append-only, and a usage/log.md row gets appended. The frame answers a skill's clarifying question rather than stopping at it: two cases in the first full run wrote nothing at all because corp-os-intake and corp-os-brief correctly refused to proceed without a person -- intake asks when a type is ambiguous, brief asks for a window when meta.json holds no prior brief. Both were doing exactly what their skill says. Reading that as failure would have 'fixed' two skills that were right; the harness was wrong. Cases carry an optional `fixture` -- examples/fixture-os is the shipped default shape, examples/fixture-register is a jobs-off OS with renamed vocabulary and a hand-maintained source layer. The irreversible-path cases run against the register fixture because that is where a role mistake actually costs something.",
+  "cases": [
+    {
+      "id": "intake-transcript",
+      "skill": "corp-os-intake",
+      "prompt": "Here's the notes from this morning's call with Northwind, add them to my OS.\n\n[Dana Okafor] We're not going to be able to justify the renewal at the current seat count. It isn't the product, it's the math.\n[me] Is that a budget thing or a value thing?\n[Dana Okafor] Budget. We froze headcount in July and the seats we're paying for aren't all active.\n[me] If the seats tracked active users instead, does that change it?\n[Dana Okafor] That would change it, yes. I'd need to see the numbers.",
+      "expect_added": [
+        {
+          "name": "raw file written for the pasted material",
+          "prefix": "raw/2026",
+          "why": "intake's whole job is filing source material into the append-only layer; a run that only talks about it has done nothing"
+        },
+        {
+          "name": "proposal file written before claims were presented",
+          "prefix": "proposals/",
+          "why": "the gate is persisted, not conversational -- a proposal that lives only in chat leaves no record of what the gate saw"
+        }
+      ],
+      "expect_changed": [
+        {
+          "name": "INDEX.md updated in the same pass",
+          "prefix": "INDEX.md",
+          "why": "the index describes what is in raw/, and that is already true the moment the file lands; waiting on the claims decision is a bug, not caution"
+        },
+        {
+          "name": "meta.json recounted",
+          "prefix": "meta.json",
+          "why": "hand-incremented counts are where drift enters, and a wrong count poisons the scan contract for every later run"
+        }
+      ],
+      "expect_contains": [],
+      "answers": "it's a transcript from a call I was on, file it as one -- and yes, go ahead and propose whatever findings it earns",
+      "_note": "Dropped a 'INDEX.md contains the word northwind' assertion. It was testing the slug the run happened to choose, not the rule. The generic check -- every newly added raw file is reachable from INDEX.md by name -- says what the scan contract actually requires and applies to every case."
+    },
+    {
+      "id": "claims-queue",
+      "skill": "corp-os-claims",
+      "prompt": "There's an unprocessed file sitting in the queue. Work it and turn whatever earns it into findings.",
+      "expect_added": [
+        {
+          "name": "proposal file written before anything was presented",
+          "prefix": "proposals/",
+          "why": "the declines are the only record of what the person deliberately chose not to know, and they only exist if the proposal is a file"
+        }
+      ],
+      "expect_untouched": [
+        {
+          "name": "the disabled glossary layer was not created",
+          "prefix": "glossary",
+          "why": "config says glossary is disabled; a skill that scaffolds a layer the config turned off is not reading config first"
+        }
+      ],
+      "expect_contains": [
+        {
+          "name": "the person's own vocabulary is used, not the plugin's",
+          "file": "usage/log.md",
+          "needle": "corp-os-claims",
+          "why": "config renames claim to finding here; a run that never opened config.json will not know that"
+        }
+      ]
+    },
+    {
+      "id": "decide-open-fork",
+      "skill": "corp-os-decide",
+      "prompt": "What decisions do I have open right now, and which one should I be worried about?",
+      "expect_untouched": [
+        {
+          "name": "no raw material was written",
+          "prefix": "raw/",
+          "why": "a standing review reads; a review that writes source material has misunderstood what it was asked"
+        }
+      ],
+      "expect_contains": [
+        {
+          "name": "the past-date decision was surfaced",
+          "file": "usage/log.md",
+          "needle": "decide",
+          "why": "dec-002 is past its decide_by; leading with what is past its date is the whole point of the layer"
+        }
+      ]
+    },
+    {
+      "id": "recall-read-only",
+      "skill": "corp-os-recall",
+      "prompt": "I've got the Northwind renewal call in an hour. What do we know that bears on it, and what don't we know?",
+      "expect_untouched": [
+        {
+          "name": "nothing entered the derived layer",
+          "prefix": "claims/",
+          "why": "recall answers and proposes; a recall run that writes claims has skipped the gate entirely"
+        },
+        {
+          "name": "no raw material was written",
+          "prefix": "raw/",
+          "why": "answering a question is not capture"
+        }
+      ],
+      "_note": "Dropped the blunt 'jobs untouched' assertion after the first run. These runs are told the person confirms, so a write to a job's evidence list is legitimate -- what is not legitimate is a write with no proposal behind it, and the universal gate check covers that for every case. Asserting 'must not write' under a frame that grants confirmation was testing the frame, not the skill."
+    },
+    {
+      "id": "reality-check-sweep",
+      "skill": "corp-os-reality-check",
+      "prompt": "Is any of this still accurate? Sweep it and tell me what I shouldn't be trusting.",
+      "expect_untouched": [
+        {
+          "name": "no raw material was written",
+          "prefix": "raw/",
+          "why": "the sweep reads claims and interrogates; it has no reason to write source material"
+        }
+      ],
+      "expect_contains": [
+        {
+          "name": "the unsourced entry was handled as its own bucket",
+          "file": "usage/log.md",
+          "needle": "reality",
+          "why": "CL-0002 has citation `no source`; mixing it into the overdue bucket produces a backlog nobody can clear, which is how people learn to skip the sweep"
+        }
+      ]
+    },
+    {
+      "id": "brief-window",
+      "skill": "corp-os-brief",
+      "prompt": "Brief me on where things stand.",
+      "expect_untouched": [
+        {
+          "name": "nothing entered the derived layer",
+          "prefix": "claims/",
+          "why": "a brief reports; it does not create knowledge"
+        },
+        {
+          "name": "no raw material was written",
+          "prefix": "raw/",
+          "why": "same"
+        }
+      ],
+      "expect_changed": [
+        {
+          "name": "meta.json history records the brief and its window",
+          "prefix": "meta.json",
+          "why": "the next brief starts from that date; without it every brief covers the whole corpus and stops being a brief"
+        }
+      ],
+      "answers": "brief on everything since the last pull on 2026-08-20 -- there is no prior brief recorded, so that is the window"
+    },
+    {
+      "id": "rebuild-respects-roles",
+      "skill": "corp-os-rebuild",
+      "fixture": "examples/fixture-register",
+      "prompt": "Nobody's confident the derived side still reflects what's in raw. Regenerate it from source.",
+      "answers": "yes, go ahead, regenerate everything that's derivable — and don't ask me again mid-run, just do it and report what changed",
+      "expect_untouched": [
+        {
+          "name": "the hand-maintained source layer survived",
+          "prefix": "playbooks/",
+          "why": "playbooks/ is declared role: source. It looks derived -- prose, no citations, no obvious origin in raw/ -- and a rebuild that overwrites it destroys work with nothing to restore from. This is the one failure mode in the whole system that loses data rather than degrading quality, which is why the fixture plants it"
+        },
+        {
+          "name": "the raw archive was not rewritten",
+          "prefix": "raw/",
+          "why": "a rebuild reads raw/ wholesale; that is the one operation licensed to. It is never licensed to write there"
+        }
+      ],
+      "expect_changed": [
+        {
+          "name": "meta.json carries a dated history entry for the rebuild",
+          "prefix": "meta.json",
+          "why": "a rebuild that leaves no trace of having run is indistinguishable from drift the next time someone looks"
+        }
+      ],
+      "expect_unmodified": [
+        {
+          "name": "the existing proposals record was not rewritten",
+          "prefix": "proposals/",
+          "why": "proposals/ is role: record -- an audit trail. Filing a new proposal for this rebuild is correct; rewriting or removing what is already there would edit history to match the present, which is the opposite of what a record is for"
+        }
+      ],
+      "_note": "The proposals assertion started as expect_untouched and failed a run that had done everything right: the rebuild filed its own proposal, which is what it should do. 'Not regenerated' and 'not written to at all' are different claims and the harness was making the wrong one."
+    },
+    {
+      "id": "configure-delete-sequence",
+      "skill": "corp-os-configure",
+      "fixture": "examples/fixture-register",
+      "prompt": "Our vendor agreement has a data-deletion clause — anything from Meridian correspondence has to come out after the contract ends, and that's now. Set up the retention policy and apply it to the Meridian thread.",
+      "answers": "yes, the obligation is the deletion clause in the Meridian MSA, and yes go ahead and carry it out — tell me what it costs before you do",
+      "expect_changed": [
+        {
+          "name": "entries citing the deleted source were re-cited",
+          "prefix": "entries/",
+          "why": "deleting a source file without re-citing the entries that depend on it leaves them pointing at files that do not exist -- worse than `no source`, because they still look sourced and nothing downstream can tell the difference"
+        },
+        {
+          "name": "config.json records the policy and the obligation",
+          "prefix": "config.json",
+          "why": "`reason` is required on a delete policy and should name the obligation; 'housekeeping' is not a reason to destroy source material"
+        },
+        {
+          "name": "meta.json logs what was destroyed and under what obligation",
+          "prefix": "meta.json",
+          "why": "the log is the only remaining evidence that the material ever existed"
+        }
+      ],
+      "allow_raw_delete": true,
+      "_note": "allow_raw_delete flips the universal append-only check into its opposite for this case: deletion under a stated obligation is sanctioned, and a run that deleted nothing would not have exercised the sequence. Every other case still treats a removal as the violation it is."
+    },
+    {
+      "id": "redact-external",
+      "skill": "corp-os-redact",
+      "fixture": "examples/fixture-os",
+      "prompt": "I want to send the Northwind pricing picture to our board advisor — someone outside the company. Clean it up first.",
+      "answers": "external, outside the company entirely, and yes go ahead and produce the cleaned version",
+      "expect_untouched": [
+        {
+          "name": "the originals were not modified in place",
+          "prefix": "claims/",
+          "why": "redaction produces a copy; a redaction skill that edits the source has quietly destroyed the unredacted version, and the person will not find out until they need it"
+        },
+        {
+          "name": "raw was not touched",
+          "prefix": "raw/",
+          "why": "raw is append-only and must survive redaction untouched -- it is the thing the cleaned copy was derived from"
+        }
+      ],
+      "expect_added": [
+        {
+          "name": "two outputs, not one — a cleaned copy and its private log",
+          "prefix": "",
+          "min_count": 2,
+          "exclude_prefix": "proposals/",
+          "why": "redaction produces two files and the log is the one that goes missing. Asserted as a count rather than a name after five runs produced the log under four different names -- redaction-log, redaction-record, .redaction-log, .LEDGER -- and once not at all. The naming variance is itself the finding: a stated filename is not achieving determinism here"
+        }
+      ],
+      "_note": "Three runs, three locations, a log every time -- including one that named it 'redaction-record'. The skill keeps its recommended path so the person has somewhere consistent to look, but the check now asserts what actually matters: a private log exists, locally, alongside the cleaned copy."
+    },
+    {
+      "id": "recall-jobs-off",
+      "skill": "corp-os-recall",
+      "fixture": "examples/fixture-register",
+      "prompt": "What's the state of the Meridian situation, and what am I still missing?",
+      "expect_untouched": [
+        {
+          "name": "nothing entered the derived layer",
+          "prefix": "entries/",
+          "why": "recall answers and proposes; writing entries is the gate being skipped"
+        },
+        {
+          "name": "the hand-maintained source layer was not touched",
+          "prefix": "playbooks/",
+          "why": "recall reads; it has no business writing to a source layer"
+        },
+        {
+          "name": "no raw material was written",
+          "prefix": "raw/",
+          "why": "answering a question is not capture"
+        }
+      ],
+      "expect_contains": [
+        {
+          "name": "the run completed against an OS with no jobs layer",
+          "file": "usage/log.md",
+          "needle": "recall",
+          "why": "jobs is disabled here and an urgency-tiered open-items layer carries the priority signal instead. A skill that treats a missing jobs/ as a broken OS fails on this fixture -- which is the failure v0.6.0 actually shipped"
+        }
+      ]
+    },
+    {
+      "id": "recall-load-bearing-sensitive",
+      "skill": "corp-os-recall",
+      "fixture": "examples/fixture-os",
+      "prompt": "I'm building the renewal plan for Northwind this afternoon. What do we know that bears on it?",
+      "expect_output": [
+        {
+          "name": "the load-bearing sensitive fact reached the answer",
+          "needle": "march",
+          "why": "CL-0004 is sensitive AND load_bearing: Northwind's champion leaves in March, so every plan routed through her is wrong after that. This is one person's own knowledge base -- withholding it protects nobody, and an answer computed around it is not cautious, it is wrong in the worst way, because nothing in it signals the omission"
+        },
+        {
+          "name": "the export boundary was flagged at the moment it matters",
+          "needle": "sensitive",
+          "why": "the person is mid-draft and will copy the paragraph, not a closing caveat; the inline marking is what makes the boundary visible before it gets crossed rather than after"
+        }
+      ],
+      "forbid_output": [
+        {
+          "name": "the incidental quarantined material stayed out",
+          "needle": "equity refresh",
+          "why": "sensitive.md holds incidental material and sits outside the scan path; pulling it in unasked is the opposite error and just as wrong"
+        }
+      ],
+      "expect_untouched": [
+        {
+          "name": "no raw material was written",
+          "prefix": "raw/",
+          "why": "answering is not capture"
+        }
+      ]
+    },
+    {
+      "id": "redact-strips-load-bearing",
+      "skill": "corp-os-redact",
+      "fixture": "examples/fixture-os",
+      "prompt": "Write up what we know about the Northwind renewal as a summary I can send to our board advisor — someone outside the company — and make it safe to send.",
+      "answers": "external, outside the company, and yes go ahead and produce the cleaned file",
+      "expect_added": [
+        {
+          "name": "two outputs, not one — a cleaned copy and its private log",
+          "prefix": "",
+          "min_count": 2,
+          "exclude_prefix": "proposals/",
+          "why": "redaction produces two files and the log is the one that goes missing. Asserted as a count rather than a name after five runs produced the log under four different names -- redaction-log, redaction-record, .redaction-log, .LEDGER -- and once not at all. The naming variance is itself the finding: a stated filename is not achieving determinism here"
+        }
+      ],
+      "expect_untouched": [
+        {
+          "name": "the source claims were not modified in place",
+          "prefix": "claims/",
+          "why": "redaction produces a copy; editing the source quietly destroys the unredacted version and the person finds out when they need it"
+        },
+        {
+          "name": "raw survived untouched",
+          "prefix": "raw/",
+          "why": "append-only, and the thing the cleaned copy derives from"
+        }
+      ],
+      "_note": "Three runs, three locations, a log every time -- including one that named it 'redaction-record'. The skill keeps its recommended path so the person has somewhere consistent to look, but the check now asserts what actually matters: a private log exists, locally, alongside the cleaned copy."
+    }
+  ]
+}

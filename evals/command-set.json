@@ -1,0 +1,171 @@
+{
+  "_note": "One short model call each: show the command roster and one thing a person typed, ask which skill fires and what it does first. `command` names the file whose full text gets shown, so the body's wording is under test and not just the description. Cases come in pairs -- with arguments and without -- because the no-args path is where a command either does something sensible or asks a question nobody wanted.\n\nThe `picker` cases carry no slash command at all. They are the real risk of having eight commands: a person scanning the list has only the descriptions to go on, and eight one-liners about the same knowledge base are exactly the shape that blurs. This is the one question this harness asks that no other one does.\n\nAn earlier set had three `byname-` cases checking that configure, rebuild and audit are reachable without a command. They were removed: the model kept answering `none` or `/corp-os`, correctly, because this harness's question is about commands and theirs is about skills. run_routing.py already answers it, at 100%. Contorting a harness to ask a question another one asks better is how both get worse.",
+  "cases": [
+    {
+      "id": "guide-noargs",
+      "command": "/corp-os",
+      "expect_skill": "corp-os-guide",
+      "probes": "noargs",
+      "typed": "/corp-os"
+    },
+    {
+      "id": "guide-args",
+      "command": "/corp-os",
+      "expect_skill": "corp-os-guide",
+      "probes": "args",
+      "typed": "/corp-os I think some of my claims are out of date, where do I even start",
+      "also_ok": [
+        "corp-os-reality-check",
+        "corp-os-check"
+      ],
+      "_note": "Routed straight to the sweep rather than naming the guide, and that is correct: the command file says to route directly rather than explain the system when the person already said what they need. Insisting on `corp-os-guide` would have scored the label instead of the behavior."
+    },
+    {
+      "id": "capture-args",
+      "command": "/corp-os-capture",
+      "expect_skill": "corp-os-intake",
+      "probes": "args",
+      "typed": "/corp-os-capture Wren said the helpdesk migration is off until volume normalizes — she owns it, decision was hers"
+    },
+    {
+      "id": "capture-noargs",
+      "command": "/corp-os-capture",
+      "expect_skill": "corp-os-intake",
+      "probes": "noargs",
+      "typed": "/corp-os-capture"
+    },
+    {
+      "id": "recall-args",
+      "command": "/corp-os-recall",
+      "expect_skill": "corp-os-recall",
+      "probes": "args",
+      "typed": "/corp-os-recall what do we know that bears on the Northwind renewal"
+    },
+    {
+      "id": "recall-noargs",
+      "command": "/corp-os-recall",
+      "expect_skill": "corp-os-recall",
+      "probes": "noargs",
+      "typed": "/corp-os-recall"
+    },
+    {
+      "id": "brief-noargs",
+      "command": "/corp-os-brief",
+      "expect_skill": "corp-os-brief",
+      "probes": "noargs",
+      "typed": "/corp-os-brief"
+    },
+    {
+      "id": "brief-args",
+      "command": "/corp-os-brief",
+      "expect_skill": "corp-os-brief",
+      "probes": "args",
+      "typed": "/corp-os-brief just the last two weeks"
+    },
+    {
+      "id": "catchup-noargs",
+      "command": "/corp-os-catchup",
+      "expect_skill": "corp-os-pull",
+      "probes": "noargs",
+      "typed": "/corp-os-catchup"
+    },
+    {
+      "id": "catchup-args",
+      "command": "/corp-os-catchup",
+      "expect_skill": "corp-os-pull",
+      "probes": "args",
+      "typed": "/corp-os-catchup just my meeting notes, since monday"
+    },
+    {
+      "id": "open-noargs",
+      "command": "/corp-os-open",
+      "expect_skill": "corp-os-decide",
+      "probes": "noargs",
+      "typed": "/corp-os-open"
+    },
+    {
+      "id": "open-args",
+      "command": "/corp-os-open",
+      "expect_skill": "corp-os-decide",
+      "probes": "args",
+      "typed": "/corp-os-open the mid-market pricing one — who owns it and when does it stop being reversible"
+    },
+    {
+      "id": "check-noargs",
+      "command": "/corp-os-check",
+      "expect_skill": "corp-os-reality-check",
+      "probes": "noargs",
+      "typed": "/corp-os-check"
+    },
+    {
+      "id": "check-args",
+      "command": "/corp-os-check",
+      "expect_skill": "corp-os-reality-check",
+      "probes": "args",
+      "typed": "/corp-os-check just the pricing claims"
+    },
+    {
+      "id": "share-args",
+      "command": "/corp-os-share",
+      "expect_skill": "corp-os-redact",
+      "probes": "args",
+      "typed": "/corp-os-share the renewal summary, going to our board advisor outside the company"
+    },
+    {
+      "id": "share-noargs",
+      "command": "/corp-os-share",
+      "expect_skill": "corp-os-redact",
+      "probes": "noargs",
+      "typed": "/corp-os-share"
+    },
+    {
+      "id": "picker-catchup",
+      "command": "",
+      "expect_skill": "corp-os-pull",
+      "probes": "picker",
+      "typed": "i've been out for a week and there's stuff piled up in my meeting notes tool"
+    },
+    {
+      "id": "picker-brief",
+      "command": "",
+      "expect_skill": "corp-os-brief",
+      "probes": "picker",
+      "typed": "it's monday morning, what changed and what needs me"
+    },
+    {
+      "id": "picker-open",
+      "command": "",
+      "expect_skill": "corp-os-decide",
+      "probes": "picker",
+      "typed": "what am i sitting on that i keep not resolving"
+    },
+    {
+      "id": "picker-check",
+      "command": "",
+      "expect_skill": "corp-os-reality-check",
+      "probes": "picker",
+      "typed": "how much of what's in here do you think is just wrong by now"
+    },
+    {
+      "id": "picker-share",
+      "command": "",
+      "expect_skill": "corp-os-redact",
+      "probes": "picker",
+      "typed": "i want to send this to someone outside the company without the comp stuff in it"
+    },
+    {
+      "id": "picker-recall",
+      "command": "",
+      "expect_skill": "corp-os-recall",
+      "probes": "picker",
+      "typed": "what do we actually know about the northwind renewal"
+    },
+    {
+      "id": "picker-capture",
+      "command": "",
+      "expect_skill": "corp-os-intake",
+      "probes": "picker",
+      "typed": "here's a transcript, put it somewhere it won't get lost"
+    }
+  ]
+}

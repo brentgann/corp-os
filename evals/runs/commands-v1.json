@@ -1,0 +1,421 @@
+{
+  "model": "claude-opus-5",
+  "repeats": 3,
+  "overall": 1.0,
+  "rows": [
+    {
+      "id": "guide-noargs",
+      "typed": "/corp-os",
+      "command": "/corp-os",
+      "expect": "corp-os-guide",
+      "probes": "noargs",
+      "picks": [
+        "corp-os-guide",
+        "corp-os-guide",
+        "corp-os-guide"
+      ],
+      "rate": 1.0,
+      "firsts": [
+        "Locate their Corp-OS on disk and read its index/state.",
+        "Locate their Corp-OS and read its current state before saying anything.",
+        "Locate their Corp-OS and read its current state before saying anything."
+      ]
+    },
+    {
+      "id": "guide-args",
+      "typed": "/corp-os I think some of my claims are out of date, where do I even start",
+      "command": "/corp-os",
+      "expect": "corp-os-guide",
+      "probes": "args",
+      "picks": [
+        "corp-os-check",
+        "corp-os-check",
+        "corp-os-check"
+      ],
+      "rate": 1.0,
+      "firsts": [
+        "Sweep the OS for stale, unverified, and contradicted claims, oldest first.",
+        "Sweep the OS for stale, unverified, and contradicted claims, oldest first.",
+        "Sweep the OS for stale, unverified, and contradicted claims, oldest first."
+      ]
+    },
+    {
+      "id": "capture-args",
+      "typed": "/corp-os-capture Wren said the helpdesk migration is off until volume normalizes \u2014 she owns it, decision was hers",
+      "command": "/corp-os-capture",
+      "expect": "corp-os-intake",
+      "probes": "args",
+      "picks": [
+        "corp-os-intake",
+        "corp-os-intake",
+        "corp-os-intake"
+      ],
+      "rate": 1.0,
+      "firsts": [
+        "Append Wren's verbatim note to the raw layer, timestamped and tagged decision/ownership.",
+        "Append Wren's decision verbatim to the raw layer with source, owner, date.",
+        "Append Wren's decision verbatim to the raw layer with source, owner, date."
+      ]
+    },
+    {
+      "id": "capture-noargs",
+      "typed": "/corp-os-capture",
+      "command": "/corp-os-capture",
+      "expect": "corp-os-intake",
+      "probes": "noargs",
+      "picks": [
+        "corp-os-intake",
+        "corp-os-intake",
+        "corp-os-intake"
+      ],
+      "rate": 1.0,
+      "firsts": [
+        "Ask what they're filing \u2014 paste the transcript, thread, doc, or note.",
+        "Ask them to paste the material they want filed.",
+        "Ask them to paste or point me to the material they want filed."
+      ]
+    },
+    {
+      "id": "recall-args",
+      "typed": "/corp-os-recall what do we know that bears on the Northwind renewal",
+      "command": "/corp-os-recall",
+      "expect": "corp-os-recall",
+      "probes": "args",
+      "picks": [
+        "corp-os-recall",
+        "corp-os-recall",
+        "corp-os-recall"
+      ],
+      "rate": 1.0,
+      "firsts": [
+        "Scan the OS for Northwind \u2014 contract, decisions, threads \u2014 then answer with provenance.",
+        "Scan the OS for Northwind-tagged records \u2014 contract, contacts, decisions, open threads.",
+        "Scan the OS for Northwind-tagged material \u2014 contract, decisions, threads, open items."
+      ]
+    },
+    {
+      "id": "recall-noargs",
+      "typed": "/corp-os-recall",
+      "command": "/corp-os-recall",
+      "expect": "corp-os-recall",
+      "probes": "noargs",
+      "picks": [
+        "corp-os-recall",
+        "corp-os-recall",
+        "corp-os-recall"
+      ],
+      "rate": 1.0,
+      "firsts": [
+        "Ask what they want recalled \u2014 no arguments given, so scan nothing yet.",
+        "Ask what they want to know \u2014 no arguments given, so scan nothing yet.",
+        "Ask what they need answered \u2014 no arguments were given, so nothing gets scanned yet."
+      ]
+    },
+    {
+      "id": "brief-noargs",
+      "typed": "/corp-os-brief",
+      "command": "/corp-os-brief",
+      "expect": "corp-os-brief",
+      "probes": "noargs",
+      "picks": [
+        "corp-os-brief",
+        "corp-os-brief",
+        "corp-os-brief"
+      ],
+      "rate": 1.0,
+      "firsts": [
+        "Read meta.json for the last brief timestamp; if none, ask for a window.",
+        "Read meta.json for the last brief timestamp; if none, ask for a window.",
+        "Read meta.json for the last brief timestamp; if none, ask for a window."
+      ]
+    },
+    {
+      "id": "brief-args",
+      "typed": "/corp-os-brief just the last two weeks",
+      "command": "/corp-os-brief",
+      "expect": "corp-os-brief",
+      "probes": "args",
+      "picks": [
+        "corp-os-brief",
+        "corp-os-brief",
+        "corp-os-brief"
+      ],
+      "rate": 1.0,
+      "firsts": [
+        "Read meta.json, then scan sources dated 2026-08-22 onward for movement.",
+        "Read meta.json, then scan sources for changes since 2026-08-22.",
+        "Read meta.json, then scan sources dated 2026-08-22 onward for movement."
+      ]
+    },
+    {
+      "id": "catchup-noargs",
+      "typed": "/corp-os-catchup",
+      "command": "/corp-os-catchup",
+      "expect": "corp-os-pull",
+      "probes": "noargs",
+      "picks": [
+        "corp-os-pull",
+        "corp-os-pull",
+        "corp-os-pull"
+      ],
+      "rate": 1.0,
+      "firsts": [
+        "Read each connected source's recorded cutoff, then pull everything since.",
+        "Read each connected source's recorded cutoff, then pull everything since.",
+        "Read each connected source's recorded cutoff, then pull everything since it."
+      ]
+    },
+    {
+      "id": "catchup-args",
+      "typed": "/corp-os-catchup just my meeting notes, since monday",
+      "command": "/corp-os-catchup",
+      "expect": "corp-os-pull",
+      "probes": "args",
+      "picks": [
+        "corp-os-pull",
+        "corp-os-pull",
+        "corp-os-pull"
+      ],
+      "rate": 1.0,
+      "firsts": [
+        "Pull only meeting-notes sources, window scoped to Monday forward.",
+        "Pull meeting-notes source only, from Monday 2026-08-31 to now.",
+        "Pull meeting notes only, from Monday 2026-08-31 forward, ignoring other sources' cutoffs."
+      ]
+    },
+    {
+      "id": "open-noargs",
+      "typed": "/corp-os-open",
+      "command": "/corp-os-open",
+      "expect": "corp-os-decide",
+      "probes": "noargs",
+      "picks": [
+        "corp-os-decide",
+        "corp-os-decide",
+        "corp-os-decide"
+      ],
+      "rate": 1.0,
+      "firsts": [
+        "Load the open decision forks and sort by past-due date first.",
+        "Load the open forks, sort past-due first, and identify each one's default-by-inaction winner.",
+        "Load open forks, sort past-due first, name what inaction is choosing."
+      ]
+    },
+    {
+      "id": "open-args",
+      "typed": "/corp-os-open the mid-market pricing one \u2014 who owns it and when does it stop being reversible",
+      "command": "/corp-os-open",
+      "expect": "corp-os-decide",
+      "probes": "args",
+      "picks": [
+        "corp-os-decide",
+        "corp-os-decide",
+        "corp-os-decide"
+      ],
+      "rate": 1.0,
+      "firsts": [
+        "Open the mid-market pricing fork's record; read owner, decide_by, and reversibility window.",
+        "Open the mid-market pricing fork's record; read owner, decide_by, and reversibility window.",
+        "Open the mid-market pricing fork's record; read owner, decide_by, and reversibility window."
+      ]
+    },
+    {
+      "id": "check-noargs",
+      "typed": "/corp-os-check",
+      "command": "/corp-os-check",
+      "expect": "corp-os-reality-check",
+      "probes": "noargs",
+      "picks": [
+        "corp-os-reality-check",
+        "corp-os-reality-check",
+        "corp-os-reality-check"
+      ],
+      "rate": 1.0,
+      "firsts": [
+        "Load the OS index and pull claims with the highest cost-of-being-wrong.",
+        "Load the OS index and pull claims by staleness, source, and dependency risk.",
+        "Load the OS index and pull the highest-cost claims into a first batch."
+      ]
+    },
+    {
+      "id": "check-args",
+      "typed": "/corp-os-check just the pricing claims",
+      "command": "/corp-os-check",
+      "expect": "corp-os-reality-check",
+      "probes": "args",
+      "picks": [
+        "corp-os-reality-check",
+        "corp-os-reality-check",
+        "corp-os-reality-check"
+      ],
+      "rate": 1.0,
+      "firsts": [
+        "Pull every pricing claim from the OS, ordered by cost of being wrong.",
+        "Filter the OS to pricing-related claims, then order by cost-if-wrong.",
+        "Pull every pricing claim from the OS, ordered by exposure, sourced separately from unsourced."
+      ]
+    },
+    {
+      "id": "share-args",
+      "typed": "/corp-os-share the renewal summary, going to our board advisor outside the company",
+      "command": "/corp-os-share",
+      "expect": "corp-os-redact",
+      "probes": "args",
+      "picks": [
+        "corp-os-redact",
+        "corp-os-redact",
+        "corp-os-redact"
+      ],
+      "rate": 1.0,
+      "firsts": [
+        "Set external threshold \u2014 board advisor is outside the company.",
+        "Locate the renewal summary, then redact to the external threshold \u2014 audience is outside the company.",
+        "Locate the renewal summary, then redact to the external threshold \u2014 audience is outside the company."
+      ]
+    },
+    {
+      "id": "share-noargs",
+      "typed": "/corp-os-share",
+      "command": "/corp-os-share",
+      "expect": "corp-os-redact",
+      "probes": "noargs",
+      "picks": [
+        "corp-os-redact",
+        "corp-os-redact",
+        "corp-os-redact"
+      ],
+      "rate": 1.0,
+      "firsts": [
+        "Ask who the audience is, since that sets the redaction threshold.",
+        "Ask who the audience is, since that sets the redaction threshold.",
+        "Ask who the audience is, since that sets the redaction threshold."
+      ]
+    },
+    {
+      "id": "picker-catchup",
+      "typed": "i've been out for a week and there's stuff piled up in my meeting notes tool",
+      "command": "",
+      "expect": "corp-os-pull",
+      "probes": "picker",
+      "picks": [
+        "corp-os-catchup",
+        "corp-os-catchup",
+        "corp-os-catchup"
+      ],
+      "rate": 1.0,
+      "firsts": [
+        "Find the connected meeting-notes source and pull everything new since last sync.",
+        "Pull the week's new meeting notes from the connected source and diff against the OS.",
+        "Pull new items from the connected meeting-notes source since their last catchup."
+      ]
+    },
+    {
+      "id": "picker-brief",
+      "typed": "it's monday morning, what changed and what needs me",
+      "command": "",
+      "expect": "corp-os-brief",
+      "probes": "picker",
+      "picks": [
+        "corp-os-brief",
+        "corp-os-brief",
+        "corp-os-brief"
+      ],
+      "rate": 1.0,
+      "firsts": [
+        "Locate their Corp-OS root and read the last brief's timestamp as the delta boundary.",
+        "Locate the OS, read its state, and diff against the last brief's timestamp.",
+        "Locate the Corp-OS root and read what changed since the last brief."
+      ]
+    },
+    {
+      "id": "picker-open",
+      "typed": "what am i sitting on that i keep not resolving",
+      "command": "",
+      "expect": "corp-os-decide",
+      "probes": "picker",
+      "picks": [
+        "corp-os-open",
+        "corp-os-open",
+        "corp-os-open"
+      ],
+      "rate": 1.0,
+      "firsts": [
+        "Pull open decisions, sort by age past date and who they're blocked on.",
+        "Pull open decisions, sort by age past date and who's blocking.",
+        "List open decisions, sorted by age past their date, flagging who each is blocked on."
+      ]
+    },
+    {
+      "id": "picker-check",
+      "typed": "how much of what's in here do you think is just wrong by now",
+      "command": "",
+      "expect": "corp-os-reality-check",
+      "probes": "picker",
+      "picks": [
+        "corp-os-check",
+        "corp-os-check",
+        "corp-os-check"
+      ],
+      "rate": 1.0,
+      "firsts": [
+        "Scan the OS for claims past their verify-by date or unverified.",
+        "Scan the OS for claims past their verify-by date or lacking any verification.",
+        "Scan the OS for aging, unverified, and contradicted entries, ranked by staleness."
+      ]
+    },
+    {
+      "id": "picker-share",
+      "typed": "i want to send this to someone outside the company without the comp stuff in it",
+      "command": "",
+      "expect": "corp-os-redact",
+      "probes": "picker",
+      "picks": [
+        "corp-os-share",
+        "corp-os-share",
+        "corp-os-share"
+      ],
+      "rate": 1.0,
+      "firsts": [
+        "Ask which document, then locate it and scan for comp-related content to redact.",
+        "Ask which document, then locate it and scan for comp-related content to strip.",
+        "Identify the source document, then find every compensation-related passage in it."
+      ]
+    },
+    {
+      "id": "picker-recall",
+      "typed": "what do we actually know about the northwind renewal",
+      "command": "",
+      "expect": "corp-os-recall",
+      "probes": "picker",
+      "picks": [
+        "corp-os-recall",
+        "corp-os-recall",
+        "corp-os-recall"
+      ],
+      "rate": 1.0,
+      "firsts": [
+        "Search the OS for every Northwind renewal claim, with dates and sources.",
+        "Search the OS for all Northwind renewal claims, with sources and dates attached.",
+        "Search the OS for every Northwind renewal claim, with dates and sources."
+      ]
+    },
+    {
+      "id": "picker-capture",
+      "typed": "here's a transcript, put it somewhere it won't get lost",
+      "command": "",
+      "expect": "corp-os-intake",
+      "probes": "picker",
+      "picks": [
+        "corp-os-capture",
+        "corp-os-capture",
+        "corp-os-capture"
+      ],
+      "rate": 1.0,
+      "firsts": [
+        "Read the transcript, identify the source and date, then file it.",
+        "Locate the transcript file and the Corp-OS root, then confirm what it is.",
+        "Locate the transcript they mean and confirm the target Corp-OS."
+      ]
+    }
+  ]
+}

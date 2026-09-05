@@ -1,0 +1,16 @@
+{
+  "created": "2026-06-01",
+  "claims": 4,
+  "open-items": 3,
+  "playbooks": 2,
+  "next_claim_id": 5,
+  "next_open_item_id": 4,
+  "cutoff": { "email": "2026-08-22" },
+  "confidence_ceilings": {
+    "legacy-migration-2026-06": { "ceiling": "reconstructed", "count": 2 }
+  },
+  "history": [
+    { "date": "2026-06-01", "event": "scaffolded from the register profile; jobs deliberately off" },
+    { "date": "2026-06-03", "event": "migrated 2 summaries from previous tool under a reconstructed ceiling" }
+  ]
+}

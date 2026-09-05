@@ -9,13 +9,15 @@ The claims layer is what separates a Corp-OS from a tagged archive. A claim is a
 
 Read the claim record section of `${CLAUDE_PLUGIN_ROOT}/reference/data-model.md` before writing anything.
 
-Read `config.json` first — it is the authority on this OS's layers, vocabulary, decay windows, retention policy, and gate strictness. Fall back to the shipped defaults only where it is silent, and speak the person's own labels back to them rather than this plugin's. A `claim` renamed `finding` is still a claim: same fields, same gate, the person's word.
-
 ## Pre-flight
 
 Confirm the OS is actually accessible right now — mounted, current, readable — not recalled from an earlier session. A stale export or a folder that did not mount produces confident output about files that do not exist. If it is not there, stop and ask.
 
 The files outrank memory. Where anything recalled conflicts with what is written in the OS, the files win and the memory gets corrected.
+
+Read `config.json` first — it is the authority on this OS's layers, vocabulary, decay windows, retention policy, and gate strictness. Fall back to the shipped defaults only where it is silent, and speak the person's own labels back to them rather than this plugin's.
+
+A `claim` renamed `finding` is still a claim: same fields, same gate, the person's word.
 
 ## Step 0 — scan
 
@@ -30,6 +32,7 @@ Common asks and what each means:
 - **"Process my queue"** — the unprocessed raw files in `INDEX.md`, oldest first. If the queue is long, work the files that serve open evidence lists first and say that is what you are doing.
 - **"Turn this into claims"** — the specific material just discussed.
 - **"What do we know about X"** — this is recall, not claims. Hand to `corp-os-recall`.
+- **A choice nobody has made yet** — a `decision` claim records a call that *was* made. A live fork belongs in the decision layer via `corp-os-decide`, because it needs an owner and a date, and a claim has neither. Filing one as a claim is how a fork goes quiet.
 
 ## Step 2 — extract candidates
 
@@ -56,6 +59,10 @@ Filing an assumption as a fact is the single most damaging error available here,
 - `reconstructed` — backfilled from a summary or from memory rather than a real source. Never promote to `confirmed` without a real citation appearing.
 - `disputed` — live evidence points both ways. Keep both citations visible; do not pick a winner to tidy the record.
 - `retired` — no longer true. Kept, never deleted, with what superseded it.
+
+**Sensitivity and bearing.** Two fields, not one, and they answer different questions. `sensitivity` is the export class — what must not leave. `bearing` is whether the OS can reason correctly without it: `incidental` if removing it makes an answer thinner, `load_bearing` if removing it makes an answer *wrong*.
+
+Set both at proposal time. **When bearing is genuinely unclear, write `load_bearing`** — a wrongly quarantined fact produces confidently wrong answers with nothing to signal the omission, while a wrongly retained one just gives `corp-os-redact` more to strip. Full reasoning in `${CLAUDE_PLUGIN_ROOT}/reference/data-model.md`; the short version is that sensitivity governs what leaves, not what the person is allowed to know.
 
 **Decay.** Ask "when would this need re-checking?" and write the interval. Pricing, headcount, org structure, roadmap, competitive positioning: 30 to 90 days. Someone's role or a customer's architecture: a year. A stated principle, a contract term, a fiscal calendar: `none`.
 
@@ -106,6 +113,16 @@ Statements can be sharpened, citations added, decay adjusted, jobs re-linked. Tw
 
 ## Every run ends with
 
+Close the run with `scripts/log_run.py` in the OS rather than editing the files by hand — it writes the `usage/log.md` row and the dated `meta.json` history entry in one call, and refuses a blank friction field:
+
+```bash
+python3 scripts/log_run.py --skill corp-os-claims --scope "<what this run covered>" \
+    --friction "<where it hurt, or 'none'>" \
+    --event "<what changed>"
+```
+
+These are the two writes measurement says get dropped, because they sit after the interesting work is done. A step that has to happen every time and that nothing else will catch belongs in code, not in a reminder.
+
 - Programmatic recount of claims and `next_claim_id`, cross-checked against actual header counts.
-- A `usage/log.md` row with real friction — "person could not tell whether three items were facts or assumptions" is exactly what `improve-corp-os` needs.
+- A `usage/log.md` row with real friction — "person could not tell whether three items were facts or assumptions" is exactly what `corp-os-improve` needs.
 - A summary: claims added, claims enriched, contradictions found, jobs moved, and how much of the queue is still waiting.

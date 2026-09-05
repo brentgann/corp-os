@@ -11,6 +11,14 @@ Say that out loud at the start. It changes how the person engages — from defen
 
 Read `${CLAUDE_PLUGIN_ROOT}/reference/os-audit-rubric.md` and `${CLAUDE_PLUGIN_ROOT}/reference/improvement-packet.md`.
 
+## Pre-flight
+
+Confirm their system is actually accessible right now — mounted, current, readable — not recalled from an earlier session. A stale export or a folder that did not mount produces confident output about files that do not exist. If it is not there, stop and ask.
+
+The files outrank memory, and here that matters twice over: an audit scored from what someone remembers about their own system is worth nothing. Where anything recalled conflicts with what is written, the files win.
+
+If what they hand over is a Corp-OS, read its `config.json` first and assess it against its own declared shape rather than the shipped defaults. A layer they disabled deliberately is not a missing layer.
+
 ## Step 0 — read their system on its own terms first
 
 Before applying any rubric, understand what they built and why. Read their own README, index, or entry point if one exists. Sample actual entries — a handful across different areas and dates, not just the newest. Note the vocabulary and conventions they use.

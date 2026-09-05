@@ -9,6 +9,14 @@ Produces two outputs, always: a cleaned copy safe to share, and a private log of
 
 Never modify the original in place. `raw/` in particular is append-only and must survive this untouched.
 
+## Pre-flight
+
+Confirm the OS is actually accessible right now — mounted, current, readable — not recalled from an earlier session. A stale export or a folder that did not mount produces confident output about files that do not exist. If it is not there, stop and ask.
+
+The files outrank memory. Where anything recalled conflicts with what is written in the OS, the files win and the memory gets corrected.
+
+Read `config.json` first — it is the authority on this OS's layers, vocabulary, decay windows, retention policy, and gate strictness. Fall back to the shipped defaults only where it is silent, and speak the person's own labels back to them rather than this plugin's.
+
 ## Step 0 — establish what is leaving, and to whom
 
 The audience determines the threshold. Ask if it is not stated:
@@ -20,7 +28,19 @@ The audience determines the threshold. Ask if it is not stated:
 
 If the person will not say the audience, use the external threshold and say that is what you did.
 
-## Step 1 — sweep for the categories
+## Step 1 — keep the removal list as you go
+
+Keep a running list of removals as you sweep — category, location, action, original, replacement, reason — one entry per decision, written down while you are already thinking about it.
+
+You will not hand-write either output file. `scripts/write_export.py` in the OS writes both, and **it refuses to write the cleaned copy without the log.** That refusal is the point. Measured across five runs, the log was the thing that went missing or came out under four different names, while the instruction to write it was present, concrete, and explained the whole time. Past a certain point more instruction stops buying reliability, and the answer is to take the step out of the model's hands — the same move `build_index.py` makes for the index.
+
+`usage/` is outside the scan path, so neither file loads on every scan or needs declaring as a layer.
+
+This ordering is the whole point. Written up at the end, the log is the thing that gets dropped — measured against a fixture it went missing in every run, because by then the judgment is done and it feels like paperwork. Written as you go, there is nothing left to remember: the log accumulates while you are already thinking about each decision, which is also when the reasoning is sharpest and cheapest to record.
+
+The log holds the sensitive material by design. It stays local, never travels with the cleaned copy, and never gets published.
+
+## Step 2 — sweep for the categories
 
 Work all of these, not just the obvious ones:
 
@@ -34,7 +54,9 @@ Work all of these, not just the obvious ones:
 
 Then check the OS's own `sensitivity` flags and `sensitive.md`. Anything marked `sensitive` gets pulled by default, but do not rely on the flags alone — the sweep must run on content, because flags are applied by fallible judgment at capture time.
 
-## Step 2 — prefer generalizing to deleting
+**`bearing` changes nothing here.** A `load_bearing` entry sits in the scan path precisely so the person can reason with it; that is an argument about their own OS and none at all about what may leave it. If anything, load-bearing sensitive material is the most dangerous kind at an export boundary — it is load-bearing because it changes conclusions, which is exactly why someone outside would find it interesting. Redaction is the only place confidentiality is enforced, so a sensitive entry that reached the scan path legitimately must still be generalized or removed on the way out.
+
+## Step 3 — prefer generalizing to deleting
 
 A hole in a document destroys its usefulness; a generalization usually preserves the point.
 
@@ -46,11 +68,13 @@ Credentials are the exception: remove, never generalize.
 
 When generalizing would make a claim meaningless, remove it and say in the log that removal was necessary rather than pretending the cleaned version is complete.
 
-## Step 3 — quarantine at the source, not just at the exit
+## Step 4 — quarantine at the source, not just at the exit
 
 Redacting on the way out is necessary and not sufficient. A `sensitive` entry sitting inline in a topic file still loads on every scan, still gets read over a shoulder, and still travels the next time that file is shared by someone who did not run this skill.
 
-When the sweep finds sensitive content living inline in the derived layer, propose moving it to `sensitive.md` — the quarantine file deliberately outside the scan path — leaving a one-line pointer behind so continuity is not lost:
+When the sweep finds sensitive content living inline in the derived layer, ask first whether it is `incidental` or `load_bearing` — see the two-axis model in `${CLAUDE_PLUGIN_ROOT}/reference/data-model.md`. Only `incidental` material gets quarantined. Moving a `load_bearing` entry out of the scan path does not protect anything (redaction already does that) and it makes every later answer wrong in a way nobody can see, which is the failure this model exists to prevent.
+
+For `incidental` material, propose moving it to `sensitive.md` — the quarantine file deliberately outside the scan path — leaving a one-line pointer behind so continuity is not lost:
 
 > Personnel context on this exists — see `sensitive.md`.
 
@@ -58,21 +82,29 @@ Captured, never suppressed. The aim is that content nobody needs for the daily j
 
 Quarantine migrations are derived-layer writes: propose, confirm, then move. And treat a deferred migration as debt with a date, not a standing note — "migrate the next time this file is touched" is a TODO with no forcing function, and it will still be pending three months later.
 
-## Step 4 — log reclassifications as decisions, not edits
+## Step 5 — log reclassifications as decisions, not edits
 
 Sensitivity judgments get revised, in both directions. An over-cautious `sensitive` flag turns out to be ordinary business signal; something filed as `internal` turns out to touch a person.
 
 Record the change and its reasoning as an entry, never as a silent edit. The next reader — including a future rebuild — needs to see that a flag was *reviewed and downgraded against the schema's actual definition*, not that it was never applied. This is provenance for the classification, distinct from provenance for the content, and systems that skip it develop a slow invisible drift in what their own labels mean.
 
-## Step 5 — check what remains for re-identification
+## Step 6 — check what remains for re-identification
 
 The step that is almost always skipped. Individually clean details can identify someone in combination: a role plus a team plus a date plus a decision often names exactly one person. Read the cleaned copy as an outsider with organizational context would, and generalize further where the combination gives it away.
 
-## Step 6 — write both outputs
+## Step 7 — write both outputs
 
-**The cleaned copy** — to the session output folder or wherever the person is sending it from, clearly named as the cleaned version. Add a one-line header noting it has been redacted and pointing at the log, so nobody downstream mistakes it for complete.
+Call the script with a spec — `slug`, `audience`, `cleaned`, and `removals`:
 
-**The log** — private and local, in the OS folder (`usage/redaction-log-<date>.md`), never published, never shared alongside the cleaned copy:
+```bash
+python3 scripts/write_export.py spec.json --os-root .
+```
+
+It writes `usage/exports/<date>--<slug>--<audience>.md` with a header saying it is redacted and where the log lives, and `usage/exports/<date>--<slug>--redaction-log.md` beside it. Pass `removals: []` when the sweep genuinely found nothing — an empty log and an absent log mean different things, and the script will not accept the field missing. Copy the cleaned file wherever the person is sending it from; the OS keeps its own record either way.
+
+**The cleaned copy**
+
+**The log** — written by the same call, never separately. Its shape, for reference when reading one back:
 
 ```markdown
 ## Removal 3
@@ -86,7 +118,7 @@ The step that is almost always skipped. Individually clean details can identify 
 
 The log contains the sensitive material by design. State plainly that it stays local.
 
-## Step 7 — report and hand the decision back
+## Step 8 — report and hand the decision back
 
 Say what was removed by category and count, name anything that was a genuine judgment call, and state what could not be cleaned without losing the point.
 
@@ -96,4 +128,15 @@ If asked to redact something so that a third party will take it as complete or a
 
 ## Every run ends with
 
-A `usage/log.md` row noting a redaction ran and for what audience — never the removed content itself.
+Close the run with `scripts/log_run.py` in the OS rather than editing the files by hand — it writes the `usage/log.md` row and the dated `meta.json` history entry in one call, and refuses a blank friction field:
+
+```bash
+python3 scripts/log_run.py --skill corp-os-redact --scope "<what this run covered>" \
+    --friction "<where it hurt, or 'none'>" \
+    --event "<what changed>"
+```
+
+These are the two writes measurement says get dropped, because they sit after the interesting work is done. A step that has to happen every time and that nothing else will catch belongs in code, not in a reminder.
+
+- **Both files on disk**, as the script reports them. If it errored, nothing was written — fix the spec and call it again rather than writing either file by hand.
+- A `usage/log.md` row noting a redaction ran and for what audience — never the removed content itself.

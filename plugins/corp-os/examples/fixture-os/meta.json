@@ -1,0 +1,24 @@
+{
+  "created": "2026-07-01",
+  "jobs": 2,
+  "claims": 4,
+  "decisions": 2,
+  "next_job_id": 3,
+  "next_claim_id": 5,
+  "next_decision_id": 3,
+  "cutoff": {
+    "meeting-notes": "2026-08-20",
+    "chat": "2026-08-18"
+  },
+  "confidence_ceilings": {},
+  "history": [
+    {
+      "date": "2026-07-01",
+      "event": "scaffolded by corp-os-setup"
+    },
+    {
+      "date": "2026-08-20",
+      "event": "pull: 2 sources, 3 raw files"
+    }
+  ]
+}

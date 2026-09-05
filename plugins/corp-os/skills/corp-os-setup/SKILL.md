@@ -9,9 +9,19 @@ Interrogate first, scaffold second. The interrogation is the deliverable as much
 
 Read `${CLAUDE_PLUGIN_ROOT}/reference/data-model.md` and `${CLAUDE_PLUGIN_ROOT}/reference/interrogation.md` before starting. Read `${CLAUDE_PLUGIN_ROOT}/reference/jtbd-patterns.md` when working on jobs in area 3.
 
+## Pre-flight
+
+Confirm the OS is actually accessible right now — mounted, current, readable — not recalled from an earlier session. A stale export or a folder that did not mount produces confident output about files that do not exist. If it is not there, stop and ask.
+
+The files outrank memory. Where anything recalled conflicts with what is written in the OS, the files win and the memory gets corrected.
+
+Read `config.json` first — it is the authority on this OS's layers, vocabulary, decay windows, retention policy, and gate strictness. Fall back to the shipped defaults only where it is silent, and speak the person's own labels back to them rather than this plugin's.
+
 ## Step 0 — check nothing already exists
 
-Look for an existing Corp-OS root (`INDEX.md` + `meta.json` + `jobs/`) wherever the person means. If one exists, stop and say so — this skill does not re-scaffold over a live OS. Offer `corp-os-jobs` to add jobs, `improve-corp-os` to reshape structure, or `corp-os-rebuild` to re-derive.
+Look for an existing Corp-OS root — `INDEX.md` + `meta.json`, with `config.json` beside them as confirmation — wherever the person means. If one exists, stop and say so: this skill does not re-scaffold over a live OS. Offer `corp-os-jobs` to add jobs, `corp-os-configure` to reshape structure, or `corp-os-rebuild` to re-derive.
+
+**Never make the presence of `jobs/`, `claims/`, or any other layer part of that test.** Those layers are optional by design, and a `jobs`-disabled OS that reads as "no OS" is one confirmation away from being overwritten — the only path in this suite that destroys a working system.
 
 If a knowledge system exists but is not corp-os-shaped, offer `corp-os-audit` instead of converting it unasked.
 
@@ -40,11 +50,20 @@ Create the mandatory core: `raw/README.md`, `INDEX.md`, `meta.json`, `profile.md
 
 Create `proposals/` alongside them — the review gate writes there, so it is not optional.
 
-Then create only the optional layers they asked for: `claims/`, `people/`, `topics/`, `glossary.md`, `company/`, `connectors.md`, `design.md`, `dashboards/registry.md`.
+Then create only the optional layers they asked for: `claims/`, `glossary.md`, `company/`, `connectors.md`, `design.md`, `dashboards/registry.md`.
+
+**Do not scaffold a layer you cannot write a schema for.** A person layer, a topic layer, anything the interrogation turned up that the shipped model has no name for — each is a declared layer with its own `entry_schema` and `index_line`, or it is not created. A folder that exists, appears in `INDEX.md`, and has no stated record shape fills with whatever the first session to touch it invented. If area 4 called for one, write the declaration now per `${CLAUDE_PLUGIN_ROOT}/reference/configuration.md`; the `relationship` profile carries a worked `people` declaration to copy.
+
+Sensitivity is two fields, not one — `sensitivity` for what must not leave, `bearing` for whether the OS can reason correctly without it. Say that plainly in area 9 if anything sensitive comes up, because the person's instinct will be that sensitive means hidden, and hiding load-bearing material from its own owner is what makes an OS quietly wrong.
 
 If area 9 turned up anything sensitive, create `sensitive.md` now and write into `INDEX.md` that it exists but is deliberately **not** linked from the scan path. A quarantine file added after the fact means retrofitting content out of files it has already been scanned and shared from.
 
-Copy `${CLAUDE_PLUGIN_ROOT}/scripts/build_index.py` into the OS's `scripts/`, and tell the person what it is for: a thirty-second deterministic recount they can run after any manual edit. It reads nothing from `raw/` and retags nothing, which is what makes it safe.
+Copy both shipped scripts into the OS's `scripts/`:
+
+- `${CLAUDE_PLUGIN_ROOT}/scripts/build_index.py` — a thirty-second deterministic recount they can run after any manual edit. It reads nothing from `raw/` and retags nothing, which is what makes it safe.
+- `${CLAUDE_PLUGIN_ROOT}/scripts/write_export.py` — writes a redaction's cleaned copy and its private log together, and refuses to write one without the other.
+
+Both exist for the same reason: a step that has to happen every time, that nothing else will catch if it is skipped, belongs in code rather than in an instruction.
 
 Use the shapes in `data-model.md` exactly for frontmatter and field names — every other skill in this suite depends on finding them where the spec says. Adapt prose and section wording to the person's own vocabulary.
 
@@ -93,6 +112,6 @@ Follow `${CLAUDE_PLUGIN_ROOT}/reference/dashboard-patterns.md` and hand off the 
 
 Verify programmatically: every file the spec calls for exists, every job in `jobs/` appears in `jobs/INDEX.md` with a one-liner, counts in `meta.json` and `INDEX.md` match an actual count.
 
-Append the setup row to `usage/log.md`.
+Close the run with the script you just copied in — `python3 scripts/log_run.py --skill corp-os-setup --scope "<the shape they chose>" --friction "<where the interrogation stalled>" --event "scaffolded from the <profile> profile"`. It writes the log row and the history entry together. Using it here also shows the person the tool exists, on the one run where they are watching.
 
 Then name **one** next action and offer to do it — pulling from their highest-value connector, or adding the meeting notes from this week. Do not leave someone with an empty, well-organized folder and a list of options.

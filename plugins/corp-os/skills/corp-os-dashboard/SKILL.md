@@ -9,6 +9,14 @@ Renders what the OS holds. The governing rule: **never render what the OS does n
 
 Read `${CLAUDE_PLUGIN_ROOT}/reference/dashboard-patterns.md` before building.
 
+## Pre-flight
+
+Confirm the OS is actually accessible right now — mounted, current, readable — not recalled from an earlier session. A stale export or a folder that did not mount produces confident output about files that do not exist. If it is not there, stop and ask.
+
+The files outrank memory. Where anything recalled conflicts with what is written in the OS, the files win and the memory gets corrected.
+
+Read `config.json` first — it is the authority on this OS's layers, vocabulary, decay windows, retention policy, and gate strictness. Fall back to the shipped defaults only where it is silent, and speak the person's own labels back to them rather than this plugin's.
+
 ## Step 0 — scan, and check the registry first
 
 Read `config.json` first — its `layers` block says what exists to render, `design` says what governs the look, and `dashboards.default_target` says whether output persists as an artifact or as a local file. Then `INDEX.md`, `jobs/INDEX.md`, `claims/INDEX.md`, `connectors.md`, and `dashboards/registry.md`.
@@ -77,7 +85,19 @@ If the person framed this as a one-off look — "just show me what it'd look lik
 
 A dashboard nobody refreshes is a snapshot. Offer to schedule the refresh at the cadence in the registry, and offer `corp-os-brief` for the narrative version — the two work together, and the brief is what actually gets read on a Monday morning.
 
+Schedule it per `${CLAUDE_PLUGIN_ROOT}/reference/scheduling.md`; a refresh that silently stopped running is worse than no refresh, because the dashboard still looks current.
+
 ## Every run ends with
+
+Close the run with `scripts/log_run.py` in the OS rather than editing the files by hand — it writes the `usage/log.md` row and the dated `meta.json` history entry in one call, and refuses a blank friction field:
+
+```bash
+python3 scripts/log_run.py --skill corp-os-dashboard --scope "<what this run covered>" \
+    --friction "<where it hurt, or 'none'>" \
+    --event "<what changed>"
+```
+
+These are the two writes measurement says get dropped, because they sit after the interesting work is done. A step that has to happen every time and that nothing else will catch belongs in code, not in a reminder.
 
 - Registry updated.
 - A `usage/log.md` row.

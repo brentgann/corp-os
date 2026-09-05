@@ -1,6 +1,6 @@
 # Improvement packet
 
-The interchange format for improving the Corp-OS model itself. Produced by `improve-corp-os` (from one person's own usage) and by `corp-os-audit` (from studying someone else's system). Consumed by whoever maintains this plugin.
+The interchange format for improving the Corp-OS model itself. Produced by `corp-os-improve` (from one person's own usage) and by `corp-os-audit` (from studying someone else's system). Consumed by whoever maintains this plugin.
 
 The point of a shared format is that improvements can travel without the OS contents traveling with them. A packet describes *structure and friction*, never the person's actual claims, people, or company data.
 
@@ -12,7 +12,7 @@ Write to `usage/improvement-packet-<YYYY-MM-DD>.md` in the OS folder, or to the 
 # corp-os improvement packet — <YYYY-MM-DD>
 
 ## Origin
-- **Produced by**: improve-corp-os | corp-os-audit
+- **Produced by**: corp-os-improve | corp-os-audit
 - **Operator role shape**: decision-heavy | relationship-heavy | build-heavy | operate-heavy | orientation
   (role *shape*, not job title — this is what makes the packet generalizable)
 - **OS age**: 4 months

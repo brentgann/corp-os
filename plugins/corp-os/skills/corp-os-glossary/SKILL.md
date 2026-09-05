@@ -9,6 +9,14 @@ The fastest-paying part of a work OS, and the most neglected. Every organization
 
 The glossary is also what makes the rest of the OS portable across roles. This suite ships no domain vocabulary on purpose — the terms come entirely from the person's own captured material.
 
+## Pre-flight
+
+Confirm the OS is actually accessible right now — mounted, current, readable — not recalled from an earlier session. A stale export or a folder that did not mount produces confident output about files that do not exist. If it is not there, stop and ask.
+
+The files outrank memory. Where anything recalled conflicts with what is written in the OS, the files win and the memory gets corrected.
+
+Read `config.json` first — it is the authority on this OS's layers, vocabulary, decay windows, retention policy, and gate strictness. Fall back to the shipped defaults only where it is silent, and speak the person's own labels back to them rather than this plugin's.
+
 ## Step 0 — scan
 
 Read `config.json`, the OS `README.md`, `INDEX.md`, and the existing glossary. If `layers.glossary` is disabled, offer to enable it via `corp-os-configure` and explain what it is for. Do not enable it unasked.
@@ -78,6 +86,16 @@ A glossary is not a standalone artifact. Two links to maintain:
 - When a job's evidence list contains "figure out what X actually means," resolving the term answers the job. Strike it from the evidence list in the same pass.
 
 ## Every run ends with
+
+Close the run with `scripts/log_run.py` in the OS rather than editing the files by hand — it writes the `usage/log.md` row and the dated `meta.json` history entry in one call, and refuses a blank friction field:
+
+```bash
+python3 scripts/log_run.py --skill corp-os-glossary --scope "<what this run covered>" \
+    --friction "<where it hurt, or 'none'>" \
+    --event "<what changed>"
+```
+
+These are the two writes measurement says get dropped, because they sit after the interesting work is done. A step that has to happen every time and that nothing else will catch belongs in code, not in a reminder.
 
 - Recounted term count in `meta.json`, verified against actual entries.
 - A `usage/log.md` row.

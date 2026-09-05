@@ -1,5 +1,5 @@
 {
-  "corpos_version": "0.3.0",
+  "corpos_version": "0.6.0",
   "profile": "custom",
   "vocabulary": {
     "claim": "entry",
@@ -49,7 +49,7 @@
       "enabled": true,
       "role": "derived",
       "gated": true,
-      "index_line": "{role} \u00b7 {tier} \u00b7 {status}",
+      "index_line": "{role} · {tier} · {status}",
       "fields": [
         "name",
         "role",
@@ -63,13 +63,13 @@
       "enabled": true,
       "role": "derived",
       "gated": true,
-      "index_line": "{name} \u2014 {tags}"
+      "index_line": "{name} — {tags}"
     },
     "insights": {
       "enabled": true,
       "role": "derived",
       "gated": true,
-      "index_line": "{title} \u2014 {timing}",
+      "index_line": "{title} — {timing}",
       "promotion_bar": "5I: informative AND instructive AND insightful AND immediate. All four, or it stays a topic entry.",
       "label_field": "title"
     },

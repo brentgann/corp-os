@@ -9,6 +9,14 @@ Most real context does not arrive through an API. Someone pastes a thread, forwa
 
 Read `${CLAUDE_PLUGIN_ROOT}/reference/data-model.md` for the raw file shape and the two-layer rule.
 
+## Pre-flight
+
+Confirm the OS is actually accessible right now — mounted, current, readable — not recalled from an earlier session. A stale export or a folder that did not mount produces confident output about files that do not exist. If it is not there, stop and ask.
+
+The files outrank memory. Where anything recalled conflicts with what is written in the OS, the files win and the memory gets corrected.
+
+Read `config.json` first — it is the authority on this OS's layers, vocabulary, decay windows, retention policy, and gate strictness. Fall back to the shipped defaults only where it is silent, and speak the person's own labels back to them rather than this plugin's.
+
 ## Step 0 — scan
 
 Read the OS `README.md` (for its actual conventions, which may differ from the shipped spec), `INDEX.md`, and `jobs/INDEX.md`. Check a couple of recent raw files to match the frontmatter and tag vocabulary in use.
@@ -52,9 +60,13 @@ Job tags: infer from the open evidence lists in `jobs/`. Empty is acceptable.
 
 ## Step 4 — update the index, unconditionally
 
-Add the file to `INDEX.md`'s unprocessed queue with a one-line gist. Recount `meta.json`. Add a dated history entry.
+Run `scripts/build_index.py` in the OS. It reads `processed: false` off the frontmatter you just wrote and renders the queue entry itself, which is why the file needs that flag set correctly more than it needs a hand-written line. If the OS has no copy of the script, add the queue entry and the count by hand instead.
 
-This happens in the same pass as the write, regardless of what happens with claims. Reporting the addition only in chat is not finishing the job.
+Then **open `INDEX.md` and confirm the new file is actually in it.** Not a formality: measured against a fixture, this is the step this skill drops. The raw file gets written, `meta.json` gets recounted, the proposal gets filed, the log row gets appended — and the index entry is missing, because by that point the interesting work is done and the bookkeeping feels finished. A file that exists and is not in its index is invisible to every later run's scan, so the person's queue silently under-reports and the material they handed over never resurfaces.
+
+Add a dated `meta.json` history entry.
+
+All of this happens in the same pass as the write, regardless of what happens with claims. Reporting the addition only in chat is not finishing the job.
 
 ## Step 5 — propose claims
 
@@ -78,5 +90,16 @@ Write confirmed claims, flip `processed: true`, update affected job evidence lis
 
 ## Every run ends with
 
+Close the run with `scripts/log_run.py` in the OS rather than editing the files by hand — it writes the `usage/log.md` row and the dated `meta.json` history entry in one call, and refuses a blank friction field:
+
+```bash
+python3 scripts/log_run.py --skill corp-os-intake --scope "<what this run covered>" \
+    --friction "<where it hurt, or 'none'>" \
+    --event "<what changed>"
+```
+
+These are the two writes measurement says get dropped, because they sit after the interesting work is done. A step that has to happen every time and that nothing else will catch belongs in code, not in a reminder.
+
+- **`INDEX.md` re-read and the new file confirmed present in it.** Check it rather than assuming it; see Step 4.
 - A `usage/log.md` row with the honest friction.
 - What was added, how it was typed and tagged, which jobs it touched, and the one thing worth doing next.

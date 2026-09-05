@@ -11,7 +11,13 @@ Read `${CLAUDE_PLUGIN_ROOT}/reference/configuration.md` before touching anything
 
 ## Pre-flight
 
-Confirm the OS is accessible right now, not recalled. Read its `config.json`, `README.md`, `meta.json`, and enough of the affected layers to know what a change would actually hit. If there is no `config.json`, this OS is running on shipped defaults — write one reflecting its *current* actual state first, then make the requested change on top. Never write a config that describes a shape the OS is not already in.
+Confirm the OS is actually accessible right now — mounted, current, readable — not recalled from an earlier session. A stale export or a folder that did not mount produces confident output about files that do not exist. If it is not there, stop and ask.
+
+The files outrank memory. Where anything recalled conflicts with what is written in the OS, the files win and the memory gets corrected.
+
+Read `config.json` first — it is the authority on this OS's layers, vocabulary, decay windows, retention policy, and gate strictness. Fall back to the shipped defaults only where it is silent, and speak the person's own labels back to them rather than this plugin's.
+
+Read the OS's `README.md`, `meta.json`, and enough of the affected layers to know what a change would actually hit. If there is no `config.json`, this OS is running on shipped defaults — write one reflecting its *current* actual state first, then make the requested change on top. Never write a config that describes a shape the OS is not already in.
 
 ## Step 1 — separate the safe changes from the migrations
 
@@ -59,17 +65,22 @@ When someone asks to expire raw material, find out what is actually wrong first.
 
 Reach for `delete` only when there is a real obligation: a retention schedule, an NDA clause, a customer's deletion right, a regulatory requirement. `reason` is required and should name the obligation. "Housekeeping" is not a reason to destroy source material.
 
-### If it is `delete`, this is a claim-integrity event
+### If it is `delete`, run the script
 
-Not file management. Run it in this order, and say so out loud:
+Not file management, and not something to carry out by hand. `scripts/delete_source.py` in the OS does the whole sequence in the order that cannot be got wrong:
 
-1. **Find every claim citing the affected files.** All of them, across every layer. Report the count before proceeding.
-2. **Re-cite each to `no source`** and **lower its confidence** — `confirmed` drops to `reconstructed` at best, because the thing that made it confirmable is being destroyed. Record the reason and date on each.
-3. **Add a cohort ceiling** in `config.json` so no later pass promotes them back.
-4. **Log it** in `meta.json`: what was deleted, under what obligation, how many claims were affected.
-5. **Then** remove the files.
+```bash
+python3 scripts/delete_source.py --dry-run <paths> --os-root .
+python3 scripts/delete_source.py --apply <paths> --reason "<the obligation>" --os-root .
+```
 
-Skipping steps 1 and 2 leaves claims citing files that do not exist — worse than `no source`, because they still look sourced and nothing downstream can detect the difference.
+It finds every entry citing the file and reports the count; re-cites each to `no source` and drops `confirmed` to `reconstructed`, scoped to the citing entry rather than the whole file; records a cohort ceiling in `config.json` so no later pass promotes them back; logs what is being destroyed and under what obligation in `meta.json`; then writes a tombstone beside the original and unlinks it.
+
+**Always run `--dry-run` first and show the person the count**, because that is the decision: "this destroys the source behind 14 entries, all of which drop to `no source`" is something someone can weigh. "This will delete some files" is not.
+
+`--apply` refuses without `--reason`, and the reason should name the obligation — a clause, a retention schedule, a customer's deletion right. Measured, the hand-run sequence wrote the tombstone by editing the original file two times in three: an edit to a raw file, which is the one operation `raw/` never permits and the one whose failure destroys source material. That is why it is a script.
+
+Afterwards, run `scripts/build_index.py` to recount.
 
 Set `measure_from` to `frontmatter_date`, never filesystem mtime. A sync or a restore from backup changes mtime on everything at once, which would trip or reset every TTL in the corpus simultaneously.
 
@@ -88,6 +99,16 @@ Write `config.json`, update the OS's `README.md` to match, add a dated `meta.jso
 Then run `build_index.py` and report any drift the change introduced.
 
 ## Every run ends with
+
+Close the run with `scripts/log_run.py` in the OS rather than editing the files by hand — it writes the `usage/log.md` row and the dated `meta.json` history entry in one call, and refuses a blank friction field:
+
+```bash
+python3 scripts/log_run.py --skill corp-os-configure --scope "<what this run covered>" \
+    --friction "<where it hurt, or 'none'>" \
+    --event "<what changed>"
+```
+
+These are the two writes measurement says get dropped, because they sit after the interesting work is done. A step that has to happen every time and that nothing else will catch belongs in code, not in a reminder.
 
 - A `usage/log.md` row.
 - A plain statement of what changed, what it will do the next time each affected skill runs, and — for a migration — exactly how many entries were touched.

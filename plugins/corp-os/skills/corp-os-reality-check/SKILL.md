@@ -9,13 +9,21 @@ Every personal knowledge system degrades the same way: not by being wrong at the
 
 Read the claim record section of `${CLAUDE_PLUGIN_ROOT}/reference/data-model.md`.
 
-Read `config.json` first. `decay.by_kind` and `decay.by_tag` determine what is overdue — not a shipped 90 days. If `decay.enabled` is false, this OS deliberately opted out: say the decay bucket has nothing to work from, offer the buckets that do not depend on it (contradictions, unverified, orphans, identities, cohort escapes), and mention that enabling decay is one `corp-os-configure` run away.
+## Pre-flight
+
+Confirm the OS is actually accessible right now — mounted, current, readable — not recalled from an earlier session. A stale export or a folder that did not mount produces confident output about files that do not exist. If it is not there, stop and ask.
+
+The files outrank memory. Where anything recalled conflicts with what is written in the OS, the files win and the memory gets corrected.
+
+Read `config.json` first — it is the authority on this OS's layers, vocabulary, decay windows, retention policy, and gate strictness. Fall back to the shipped defaults only where it is silent, and speak the person's own labels back to them rather than this plugin's.
+
+`decay.by_kind` and `decay.by_tag` determine what is overdue — not a shipped 90 days. If `decay.enabled` is false, this OS deliberately opted out: say the decay bucket has nothing to work from, offer the buckets that do not depend on it (contradictions, unverified, orphans, identities, cohort escapes), and mention that enabling decay is one `corp-os-configure` run away.
 
 ## Step 0 — scan and triage
 
 Read `INDEX.md`, `jobs/INDEX.md`, `claims/INDEX.md`, and enough of `claims/` to evaluate the fields. Do not load `raw/` except to re-read a specific citation under dispute.
 
-Build the worklist in five buckets:
+Build the worklist in eight buckets:
 
 1. **Past decay** — `Verified` date plus `Decay` window is in the past. Honor `decay.applies_to`: under the default `sourced`, only entries with a retrievable citation belong in this bucket.
 2. **Unsourced, awaiting disposition** — entries whose citation is `no source`. These are **not** decay candidates and must not be mixed into bucket 1: nothing can ever re-confirm them, so carrying them as overdue produces a permanently unresolvable backlog, and a sweep that always ends in failure is a sweep people stop running. Handle them as a **one-time disposition pass** instead — keep as an `assumption` with the person as its source, retire, or backfill a real source — and then stop carrying them. Report the size of this bucket separately, since on a migrated corpus it is often a third of everything.
@@ -63,6 +71,7 @@ Per resolved item:
 - Reality changed → old claim `retired`, new claim created via the `corp-os-claims` shape, linked both ways.
 - Still genuinely contested → `disputed`, both citations retained.
 - Re-typed → kind changed, with a note of the change and why.
+- Reclassified on `bearing` → **logged as a decision, and act on it.** Promoting `incidental` to `load_bearing` means moving the entry back out of `sensitive.md` into its normal layer; demoting does the reverse. The flag and the placement have to agree, or the next scan gets a different answer than the schema says it should. Watch for the specific case worth catching: an entry in `sensitive.md` that other claims or an active job clearly depend on. That is a fact the OS has been reasoning without, and it is the sensitivity equivalent of an assumption load-bearing on an active job.
 - Reclassified on sensitivity → **logged as a decision, not an edit.** A `sensitive` flag downgraded because the content turned out to be business signal rather than personnel signal is a judgment about how the schema applies, and the next reader needs to see it was reviewed rather than assume it was never flagged. Same in reverse.
 - Identity resolved → record the resolution *and* every place it propagated, including any sensitivity change that follows. "Both names refer to one person; corrected in two topic files and one person file; also downgraded from sensitive to internal, because the departure turned out to be from a role rather than the organization."
 
@@ -80,9 +89,19 @@ If a job's supporting claims mostly failed the check, say so directly. A job run
 
 End with a plain assessment: how many claims were checked, how many held, how many were retired, how many contradictions were found, and which active jobs are now running on weaker evidence than they appeared to be.
 
-Then set the next sweep. Recurring is better than heroic — offer to schedule a small regular pass over the past-decay bucket. A sweep that happens monthly and resolves ten items keeps an OS honest; one that happens once a year and resolves two hundred is an event nobody repeats.
+Then set the next sweep. Recurring is better than heroic — offer to schedule a small regular pass over the past-decay bucket, per `${CLAUDE_PLUGIN_ROOT}/reference/scheduling.md`. A sweep that happens monthly and resolves ten items keeps an OS honest; one that happens once a year and resolves two hundred is an event nobody repeats.
 
 ## Every run ends with
 
+Close the run with `scripts/log_run.py` in the OS rather than editing the files by hand — it writes the `usage/log.md` row and the dated `meta.json` history entry in one call, and refuses a blank friction field:
+
+```bash
+python3 scripts/log_run.py --skill corp-os-reality-check --scope "<what this run covered>" \
+    --friction "<where it hurt, or 'none'>" \
+    --event "<what changed>"
+```
+
+These are the two writes measurement says get dropped, because they sit after the interesting work is done. A step that has to happen every time and that nothing else will catch belongs in code, not in a reminder.
+
 - Recounted `meta.json` and a dated `history` entry describing the sweep's outcome.
-- A `usage/log.md` row. If a whole category kept coming up — "every pricing claim was past decay" — that friction points at a decay window set wrong at capture time, which is a model problem worth handing to `improve-corp-os`.
+- A `usage/log.md` row. If a whole category kept coming up — "every pricing claim was past decay" — that friction points at a decay window set wrong at capture time, which is a model problem worth handing to `corp-os-improve`.

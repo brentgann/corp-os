@@ -20,3 +20,23 @@ venv/
 **/sensitive.md
 **/usage/log.md
 **/proposals/
+
+# validator denylist -- names the leakage check greps for
+.validate-denylist
+
+# eval stage/result tarballs
+dist/*.tgz
+
+# ...but the fixtures are the exception, and it matters. They are synthetic --
+# invented names, invented companies -- and validate.py EXECUTES build_index.py
+# against them. A clone whose fixture is missing its raw/ or usage/ does not
+# have a smaller fixture, it has a broken build, and the failure only shows up
+# on someone else's machine. Git cannot re-include a file under an excluded
+# directory, so the directories are un-ignored first.
+!plugins/corp-os/examples/fixture-*/raw/
+!plugins/corp-os/examples/fixture-*/raw/**
+!plugins/corp-os/examples/fixture-*/proposals/
+!plugins/corp-os/examples/fixture-*/proposals/**
+!plugins/corp-os/examples/fixture-*/usage/
+!plugins/corp-os/examples/fixture-*/usage/**
+!plugins/corp-os/examples/fixture-*/sensitive.md

@@ -1,0 +1,126 @@
+{
+  "corpos_version": "0.8.0",
+  "profile": "register",
+  "vocabulary": {
+    "claim": "entry",
+    "confidence": [
+      "confirmed",
+      "needs_review",
+      "reconstructed",
+      "disputed",
+      "retired"
+    ],
+    "sensitivity": [
+      "internal",
+      "sensitive"
+    ],
+    "tags": [
+      "Ops",
+      "Vendor",
+      "Compliance"
+    ],
+    "urgency": [
+      "now",
+      "soon",
+      "watching",
+      "resolved"
+    ]
+  },
+  "layers": {
+    "raw": {
+      "enabled": true,
+      "role": "source",
+      "path": "raw/"
+    },
+    "jobs": {
+      "enabled": false
+    },
+    "claims": {
+      "enabled": true,
+      "role": "derived",
+      "path": "entries/"
+    },
+    "proposals": {
+      "enabled": true,
+      "role": "record",
+      "path": "proposals/"
+    },
+    "open-items": {
+      "enabled": true,
+      "role": "derived",
+      "gated": true,
+      "path": "open-items/",
+      "entry_schema": {
+        "id": {
+          "type": "string",
+          "required": true
+        },
+        "question": {
+          "type": "string",
+          "required": true
+        },
+        "urgency": {
+          "type": "enum",
+          "values": [
+            "now",
+            "soon",
+            "watching",
+            "resolved"
+          ]
+        },
+        "waiting_on": {
+          "type": "string"
+        }
+      },
+      "index_line": "{id} \u2014 {question} \u00b7 {urgency}",
+      "decay": "60d"
+    },
+    "playbooks": {
+      "enabled": true,
+      "role": "source",
+      "gated": false,
+      "path": "playbooks/",
+      "entry_schema": {
+        "name": {
+          "type": "string",
+          "required": true
+        },
+        "owner": {
+          "type": "string"
+        }
+      },
+      "index_line": "{name} \u2014 hand-maintained",
+      "decay": "none"
+    }
+  },
+  "decay": {
+    "enabled": true,
+    "default": "90d",
+    "applies_to": "sourced",
+    "by_kind": {
+      "decision": "none",
+      "constraint": "none"
+    }
+  },
+  "retention": {
+    "raw": {
+      "policy": "keep",
+      "measure_from": "frontmatter_date"
+    }
+  },
+  "gate": {
+    "mode": "propose"
+  },
+  "confidence_ceilings": {
+    "legacy-migration-2026-06": {
+      "ceiling": "reconstructed",
+      "reason": "bulk import of summaries from a previous tool; no retrievable originals"
+    }
+  },
+  "scan": {
+    "excluded_from_scan": [
+      "usage/",
+      "sensitive.md"
+    ]
+  }
+}

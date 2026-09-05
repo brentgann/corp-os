@@ -9,6 +9,14 @@ The operating rhythm. The specific fix for the person whose last knowledge syste
 
 A brief is short. If it runs past a screen, it has become a report and will stop being read.
 
+## Pre-flight
+
+Confirm the OS is actually accessible right now — mounted, current, readable — not recalled from an earlier session. A stale export or a folder that did not mount produces confident output about files that do not exist. If it is not there, stop and ask.
+
+The files outrank memory. Where anything recalled conflicts with what is written in the OS, the files win and the memory gets corrected.
+
+Read `config.json` first — it is the authority on this OS's layers, vocabulary, decay windows, retention policy, and gate strictness. Fall back to the shipped defaults only where it is silent, and speak the person's own labels back to them rather than this plugin's.
+
 ## Step 0 — scan
 
 Read `config.json` (for cadence, layers, and vocabulary), then `INDEX.md`, `jobs/INDEX.md`, `claims/INDEX.md`, `connectors.md`, `meta.json` (for the last brief's date in `history`), and the tail of `usage/log.md`.
@@ -55,11 +63,23 @@ If asked to set up a recurring brief, or if the person's setup answers indicated
 
 A scheduled brief plus recurring `corp-os-pull` is the minimum viable operating rhythm for a low-upkeep OS. Say so once when setting it up, then stop mentioning it.
 
+Use the mechanism `${CLAUDE_PLUGIN_ROOT}/reference/scheduling.md` describes, and read it before promising a cadence — a schedule made with a session-scoped scheduler dies with the session, silently, and the person finds out weeks later when they notice the brief never came.
+
 ## Format
 
 Chat by default — a brief is meant to be read in place. Render it as a page only when the person asks, or when it is going to someone else, in which case follow `design.md` and run it past `corp-os-redact` first if it contains anything sensitive.
 
 ## Every run ends with
 
-- A dated `history` entry in `meta.json` marking the brief and its window, so the next run knows where to start.
+Close the run with `scripts/log_run.py` in the OS rather than editing the files by hand — it writes the `usage/log.md` row and the dated `meta.json` history entry in one call, and refuses a blank friction field:
+
+```bash
+python3 scripts/log_run.py --skill corp-os-brief --scope "<what this run covered>" \
+    --friction "<where it hurt, or 'none'>" \
+    --event "<what changed>"
+```
+
+These are the two writes measurement says get dropped, because they sit after the interesting work is done. A step that has to happen every time and that nothing else will catch belongs in code, not in a reminder.
+
+- A dated `history` entry in `meta.json` marking the brief and its window. Write it even though nothing else about a brief changes the OS — **this is the one write a brief makes, and skipping it is silent**: the next brief has no prior date, so it either asks for a window again or covers the whole corpus, and a brief covering four months is a report nobody reads. A run that produced a good brief and no history entry has not finished.
 - A `usage/log.md` row.

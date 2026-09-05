@@ -1,15 +1,23 @@
 ---
-name: improve-corp-os
+name: corp-os-improve
 description: Analyzes how a Corp-OS knowledge base is actually being used — from its usage log, structure, and drift — and proposes specific changes to the OS's own shape, plus an anonymized improvement packet that can be sent back to whoever maintains the Corp-OS model. Use when someone says "improve my OS", "this is getting annoying to use", "what should I change about how this is set up", "is this working", "what am I not using", or after enough real use to have evidence. Not for fixing content accuracy (use corp-os-reality-check) and not for regenerating the derived layer (use corp-os-rebuild).
 ---
 
-# Improve Corp-OS
+# Corp-OS improve
 
 The OS watches how it gets used and reshapes itself from evidence. This is what stops a personal knowledge system from being frozen at whatever its owner guessed on day one.
 
 The discipline that makes this skill worth running: **every proposal carries a count.** A hunch about what would be nicer is worth less than one line of the usage log, because a hunch is how the previous system got over-built.
 
 Read `${CLAUDE_PLUGIN_ROOT}/reference/improvement-packet.md` and `${CLAUDE_PLUGIN_ROOT}/reference/data-model.md`.
+
+## Pre-flight
+
+Confirm the OS is actually accessible right now — mounted, current, readable — not recalled from an earlier session. A stale export or a folder that did not mount produces confident output about files that do not exist. If it is not there, stop and ask.
+
+The files outrank memory. Where anything recalled conflicts with what is written in the OS, the files win and the memory gets corrected.
+
+Read `config.json` first — it is the authority on this OS's layers, vocabulary, decay windows, retention policy, and gate strictness. Fall back to the shipped defaults only where it is silent, and speak the person's own labels back to them rather than this plugin's.
 
 ## Step 0 — check there is enough evidence
 
@@ -102,6 +110,16 @@ Carry out confirmed local fixes: retire the unused category (relocating its cont
 Update the OS `README.md` on any structural change. A structure that changed while its documentation did not is worse than either the old or new structure alone.
 
 ## Every run ends with
+
+Close the run with `scripts/log_run.py` in the OS rather than editing the files by hand — it writes the `usage/log.md` row and the dated `meta.json` history entry in one call, and refuses a blank friction field:
+
+```bash
+python3 scripts/log_run.py --skill corp-os-improve --scope "<what this run covered>" \
+    --friction "<where it hurt, or 'none'>" \
+    --event "<what changed>"
+```
+
+These are the two writes measurement says get dropped, because they sit after the interesting work is done. A step that has to happen every time and that nothing else will catch belongs in code, not in a reminder.
 
 - `usage/proposals.md` updated with everything considered, including what was rejected and why — that record stops the same idea being re-proposed every quarter.
 - A dated `history` entry in `meta.json`.

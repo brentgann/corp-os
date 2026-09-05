@@ -35,7 +35,7 @@ Built from `connectors.md`.
 ### Stakeholder map
 Only for relationship-heavy jobs. One card per person: role, which jobs they touch, last contact, what they last said that mattered (with its claim ID), and open asks.
 
-Built from `people/` plus claim cross-references.
+Built from a declared person layer plus claim cross-references. Needs that layer to exist — without one, propose the company brief or the job board instead rather than rendering a panel from nothing.
 
 ### Company brief
 A single-page rendering of `company/<slug>.md` — what they sell, users versus buyers, pricing shape, monetization, funding and status, competitors. Useful precisely because it is the thing people re-explain most often.

@@ -1,0 +1,121 @@
+{
+  "corpos_version": "0.7.0",
+  "profile": "custom",
+  "vocabulary": {
+    "claim": "finding",
+    "confidence": [
+      "confirmed",
+      "needs_review",
+      "reconstructed",
+      "disputed",
+      "retired"
+    ],
+    "sensitivity": [
+      "internal",
+      "sensitive"
+    ],
+    "tags": [
+      "Platform",
+      "Pricing",
+      "Support"
+    ]
+  },
+  "layers": {
+    "raw": {
+      "enabled": true,
+      "role": "source",
+      "path": "raw/"
+    },
+    "jobs": {
+      "enabled": true,
+      "role": "derived",
+      "path": "jobs/",
+      "index_line": "{id} \u2014 {statement}"
+    },
+    "claims": {
+      "enabled": true,
+      "role": "derived",
+      "path": "claims/"
+    },
+    "glossary": {
+      "enabled": false,
+      "role": "derived"
+    },
+    "proposals": {
+      "enabled": true,
+      "role": "record",
+      "path": "proposals/"
+    },
+    "decisions": {
+      "enabled": true,
+      "role": "derived",
+      "gated": true,
+      "path": "decisions/",
+      "entry_schema": {
+        "id": {
+          "type": "string",
+          "required": true
+        },
+        "statement": {
+          "type": "string",
+          "required": true
+        },
+        "owner": {
+          "type": "string",
+          "required": true
+        },
+        "status": {
+          "type": "enum",
+          "values": [
+            "open",
+            "blocked",
+            "decided",
+            "lapsed",
+            "moot"
+          ]
+        },
+        "decide_by": {
+          "type": "date",
+          "required": true
+        },
+        "reversibility": {
+          "type": "enum",
+          "values": [
+            "reversible",
+            "costly",
+            "one-way"
+          ]
+        },
+        "blocks": {
+          "type": "list"
+        }
+      },
+      "index_line": "{id} \u2014 {statement} \u00b7 {owner} \u00b7 by {decide_by}",
+      "decay": "none"
+    }
+  },
+  "decay": {
+    "enabled": true,
+    "default": "90d",
+    "applies_to": "sourced",
+    "by_kind": {
+      "decision": "none",
+      "metric": "30d"
+    }
+  },
+  "retention": {
+    "raw": {
+      "policy": "keep",
+      "measure_from": "frontmatter_date"
+    }
+  },
+  "gate": {
+    "mode": "propose"
+  },
+  "scan": {
+    "excluded_from_scan": [
+      "usage/",
+      "sensitive.md"
+    ]
+  }
+}

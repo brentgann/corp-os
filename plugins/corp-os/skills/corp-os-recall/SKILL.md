@@ -13,6 +13,8 @@ Confirm the OS is actually accessible right now — mounted, current, readable �
 
 The files outrank memory. Where anything recalled conflicts with what is written in the OS, the files win and the memory gets corrected.
 
+Read `config.json` first — it is the authority on this OS's layers, vocabulary, decay windows, retention policy, and gate strictness. Fall back to the shipped defaults only where it is silent, and speak the person's own labels back to them rather than this plugin's.
+
 ## Step 0 — scan, in order, and stop early
 
 0. `config.json` — which layers exist here, what they are called, what is excluded from the scan path
@@ -23,9 +25,11 @@ The files outrank memory. Where anything recalled conflicts with what is written
 
 Never load `raw/`. Open a raw file only to check a specific citation the person is questioning.
 
-`sensitive.md` is outside the scan path — do not open it to answer a general question. Open it only when the task specifically calls for it, and when an answer would be materially incomplete without it, say that sensitive context exists rather than either surfacing it unasked or silently omitting it.
+`sensitive.md` holds only `incidental` sensitive material and is outside the scan path — do not open it to answer a general question. Open it when the task specifically calls for it, and when an answer would be materially incomplete without it, say that sensitive context exists rather than either surfacing it unasked or silently omitting it.
 
-Most questions resolve from the indexes alone. If they routinely do not, the indexes have drifted — note that as friction in the usage log, because it is a structural problem `improve-corp-os` should see.
+**Sensitive entries marked `load_bearing` are in the scan path and belong in the answer.** This is one person's own knowledge base; withholding a fact from its owner does not protect anyone, and an answer computed around it is not cautious, it is wrong — and wrong in the worst way, because nothing in it signals that something was left out. Use them, and mark each one inline so the person knows what they are holding: `(CL-0061, sensitive — strip before this goes anywhere)`. That marking is what makes the export boundary visible at the moment they are most likely to paste the answer into a document.
+
+Most questions resolve from the indexes alone. If they routinely do not, the indexes have drifted — note that as friction in the usage log, because it is a structural problem `corp-os-improve` should see.
 
 ## Step 1 — read the question for its job
 
@@ -42,6 +46,13 @@ Structure:
 - **Confidence shown where it is not `confirmed`.** Say "one unconfirmed mention" or "this is an assumption, not something anyone told us." Do not launder a `needs_review` claim into a confident sentence — that is the single most damaging thing this skill can do, because it makes the OS worse than having no OS.
 - **Past-decay claims marked inline.** "Their pricing was per-seat as of June — that's past its re-check window." A stale claim delivered without its age is a lie of omission.
 - **`disputed` claims presented as disputed,** both sides plus the recorded diagnosis of why they might conflict — not resolved for tidiness.
+- **Sensitive claims used, and marked inline every time.** Two halves, and both get dropped.
+
+*Used*: a `load_bearing` sensitive claim is in the scan path deliberately, and leaving it out of the answer is the failure the two-axis model exists to prevent — the person gets a conclusion computed without the fact that changes it, with nothing signalling the omission. Measured, this gets skipped about a third of the time, usually out of a reflex that sensitive means withhold. It does not. There is one person in this OS and it is theirs.
+
+*Marked*: `(CL-0061, sensitive — strip before this leaves)`, on the sentence carrying the fact. Not a footnote, not a closing caveat — the person is often mid-draft and will copy the paragraph, not the caveat. A claim is load-bearing precisely because it changes conclusions, which is the same reason someone outside would find it interesting.
+
+*And not further*: this licenses using what is **in the scan path**, nothing more. `sensitive.md` holds `incidental` material and stays closed unless the task specifically calls for it. Reaching into it because sensitivity came up is the opposite error and just as wrong — measured, sharpening the first half of this rule pushed one run in three into exactly that over-correction. Two different rules: use what is in front of you; do not go looking behind the quarantine.
 - **Unresolved identities named as unresolved.** If three people in the corpus share a first name and the question touches one of them, say so instead of picking the most likely. Confidently attributing something to the wrong person is worse than the ambiguity.
 
 ## Step 3 — say what is not known
@@ -58,8 +69,8 @@ Never fill a gap with a plausible inference presented as knowledge. If an infere
 
 When the person is drafting, prepping, or building something rather than asking a question, the deliverable is their work with the OS folded in — not a report about the OS.
 
-- **Meeting prep** — who they are meeting, what was last said and when, open asks in both directions, which job this advances, what to find out. Pull from `people/`, `company/`, and claims.
-- **A document or deck** — the relevant claims with citations, correct vocabulary from `glossary.md`, the numbers with their real definitions, and an explicit note on which supporting claims are past decay so nothing stale gets published under their name.
+- **Meeting prep** — who they are meeting, what was last said and when, open asks in both directions, which job this advances, what to find out. Pull from `company/`, claims, and — where the OS declares a person layer — its records. Where it does not, the claims themselves carry the history; say what is known about the person from claims rather than reporting that a folder is missing.
+- **A document or deck** — the relevant claims with citations, correct vocabulary from `glossary.md`, the numbers with their real definitions, and an explicit note on which supporting claims are past decay so nothing stale gets published under their name. If any of it is `sensitive`, say so at the top of what you hand back and offer `corp-os-redact` — this is the moment the export boundary is actually crossed, and a note buried at the bottom is a note that gets pasted over.
 - **A decision** — the `decision` and `constraint` claims that bear on it, prior decisions this would supersede, and the assumptions it rests on. Surfacing the untested assumption is usually the highest-value move here.
 
 Match the person's format and voice. If `design.md` binds a design system and the output is visual, follow it.
@@ -80,4 +91,13 @@ One line. The most useful next action given what the answer exposed — a specif
 
 ## Every run ends with
 
-A `usage/log.md` row, with honest friction. The friction field here is the richest signal in the OS: "answered but 3 of 5 claims past decay," "had to open four detail files because the index one-liners were too thin," "no job matched the question." Those rows are what let `improve-corp-os` fix the structure rather than guess at it.
+Close the run with `scripts/log_run.py` in the OS rather than editing the files by hand — it writes the `usage/log.md` row and the dated `meta.json` history entry in one call, and refuses a blank friction field:
+
+```bash
+python3 scripts/log_run.py --skill corp-os-recall --scope "<what this run covered>" \
+    --friction "<where it hurt, or 'none'>"
+```
+
+These are the two writes measurement says get dropped, because they sit after the interesting work is done. A step that has to happen every time and that nothing else will catch belongs in code, not in a reminder.
+
+A `usage/log.md` row, with honest friction. The friction field here is the richest signal in the OS: "answered but 3 of 5 claims past decay," "had to open four detail files because the index one-liners were too thin," "no job matched the question." Those rows are what let `corp-os-improve` fix the structure rather than guess at it.

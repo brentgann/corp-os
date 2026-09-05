@@ -1,9 +1,11 @@
 {
   "name": "brentgann",
-  "owner": { "name": "Brent Gann" },
+  "owner": {
+    "name": "Brent Gann"
+  },
   "metadata": {
     "description": "Skills for building and running a portable personal work OS.",
-    "version": "0.5.0"
+    "version": "0.10.0"
   },
   "plugins": [
     {

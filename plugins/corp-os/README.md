@@ -1,10 +1,12 @@
 # Corp-OS
 
-A portable personal work OS, organized around jobs to be done.
+A portable, configurable personal work OS.
 
-Most personal knowledge systems are organized by subject: a folder per topic, a note per person. They only ever grow, nothing in them ever expires, and after a few months nobody trusts them enough to look. Corp-OS inverts the organizing principle. The primitive is the **job** — the concrete outcome someone is trying to reach — and subjects hang off jobs.
+Most personal knowledge systems are organized by subject: a folder per topic, a note per person. They only ever grow, nothing in them ever expires, and after a few months nobody trusts them enough to look. Corp-OS is a folder of markdown files plus nineteen skills that operate on it, and its shape is declared rather than assumed — layer names, label vocabulary, decay windows, retention and gate strictness all live in a `config.json` that every skill reads first.
 
-That inversion buys three things a subject-organized system cannot have:
+Its default organizing primitive is the **job** — the concrete outcome someone is trying to reach — with subjects hanging off jobs. That default is worth understanding before adopting it, and worth turning off when it does not fit; see "It is a default profile, not a schema" below.
+
+Job-organization buys three things a subject-organized system cannot have:
 
 - **Intake gets a priority signal.** A job declares what it still needs to know, which turns "capture everything" into "capture what is blocking this."
 - **Recall gets a relevance signal.** "What do we know about pricing" is unanswerable in the abstract. "What do we know about pricing that bears on this renewal" has a real answer.
@@ -22,7 +24,7 @@ Call claims "findings" if that is the right word in your field. Turn decay off f
 
 ## What it actually is
 
-A folder of markdown files plus eighteen skills that operate on it. Two layers, deliberately separated:
+Two layers, deliberately separated:
 
 - **`raw/`** — append-only source archive. Transcripts, threads, documents, notes. Never edited, never deleted. Existing here means *said*, not *true*.
 - **the derived layer** — jobs, claims, people, topics, glossary, company records. Fully regenerable from `raw/`. Nothing lands here without a person confirming it, and every proposal is written to `proposals/` before it is presented, so the gate leaves a record rather than a chat exchange.
@@ -63,6 +65,7 @@ That last field is what makes drift correctable on a schedule instead of by acci
 |---|---|
 | `corp-os-claims` | Turn raw material into reviewed, citable claims |
 | `corp-os-reality-check` | Sweep for stale, unverified, contradicted, and untested-assumption claims — then interrogate to resolve them |
+| `corp-os-decide` | Track the forks you have not decided yet — owner, date, what they block |
 | `corp-os-glossary` | Internal jargon, acronyms, and especially metric definitions |
 | `corp-os-company` | Research employers, counterparties, and competitors from the web plus what you already know |
 
@@ -85,12 +88,27 @@ That last field is what makes drift correctable on a schedule instead of by acci
 
 | Skill | What it does |
 |---|---|
-| `improve-corp-os` | Mine your usage log for friction and unused structure; propose evidence-backed changes; export an anonymized improvement packet |
+| `corp-os-improve` | Mine your usage log for friction and unused structure; propose evidence-backed changes; export an anonymized improvement packet |
 | `corp-os-audit` | Assess any knowledge system across ten dimensions, propose what to build next, and find what *it* has that Corp-OS lacks |
 
 ## Start here
 
-Ask for Corp-OS setup. The interrogation takes fifteen to twenty minutes and covers your role and mandate, why you want this, your jobs to be done, which data actually earns its keep, how information reaches you, which tools you can connect and how, your company and market, your design and output needs, and your sensitivity boundaries.
+Run `/corp-os` — it finds your OS, or offers to build one.
+
+| | |
+|---|---|
+| `/corp-os` | Find your OS and say what is worth doing next |
+| `/corp-os-capture` | File something — a transcript, a thread, a note |
+| `/corp-os-recall` | Ask a question, or fold what it knows into what you are writing |
+| `/corp-os-brief` | What moved, what needs a decision, what went stale |
+| `/corp-os-catchup` | Pull what is new from your connected sources |
+| `/corp-os-open` | The decisions you have open, worst date first |
+| `/corp-os-check` | Sweep for stale, contradicted, and never-verified |
+| `/corp-os-share` | Make something safe to send, with a private record of what came out |
+
+Named for the moment rather than the skill: reaching for the export boundary, you are thinking "share this", not "redact". Everything else — setup, configure, rebuild, audit, improve — you ask for by name, because those are rare and deliberate and a command for every skill is surface area with no return.
+
+Or just ask for Corp-OS setup. The interrogation takes fifteen to twenty minutes and covers your role and mandate, why you want this, your jobs to be done, which data actually earns its keep, how information reaches you, which tools you can connect and how, your company and market, your design and output needs, and your sensitivity boundaries.
 
 The interrogation is the deliverable as much as the folder is. A scaffold built without it produces a generic notebook that gets abandoned in a month.
 
@@ -110,30 +128,47 @@ The interrogation is the deliverable as much as the folder is. A scaffold built 
 
 **Bookkeeping is separate from judgment.** `scripts/build_index.py` recounts what is on disk and rewrites the index. It reads nothing from `raw/` and retags nothing, which is what makes it safe to run after any manual edit — and makes "the index is stale" a thirty-second fix rather than a reason to schedule a rebuild.
 
-**The OS improves from evidence, not opinion.** Every skill logs one line of friction per run. `improve-corp-os` reads those lines and proposes changes with counts attached. Structure that nobody uses gets retired; the same manual step appearing every run becomes a field.
+**The OS improves from evidence, not opinion.** Every skill logs one line of friction per run. `corp-os-improve` reads those lines and proposes changes with counts attached. Structure that nobody uses gets retired; the same manual step appearing every run becomes a field.
 
 ## Extending it
 
 Bind a design system by naming it in the OS's `design.md`, and every rendered output follows it.
 
-The model itself is specified in `reference/data-model.md`. Improvement packets from `improve-corp-os` and `corp-os-audit` are the intended path for changing it — anonymized, evidence-backed, and applied deliberately rather than automatically.
+The model itself is specified in `reference/data-model.md`. Improvement packets from `corp-os-improve` and `corp-os-audit` are the intended path for changing it — anonymized, evidence-backed, and applied deliberately rather than automatically.
 
 ## Reference
 
 | File | Contents |
 |---|---|
 | `reference/data-model.md` | The canonical spec: structure, schemas, the scan contract |
+| `reference/scheduling.md` | Which scheduler to use for a recurring run, and why the wrong one fails silently |
 | `reference/configuration.md` | Everything adjustable: vocabulary, layers, custom layers, decay, retention/TTL, gate |
 | `reference/interrogation.md` | The nine-area setup question bank |
 | `reference/jtbd-patterns.md` | Job statement forms, malformed shapes and their repairs |
 | `reference/dashboard-patterns.md` | Which views are worth building, and what makes them go stale |
 | `reference/company-research.md` | What to establish about a company, and how to source it |
 | `reference/improvement-packet.md` | The interchange format for improving the model |
-| `reference/os-audit-rubric.md` | The nine audit dimensions |
+| `reference/os-audit-rubric.md` | The ten audit dimensions |
 | `CONNECTORS.md` | How tool categories work |
 | `scripts/build_index.py` | Deterministic recount and drift check |
+| `scripts/write_export.py` | Redaction's two outputs, written together — refuses one without the other |
+| `scripts/log_run.py` | The usage-log row and the history entry, written together |
+| `scripts/delete_source.py` | The five-step retention deletion — dry-run by default, refuses without an obligation |
+| `examples/fixture-os/` | A synthetic OS the build actually runs `build_index.py` against |
+| `commands/` | Eight slash commands over the daily path — see below |
+| `evals/` | Two harnesses — does the right skill get reached, and does it do what it says |
 
 ## Version history
+
+**0.10.0** — `delete_source.py`, the fourth shipped script and the third confirmation of the same rule: the retention-delete sequence held at 67% after two instruction passes, the second saying *never edit the original into a tombstone* in as many words, and one run in three still did. With the script, 8/8 at 100%. It was the last path in the suite whose failure destroyed source material rather than degrading quality. Eight slash commands now cover the daily path, named for the moment rather than the skill — and `evals/run_commands.py` makes them iterable: a full sweep in about a minute, against half an hour for conformance, which is the difference between a loop you stay inside and one you leave. That harness settled an open question with data rather than argument — seven cases give a person plain English and nothing but eight one-line descriptions to choose between, and they land at 100%. Eight commands are distinguishable. `validate.py` also lints the static half of a command: description length, no two opening alike, a real skill named, `$ARGUMENTS` handled, and the no-args path stated rather than left to chance.
+
+**0.9.0** — Two more shipped scripts, both added because measurement demanded them. `write_export.py`: across five conformance runs `corp-os-redact` produced its private log under four different names and once not at all, while the instruction to write it was present, concrete, explained, and strengthened twice. Past a certain point more instruction stops buying reliability, so the step left the model's hands — the script writes the cleaned copy and the log together and refuses to write one without the other. `log_run.py` followed for the same reason from a different direction — `corp-os-brief` wrote its `meta.json` history entry in one run out of three — and now writes the log row and the history entry together for sixteen skills. The rule these establish, alongside `build_index.py`: a step that has to happen every time, that nothing else will catch if it is skipped, belongs in code. None of the three exercises judgment; that stays with the skill. Sensitivity also split into two axes, because one flag was making the OS quietly wrong. `sensitivity` is the export class — what must not leave, and to whom. `bearing` is whether the OS can reason correctly without it, and it is `bearing` that decides where an entry lives. Quarantining everything sensitive assumed sensitive material is never needed for the daily job; when that is false, the quarantine does not produce a gap, it produces a confidently wrong answer with nothing in it to signal the omission. So load-bearing sensitive material now stays in the scan path, marked, and is stripped at the export boundary by `corp-os-redact` — which is the only place confidentiality was ever really enforced. One operator is settled as the intended shape rather than a limitation: sharing is an export event, not a mode. Alongside that, a second fixture (`fixture-register`: jobs off, renamed vocabulary, a hand-maintained `source` layer planted as a rebuild trap) and conformance cases for the irreversible paths — rebuild refusing a non-`derived` layer, the retention-delete sequence, redaction never touching the original. Building the second fixture immediately caught the index rendering the plugin's vocabulary instead of the person's, and a retention-delete run invented the tombstone that is now in the spec.
+
+**0.8.0** — The skills got run. `evals/run_conformance.py` puts one skill in front of a throwaway copy of the fixture OS and then reads the filesystem to see what it actually did — which found, in its first run, three things no amount of reading had: `corp-os-intake` writing the raw file, recounting `meta.json`, filing the proposal, appending the log row, and leaving out the index entry, four runs out of four; `corp-os-brief` skipping the dated history entry that is the only write a brief makes; and a four-release-old contradiction where `data-model.md` said raw files are never edited while three skills instructed flipping `processed: true` on them. All fixed, and `processed` is now named as the one sanctioned exception with the reason attached. It also answered a question open since 0.2.0 — the usage-log row does get written, in every case. Two of the harness's own assertions turned out to be wrong about the skills and were corrected on the record rather than quietly, because an eval that has never been wrong about what it measures has not been looked at hard enough. On the routing side, a third iteration added the categories a 100% score should make anyone suspicious of — renamed vocabulary, no Corp-OS words at all, mid-conversation fragments, two-skill sequences — and scored 100% across all of them, which is the evidence for saying plainly that routing is not this suite's risk and putting eval effort where the defects actually are.
+
+**0.7.0** — Built out the things the 0.6.0 audit said were missing rather than wrong. `corp-os-decide` is the nineteenth skill and the one the model had been working around: a `decision` claim records a call that was made, and nothing held the ones that had not been. An open decision does not rot by going stale the way a claim does — it rots by going quiet — so the record requires an owner (a person, never a team) and a `decide_by` date, past which the choice is being made by default and the log says which option is winning by inaction. `examples/fixture-os/` is a synthetic OS that `validate.py` now *executes* `build_index.py` against, asserting the rendered index and its idempotence; parsing the script only ever proved it imports, which was never the failure mode. Building it immediately caught a silent config fallback, now a warning. `reference/scheduling.md` names the mechanism the five scheduling skills were vague about — the failure there is silent, and a brief that never fires looks exactly like a brief that fired and found nothing. Four slash commands cover the daily path. And `evals/` holds a routing harness that measures which of the nineteen skills a real query actually reaches, which is the question eighteen similar descriptions raise and nobody had answered.
+
+**0.6.0** — A conformance pass: the shipped files now obey the rules the architecture said were cross-cutting, and the validator enforces them so they cannot drift again. Root detection no longer tests for `jobs/` — an OS running with the jobs layer disabled was reading as no OS at all, which pointed its owner at a re-scaffold of a working system, the only data-destroying path in the suite. The pre-flight and config-first rules moved from six scattered skills into a single identical block in all eighteen, with `corp-os-audit` carrying the variant that fits auditing someone else's system. `people/` and `topics/` left the default scaffold under a new rule — **no layer is enabled without a declared `entry_schema` and `index_line`** — because both were being created, indexed and read while nothing specified what one entry contains; the `relationship` profile now carries a full `people` declaration for anyone who wants it. `improve-corp-os` became `corp-os-improve`, so all eighteen share the prefix that makes the suite guessable. The private-identifier denylist moved out of `validate.py` into an untracked file, since a hardcoded list of real names in a public repo publishes exactly what it was written to protect.
 
 **0.4.0** — Made the jobs layer genuinely optional and added the empirical test for whether it fits: cluster existing material into candidate jobs without looking at the subject taxonomy, and if the clusters reproduce it, the material is subject-shaped and jobs is overhead. Added the grammatical-form diagnostic that catches an open-items layer drifting into a status register (findings and errands crowding out real questions), plus checks for misfiled entries in a resolved tier and for a recurring attribute nothing groups. Added `decay.applies_to` — decay assumes re-verification is possible, so on a corpus where a large share has no retrievable source, applying it to everything produces a backlog nobody can clear; the default now scopes to sourced entries with a one-time disposition pass for the rest. `corp-os-audit` gained a tenth dimension (adjustability, including whether it is safe to regenerate), a step that proposes new skills and workflow changes rather than only scoring, and explicit instructions to resist finding what the model predicts.
 

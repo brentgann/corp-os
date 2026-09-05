@@ -98,7 +98,7 @@ If the answer to the third question is anything but a firm no, turn on the sensi
 
 ## What setup must not do
 
-- Do not scaffold categories nobody asked for. `people/`, `topics/`, `glossary.md` and `company/` are all optional and all get created on request.
+- Do not scaffold categories nobody asked for. `glossary.md` and `company/` are optional and get created on request; a person or topic layer is a declared layer with its own schema, created only when the answers here call for one.
 - Do not create more than five jobs. A person who names twelve is describing tasks; help them cluster.
 - Do not pull any data during setup. Setup builds the container and the first job records. Intake is a separate, deliberate first run.
 - Do not skip writing the OS's own `README.md`. A scaffold whose conventions live only in this plugin breaks the moment someone opens the folder without the plugin loaded.

@@ -54,14 +54,16 @@ def frontmatter(path):
     return out
 
 
+# Only layers with a declared index_line are enabled here. A layer that is
+# enabled without one degrades the scan contract silently, so people/ and
+# topics/ are no longer shipped defaults -- an OS that wants either declares it
+# in config.json with its own entry_schema and index_line. See
+# reference/configuration.md, "No layer is enabled without a schema".
 DEFAULT_LAYERS = {
     "raw":       {"enabled": True, "role": "source"},
     "jobs":      {"enabled": True, "role": "derived",
                   "index_line": "{id} — {statement}"},
     "claims":    {"enabled": True, "role": "derived"},
-    "people":    {"enabled": True, "role": "derived",
-                  "index_line": "{name} — {role}"},
-    "topics":    {"enabled": False, "role": "derived", "index_line": "{name}"},
     "company":   {"enabled": False, "role": "derived",
                   "index_line": "{company} — {relationship}"},
     "proposals": {"enabled": True, "role": "record"},
@@ -87,10 +89,34 @@ def load_config(root):
     return cfg
 
 
-def _lbl(name, layers):
-    """A layer's display name: its configured label, else its key."""
-    spec = layers.get(name) or {}
-    return spec.get("label") or name.replace("_", " ").title()
+def _plural(word):
+    """Enough pluralization for a heading. Not a linguistics engine."""
+    if word.endswith("y") and not word.endswith(("ay", "ey", "iy", "oy", "uy")):
+        return word[:-1] + "ies"
+    if word.endswith(("s", "x", "z", "ch", "sh")):
+        return word + "es"
+    return word + "s"
+
+
+def _lbl(name, layers, cfg=None):
+    """A layer's display name, in the person's words.
+
+    Order: the layer's own `label`, then the vocabulary rename for the term
+    this layer holds, then the key. The vocabulary step is the one that
+    matters -- an OS that renamed `claim` to `entry` was still getting a
+    heading that said "Claims", which is the plugin talking over the person in
+    the one file every skill reads first.
+    """
+    spec = (layers.get(name) or {})
+    if spec.get("label"):
+        return spec["label"]
+    vocab = ((cfg or {}).get("vocabulary") or {})
+    # config.vocabulary keys are singular terms ("claim"), layers are plural
+    # concepts ("claims"); match either spelling.
+    for key in (name, name[:-1] if name.endswith("s") else name):
+        if vocab.get(key):
+            return _plural(str(vocab[key])).replace("_", " ").title()
+    return name.replace("_", " ").title()
 
 
 def render_line(template, fm, fallback):
@@ -185,8 +211,14 @@ def render_index(root, s, cfg):
     """Build INDEX.md. Every entry gets a one-line descriptor -- that is what
     makes the scan contract work; a bare link forces a second read."""
     layers = cfg["layers"]
-    excluded = (cfg.get("scan") or {}).get(
-        "excluded_from_scan", ["sensitive.md", "raw/_archive/"])
+    scan = cfg.get("scan") or {}
+    # A misspelled key here fails silently and renders a plausible but wrong
+    # "not in the scan path" section, so say so rather than falling back mutely.
+    for k in scan:
+        if k not in ("excluded_from_scan", "stop_early", "order"):
+            print(f"WARNING: config scan.{k} is not a key this script knows — "
+                  "check reference/configuration.md; it is being ignored.")
+    excluded = scan.get("excluded_from_scan", ["sensitive.md", "raw/_archive/"])
     L = [
         "# corp-os — Index",
         "",
@@ -201,14 +233,14 @@ def render_index(root, s, cfg):
         f"- **Raw files**: {len(s['raw'])} ({len(s['unprocessed'])} unprocessed)",
     ]
     if s.get("jobs"):
-        L.insert(-1, f"- **{_lbl('jobs', layers)}**: {len(s['jobs'])}")
+        L.insert(-1, f"- **{_lbl('jobs', layers, cfg)}**: {len(s['jobs'])}")
     if s.get("claim_entries"):
-        L.append(f"- **{_lbl('claims', layers)}**: {s['claim_entries']}")
+        L.append(f"- **{_lbl('claims', layers, cfg)}**: {s['claim_entries']}")
     for name in sorted(k for k in s if isinstance(s.get(k), list)
                        and k not in ("raw", "jobs", "claims", "unprocessed",
                                      "unlisted")):
         if s[name]:
-            L.append(f"- **{_lbl(name, layers)}**: {len(s[name])}")
+            L.append(f"- **{_lbl(name, layers, cfg)}**: {len(s[name])}")
     for name, meta in sorted(s.get("_single", {}).items()):
         if not meta["in_scan"]:
             continue
@@ -216,7 +248,7 @@ def render_index(root, s, cfg):
         if meta["groups"]:
             detail = " (" + ", ".join(f"{k.lower()} {v}"
                                       for k, v in meta["groups"].items()) + ")"
-        L.append(f"- **{_lbl(name, layers)}**: {meta['entries']}{detail}")
+        L.append(f"- **{_lbl(name, layers, cfg)}**: {meta['entries']}{detail}")
     if s["glossary_terms"] and "glossary" not in (s.get("_single") or {}):
         L.append(f"- **Glossary terms**: {s['glossary_terms']}")
     L.append("")
@@ -236,7 +268,7 @@ def render_index(root, s, cfg):
         template = spec.get("index_line")
         if not template:
             missing_template.append(name)
-        L += [f"## {name.replace('_', ' ').title()}", ""]
+        L += [f"## {_lbl(name, layers, cfg)}", ""]
         for f in files:
             fm = frontmatter(f)
             fallback = os.path.basename(f)[:-3].replace("-", " ")
@@ -261,7 +293,7 @@ def render_index(root, s, cfg):
     for name, meta in sorted(s.get("_single", {}).items()):
         if not meta["in_scan"] or not meta["groups"]:
             continue
-        L += [f"## {_lbl(name, layers)}", "",
+        L += [f"## {_lbl(name, layers, cfg)}", "",
               f"{meta['entries']} entries in [`{meta['path']}`]({meta['path']}), "
               "grouped as:", ""]
         for g, n in meta["groups"].items():

@@ -9,6 +9,12 @@ Jobs are the organizing primitive. Everything else in the OS hangs off them, whi
 
 Read `${CLAUDE_PLUGIN_ROOT}/reference/jtbd-patterns.md` and the job record section of `${CLAUDE_PLUGIN_ROOT}/reference/data-model.md` first.
 
+## Pre-flight
+
+Confirm the OS is actually accessible right now — mounted, current, readable — not recalled from an earlier session. A stale export or a folder that did not mount produces confident output about files that do not exist. If it is not there, stop and ask.
+
+The files outrank memory. Where anything recalled conflicts with what is written in the OS, the files win and the memory gets corrected.
+
 Read `config.json` first — it is the authority on this OS's layers, vocabulary, decay windows, retention policy, and gate strictness. Fall back to the shipped defaults only where it is silent, and speak the person's own labels back to them rather than this plugin's.
 
 ## Step 0 — scan
@@ -73,6 +79,16 @@ On retirement:
 
 ## Every run ends with
 
+Close the run with `scripts/log_run.py` in the OS rather than editing the files by hand — it writes the `usage/log.md` row and the dated `meta.json` history entry in one call, and refuses a blank friction field:
+
+```bash
+python3 scripts/log_run.py --skill corp-os-jobs --scope "<what this run covered>" \
+    --friction "<where it hurt, or 'none'>" \
+    --event "<what changed>"
+```
+
+These are the two writes measurement says get dropped, because they sit after the interesting work is done. A step that has to happen every time and that nothing else will catch belongs in code, not in a reminder.
+
 - Recounted `meta.json` (`jobs`, `next_job_id`) verified against an actual file count.
-- One row appended to `usage/log.md`. Put the real friction in the friction field — "person could not state a definition of done for two of three jobs" is exactly the signal `improve-corp-os` needs.
+- One row appended to `usage/log.md`. Put the real friction in the friction field — "person could not state a definition of done for two of three jobs" is exactly the signal `corp-os-improve` needs.
 - A concrete next action: what to capture for the job's top evidence item, and which source is most likely to have it.

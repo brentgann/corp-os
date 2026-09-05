@@ -2,7 +2,7 @@
 
 A portable, configurable personal work OS — as an installable Claude plugin.
 
-Your knowledge base is a folder of markdown files. This plugin is the eighteen skills that operate on it: an interrogation that shapes it to your actual work, ingestion from meetings and documents, citable claims you can refine against reality, recall with provenance, dashboards, and an audit that will tell you when the model is wrong for you.
+Your knowledge base is a folder of markdown files. This plugin is the nineteen skills that operate on it: an interrogation that shapes it to your actual work, ingestion from meetings and documents, citable claims you can refine against reality, recall with provenance, dashboards, and an audit that will tell you when the model is wrong for you.
 
 ## Install
 
@@ -36,7 +36,7 @@ That last one is what most systems lack and what decides whether yours survives 
 
 Layer names, label vocabulary, decay windows, how long source material is kept, and how strict the review gate is are declared in a `config.json` that every skill reads first. A layer the model never imagined — `experiments/`, `matters/`, `readouts/` — gets its own field schema and index template, and every skill then treats it like a shipped one.
 
-Including the organizing idea itself: the jobs layer is a default, not a requirement, and `corp-os-audit` runs an empirical test before recommending it rather than assuming it fits.
+Including the organizing idea itself: the jobs layer is a default, not a requirement, and `corp-os-audit` runs an empirical test before recommending it rather than assuming it fits. Nothing in the suite treats the presence of an optional layer as evidence that an OS exists, and no layer may be enabled without declaring what one entry contains and what one line of it looks like in the index.
 
 `examples/config-worked-example.json` is a verified config expressing a real four-month-old system that shares none of this model's layer names.
 
@@ -44,10 +44,14 @@ Including the organizing idea itself: the jobs layer is a default, not a require
 
 ```
 plugins/corp-os/     the plugin — skills, reference specs, shipped scripts
-scripts/validate.py  structure, frontmatter, cross-reference and leakage checks
+scripts/validate.py  structure, frontmatter, cross-references, the cross-cutting
+                     rules every skill must carry, and leakage checks
+.validate-denylist   gitignored; private terms the leakage check greps for
 build.sh             validate + package
 docs/ARCHITECTURE.md the design, every decision and why, and what is still open
 ```
+
+`validate.py` is not only a linter. It enforces the rules that live in nineteen files at once — the pre-flight and config-first blocks, the usage-log row, and the rule that no optional layer may be used to detect whether an OS exists. Those had all drifted by 0.5.0, which is why they are checked rather than merely documented.
 
 Start at [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) to work on this. Start at [`plugins/corp-os/README.md`](plugins/corp-os/README.md) to use it.
 

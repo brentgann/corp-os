@@ -15,13 +15,17 @@ Confirm the OS is actually accessible right now — mounted, current, readable �
 
 The files outrank memory. Where anything recalled conflicts with what is written in the OS, the files win and the memory gets corrected.
 
+Read `config.json` first — it is the authority on this OS's layers, vocabulary, decay windows, retention policy, and gate strictness. Fall back to the shipped defaults only where it is silent, and speak the person's own labels back to them rather than this plugin's.
+
+`config.json`'s layer roles decide what this skill may touch at all — see Step 1. Reading it is not optional here.
+
 ## Step 0 — check this is the right operation
 
 Rebuilds are expensive and often unnecessary. Diagnose before proceeding:
 
 - **One file has grown unwieldy** → offer to split that file. Not a rebuild.
 - **Some claims are stale** → `corp-os-reality-check`. Not a rebuild.
-- **Recurring friction with the structure itself** → `improve-corp-os` first, so the rebuild targets a better model rather than faithfully reproducing a bad one.
+- **Recurring friction with the structure itself** → `corp-os-improve` first, so the rebuild targets a better model rather than faithfully reproducing a bad one.
 - **The taxonomy genuinely no longer fits what is in raw/** → rebuild. Categories that worked at 20 entries rarely work at 400.
 - **Nobody is confident the derived layer still reflects the corpus** → rebuild.
 
@@ -90,5 +94,15 @@ Never edits, deletes, or rewrites anything in `raw/`. Never touches a layer whos
 
 ## Every run ends with
 
+Close the run with `scripts/log_run.py` in the OS rather than editing the files by hand — it writes the `usage/log.md` row and the dated `meta.json` history entry in one call, and refuses a blank friction field:
+
+```bash
+python3 scripts/log_run.py --skill corp-os-rebuild --scope "<what this run covered>" \
+    --friction "<where it hurt, or 'none'>" \
+    --event "<what changed>"
+```
+
+These are the two writes measurement says get dropped, because they sit after the interesting work is done. A step that has to happen every time and that nothing else will catch belongs in code, not in a reminder.
+
 - A dated `history` entry in `meta.json` summarizing the rebuild.
-- A `usage/log.md` row — and if the rebuild found a systemic pattern, such as every claim from one source needing re-confidencing, that belongs in the friction field for `improve-corp-os`.
+- A `usage/log.md` row — and if the rebuild found a systemic pattern, such as every claim from one source needing re-confidencing, that belongs in the friction field for `corp-os-improve`.

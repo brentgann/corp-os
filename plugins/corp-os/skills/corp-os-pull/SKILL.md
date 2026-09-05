@@ -9,6 +9,14 @@ Executes against the connector registry. Writing to `raw/` is autonomous; everyt
 
 Read `${CLAUDE_PLUGIN_ROOT}/reference/data-model.md` for the raw file shape and the two-layer rule.
 
+## Pre-flight
+
+Confirm the OS is actually accessible right now — mounted, current, readable — not recalled from an earlier session. A stale export or a folder that did not mount produces confident output about files that do not exist. If it is not there, stop and ask.
+
+The files outrank memory. Where anything recalled conflicts with what is written in the OS, the files win and the memory gets corrected.
+
+Read `config.json` first — it is the authority on this OS's layers, vocabulary, decay windows, retention policy, and gate strictness. Fall back to the shipped defaults only where it is silent, and speak the person's own labels back to them rather than this plugin's.
+
 ## Step 0 — scan and scope
 
 Read `INDEX.md`, `jobs/INDEX.md`, `connectors.md`, and `meta.json` (for the `cutoff` map).
@@ -46,7 +54,7 @@ For `tags`: draw from the vocabulary already in use in the OS. Check recent raw 
 Non-negotiable, and independent of any claim decision:
 
 - Every new raw file appears in `INDEX.md`'s unprocessed queue with a one-line gist.
-- `meta.json` counts recounted programmatically; `cutoff` advanced per source; a dated `history` entry added.
+- Counts recounted by running `scripts/build_index.py` in the OS rather than by hand; `cutoff` advanced per source; a dated `meta.json` history entry added.
 
 A run that reports what it found only in chat, without updating `INDEX.md`, has not finished. Waiting on the claims decision before updating the index is a bug, not caution — the index describes what is in `raw/`, and that is already true.
 
@@ -68,5 +76,15 @@ Write confirmed claims, flip `processed: true` on the raw files they drew from, 
 
 ## Every run ends with
 
-- One row in `usage/log.md`. Real friction in the friction field: "four files could not be assigned to any job" or "two of five claims were proposed from a single unverified mention" is the signal `improve-corp-os` mines.
+Close the run with `scripts/log_run.py` in the OS rather than editing the files by hand — it writes the `usage/log.md` row and the dated `meta.json` history entry in one call, and refuses a blank friction field:
+
+```bash
+python3 scripts/log_run.py --skill corp-os-pull --scope "<what this run covered>" \
+    --friction "<where it hurt, or 'none'>" \
+    --event "<what changed>"
+```
+
+These are the two writes measurement says get dropped, because they sit after the interesting work is done. A step that has to happen every time and that nothing else will catch belongs in code, not in a reminder.
+
+- One row in `usage/log.md`. Real friction in the friction field: "four files could not be assigned to any job" or "two of five claims were proposed from a single unverified mention" is the signal `corp-os-improve` mines.
 - A short report: what was pulled per source, what was skipped and why, which connectors failed, which jobs moved, and what is still sitting unprocessed.

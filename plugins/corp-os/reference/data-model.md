@@ -59,15 +59,13 @@ Two rules that come before every operation, because getting them wrong silently 
 │   └── <topic-slug>.md     # claims grouped by topic
 ├── proposals/
 │   └── PROPOSAL-YYYY-MM-DD-<slug>.md   # the review gate, persisted
-├── sensitive.md            # quarantine — deliberately outside the scan path
+├── sensitive.md            # quarantine for *incidental* sensitive material only
 ├── raw/
 │   ├── README.md           # append-only convention + frontmatter shape
 │   └── YYYY-MM-DD--<source>--<slug>.md
 ├── company/
 │   ├── <company-slug>.md   # own employer, plus accounts / prospects / competitors
 │   └── market.md
-├── people/<slug>.md
-├── topics/<slug>.md
 ├── glossary.md
 ├── connectors.md           # what is connected, by what protocol, feeding what
 ├── design.md               # which design system governs rendered output
@@ -82,12 +80,16 @@ Two rules that come before every operation, because getting them wrong silently 
 
 Only `raw/`, `INDEX.md`, `meta.json`, `proposals/` and `usage/` are mandatory. **`jobs/` is not** — see below. Everything else gets created when the person actually wants it. An empty `glossary.md` nobody fills for six months is worse than not having one.
 
+A layer that is not in this tree — `people/`, `topics/`, `experiments/`, `matters/` — is not thereby unavailable. It is declared in `config.json` with its own `entry_schema` and `index_line`, and every skill then treats it exactly like a shipped one. What no layer may do is exist without that declaration: see "No layer is enabled without a schema" in `configuration.md`.
+
 ## The two layers, and the gate between them
 
 - **raw/** is the source of truth. Append-only. Never edited, never summarized in place, never deleted. Existing in raw/ does not make something true — only said.
+
+  **One sanctioned exception:** the `processed` flag in a raw file's frontmatter gets flipped to `true` once the derived layer has drawn from it. That flag is bookkeeping *about* the file, not part of what was said, and it has to live on the file so that a rebuild reading `raw/` wholesale can tell what was already worked. Nothing else in a raw file — body, speaker, date, source, citationable content — is ever edited. Stated explicitly because "append-only" and "flip `processed: true`" both appear in this suite, and an instruction that looks like it contradicts an invariant is one a future session will resolve in whichever direction it happens to read first.
 - **Everything else** is the derived layer. Fully regenerable from raw/ (that is what `corp-os-rebuild` does). Nothing lands here without a human confirming it.
 
-Skills may write to `raw/`, `INDEX.md`, `meta.json`, and `usage/log.md` autonomously. Skills must **propose, not write** anything entering `claims/`, `jobs/`, `people/`, `topics/`, `glossary.md`, or `company/`.
+Skills may write to `raw/`, `INDEX.md`, `meta.json`, and `usage/log.md` autonomously. Skills must **propose, not write** anything entering `claims/`, `jobs/`, `glossary.md`, `company/`, or any declared layer whose role is `derived`.
 
 The gate is not there because any single entry is risky. It is there because without it the derived layer stops being knowledge and becomes just a second, messier copy of raw/.
 
@@ -228,7 +230,7 @@ These get tracked as claims of kind `identity` and resolved deliberately, never 
 - **Do not merge on similarity.** A fourth person appearing under a shared first name, now with a surname attached, is a new candidate — not confirmation that they are one of the three already on file. Record it as a candidate and say so. The pull toward tidying an ambiguity into a single entry is strong and almost always wrong.
 - **When resolved, record the resolution and every place it propagated.** Not just "these two names are one person," but which files were corrected and whether the resolution changed anything else — an alias that turns out to describe someone leaving a *role* rather than the organization may also mean an entry was over-flagged as sensitive.
 
-`people/<slug>.md` carries an `aliases` list for this. An unresolved identity question is a normal state and belongs on a job's evidence list.
+Where the OS declares a `people` layer, its records carry an `aliases` list for this. An unresolved identity question is a normal state and belongs on a job's evidence list.
 
 ### Corpus-level confidence ceilings
 
@@ -246,24 +248,104 @@ Per-claim confidence is not sufficient on its own. When a batch of material ente
 
 Without a ceiling, one careless pass promotes a whole cohort of summaries to `confirmed` and there is no way afterward to tell which claims were ever really sourced. Mark the cohort in the raw frontmatter too, so a rebuild rediscovers the ceiling rather than depending on the README being read.
 
-### Sensitivity: quarantine, not just a flag
+### Sensitivity has two axes, and conflating them makes the OS wrong
 
-The `sensitivity` field marks an entry. That is not enough on its own, because a `sensitive` entry sitting inline in a topic file still gets loaded on every scan, still gets read over someone's shoulder, and still travels when that file is shared.
+A Corp-OS has one operator. Sensitivity exists so that material does not cross an **export boundary** into a multi-person system, not so that the person is kept from their own knowledge. Those are different jobs, and a single flag cannot do both — which is what an earlier version of this spec tried, and it failed in a way that is hard to see.
 
-`sensitive.md` is a quarantine file, deliberately **outside the scan path** — `INDEX.md` does not link to it, and skills do not open it unless the task specifically requires it. Sensitive content is moved there, and a one-line pointer is left in the original file so continuity is not lost:
+Every derived entry carries two independent fields:
+
+**`sensitivity`** — the **export class**. What must not leave, and to whom. `internal` / `sensitive` / `restricted` by default, renameable like any vocabulary. This is `corp-os-redact`'s axis, and redaction is the only place it is enforced.
+
+**`bearing`** — whether the OS can **reason correctly without it**. Two values:
+
+- **`incidental`** — the content is sensitive and the analysis does not depend on it. Someone's compensation band, a personal circumstance mentioned in passing. Removing it makes an answer thinner, not wrong.
+- **`load_bearing`** — the analysis is wrong without it. A departure that invalidates three plans. A constraint nobody outside the room knows about. A number that changes a conclusion.
+
+#### Where an entry lives follows from `bearing`, not from `sensitivity`
+
+| `sensitivity` | `bearing` | Where it lives |
+|---|---|---|
+| not sensitive | — | its normal layer, in the scan path |
+| sensitive | `incidental` | `sensitive.md`, outside the scan path, one-line pointer left behind |
+| sensitive | `load_bearing` | **its normal layer, in the scan path**, marked |
+
+**This is the correction, and it is worth being explicit about what was wrong.** Quarantining everything sensitive assumed that sensitive material is never needed for the daily job. When that assumption is false, the quarantine does not produce a gap — it produces a **confidently wrong answer**. The person does not hear "I don't know about that"; they hear a conclusion computed without the fact that would have changed it, with no signal that anything is missing. A gap someone can see is recoverable. An answer that is wrong for an invisible reason is not, and it is worse than never having captured the fact at all.
+
+So load-bearing sensitive material stays where the scan can reach it. The confidentiality is enforced at the export boundary, by `corp-os-redact`, which is the only place it was ever really enforced anyway — a quarantine file protects nothing the moment someone shares the folder.
+
+#### The test, and which way to fail
+
+Ask: **would an answer computed without this be *wrong*, or just thinner?** If removing it changes a conclusion, a priority, a number, or who is responsible, it is `load_bearing`. If it only removes colour, it is `incidental`.
+
+**Default to `load_bearing` when it is genuinely unclear.** The two errors are not symmetric. Wrongly marking something `incidental` quarantines a fact the person needed and produces silent wrong answers. Wrongly marking something `load_bearing` means it sits in the scan path and `corp-os-redact` has one more thing to strip on the way out — visible, recoverable, and caught by a skill built for exactly that. Fail toward the recoverable direction, the same way a new layer defaults to `role: source`.
+
+### Deletion leaves a tombstone
+
+When raw material is destroyed under a retention obligation, write a tombstone in its place — same path, `.deleted.md` suffix — recording what was deleted, its original frontmatter, the date, the obligation, and how many derived entries were re-cited as a result.
+
+**This came out of running the thing.** Asked to carry out a retention deletion against a fixture, a run invented the tombstone unprompted, and it is better than what the spec had. A deletion without one leaves a hole: a later rebuild reading `raw/` sees material that does not exist and cannot tell the difference between "never captured" and "destroyed under obligation" — and those call for completely different responses. The tombstone also means the `no source` entries left behind can be traced to a reason rather than looking like sloppiness.
+
+The tombstone carries no content from the deleted file. That would defeat the obligation.
+
+#### `sensitive.md`
+
+Still the quarantine for `incidental` material, still outside the scan path, still with a one-line pointer left behind so continuity is not lost:
 
 > Personnel context on this exists — see `sensitive.md`.
 
-Captured, never suppressed. The point is that content nobody needs for the daily job stops being in the daily path, not that it disappears.
+Captured, never suppressed. What changed is that it is no longer where *all* sensitive material goes — only the part whose absence costs nothing but detail.
 
 ### Reclassification is logged, never silent
 
-When something's confidence, sensitivity, or kind is changed on review, record the change and its reasoning as an entry — not as an edit.
+When something's confidence, sensitivity, **bearing**, or kind is changed on review, record the change and its reasoning as an entry — not as an edit.
+
+A `bearing` change is the one most worth logging, because it moves the entry: promoting `incidental` to `load_bearing` pulls it back into the scan path, and demoting does the reverse. Someone reading later needs to know that the placement was decided rather than defaulted.
 
 An over-cautious `sensitive` flag downgraded to `internal` because the content turned out to be business signal rather than personnel signal is a **decision about the schema's application**, and the next person to look (including a future rebuild) needs to see that it was reviewed rather than assume it was never flagged. The same applies in reverse.
 
 This is provenance for the classification, distinct from provenance for the content. Systems that skip it develop a slow, invisible drift in what their own labels mean.
 
+
+## Decision record
+
+Optional layer, declared as `layers.decisions`. It holds decisions that have **not been made yet** — the live forks. A decision that has been made is a `decision` claim, and closing a record here produces one.
+
+The split is worth stating because it decides where things go. A claim rots by going stale, and a sweep catches it. An open decision rots by going quiet, and nothing catches that except a date, which is why `decide_by` is required here and has no equivalent on a claim.
+
+`decisions/<slug>.md`:
+
+```markdown
+---
+id: dec-007
+statement: "Per-seat or usage pricing for the mid-market tier?"
+owner: "Priya Raman"        # a person, never a team
+status: open                # open | blocked | decided | lapsed | moot
+decide_by: 2026-11-01
+reversibility: costly       # reversible | costly | one-way
+blocks: [job-004, dec-009]
+opened: 2026-09-12
+---
+
+## Options
+- **Per-seat** — predictable revenue; caps expansion in accounts that add read-only users.
+- **Usage** — expands with adoption; unpredictable, and finance has said forecasting is the constraint.
+
+## What would settle it
+Whether the accounts that churned last year were seat-capped or usage-capped. Filed as an evidence item on job-004.
+
+## Rests on
+- CL-0042 (fact) — Acme named per-seat cost as the renewal obstacle.
+- CL-0061 (assumption, untested) — mid-market buyers prefer predictable billing.
+
+## History
+Dated log: opened, blocked, owner changed, decided or lapsed, and the reasoning at the time.
+```
+
+**`decide_by` is what makes the layer work.** Past that date the choice is being made by default, and the record should say which option is winning by inaction. A decision layer without dates is a list of things someone feels vaguely bad about.
+
+**`reversibility` sets how much evidence is worth gathering.** A reversible call made quickly and corrected beats a one-way call made slowly on the same information. Recording which kind this is stops both errors — the month spent on something that could have been tried in an afternoon, and the one-way door walked through casually.
+
+On closure, the record keeps **the reasoning at the time**, not the reasoning that looks best afterward. Whether a call was wrong or merely unlucky is the single most useful thing this layer can answer a year later, and it is unrecoverable if the record was written to flatter.
 
 ## Raw file
 
@@ -314,7 +396,7 @@ The **blind spots** field earns its keep. A connector registry that only lists w
 | 2026-09-04 | corp-os-recall | job-004 | churn risk evidence for Acme | answered from 3 claims | 2 of 3 claims were past decay |
 ```
 
-`friction` is the field `improve-corp-os` mines. Leave it blank when a run was clean; write the specific annoyance when it was not. "Had to ask the person which job this belonged to because nothing in the index made it obvious" is a useful row. "Went fine" is noise.
+`friction` is the field `corp-os-improve` mines. Leave it blank when a run was clean; write the specific annoyance when it was not. "Had to ask the person which job this belonged to because nothing in the index made it obvious" is a useful row. "Went fine" is noise.
 
 ## meta.json
 
