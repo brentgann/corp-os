@@ -14,8 +14,8 @@ _Regenerated 2026-09-05 by scripts/build_index.py (counts and listings only — 
 
 ## Open-Items
 
-- **[oi-002](open-items/attestation-scope.md)** — Does the Q2 attestation move change the evidence we have to collect? · soon
 - **[oi-001](open-items/meridian-replacement.md)** — What replaces the Meridian SLA tier after March? · now
+- **[oi-002](open-items/attestation-scope.md)** — Does the Q2 attestation move change the evidence we have to collect? · soon
 - **[oi-003](open-items/retention-figure.md)** — Is the seven-year retention figure actually right? · watching
 
 ## Playbooks

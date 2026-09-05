@@ -89,10 +89,34 @@ def load_config(root):
     return cfg
 
 
-def _lbl(name, layers):
-    """A layer's display name: its configured label, else its key."""
-    spec = layers.get(name) or {}
-    return spec.get("label") or name.replace("_", " ").title()
+def _plural(word):
+    """Enough pluralization for a heading. Not a linguistics engine."""
+    if word.endswith("y") and not word.endswith(("ay", "ey", "iy", "oy", "uy")):
+        return word[:-1] + "ies"
+    if word.endswith(("s", "x", "z", "ch", "sh")):
+        return word + "es"
+    return word + "s"
+
+
+def _lbl(name, layers, cfg=None):
+    """A layer's display name, in the person's words.
+
+    Order: the layer's own `label`, then the vocabulary rename for the term
+    this layer holds, then the key. The vocabulary step is the one that
+    matters -- an OS that renamed `claim` to `entry` was still getting a
+    heading that said "Claims", which is the plugin talking over the person in
+    the one file every skill reads first.
+    """
+    spec = (layers.get(name) or {})
+    if spec.get("label"):
+        return spec["label"]
+    vocab = ((cfg or {}).get("vocabulary") or {})
+    # config.vocabulary keys are singular terms ("claim"), layers are plural
+    # concepts ("claims"); match either spelling.
+    for key in (name, name[:-1] if name.endswith("s") else name):
+        if vocab.get(key):
+            return _plural(str(vocab[key])).replace("_", " ").title()
+    return name.replace("_", " ").title()
 
 
 def render_line(template, fm, fallback):
@@ -209,14 +233,14 @@ def render_index(root, s, cfg):
         f"- **Raw files**: {len(s['raw'])} ({len(s['unprocessed'])} unprocessed)",
     ]
     if s.get("jobs"):
-        L.insert(-1, f"- **{_lbl('jobs', layers)}**: {len(s['jobs'])}")
+        L.insert(-1, f"- **{_lbl('jobs', layers, cfg)}**: {len(s['jobs'])}")
     if s.get("claim_entries"):
-        L.append(f"- **{_lbl('claims', layers)}**: {s['claim_entries']}")
+        L.append(f"- **{_lbl('claims', layers, cfg)}**: {s['claim_entries']}")
     for name in sorted(k for k in s if isinstance(s.get(k), list)
                        and k not in ("raw", "jobs", "claims", "unprocessed",
                                      "unlisted")):
         if s[name]:
-            L.append(f"- **{_lbl(name, layers)}**: {len(s[name])}")
+            L.append(f"- **{_lbl(name, layers, cfg)}**: {len(s[name])}")
     for name, meta in sorted(s.get("_single", {}).items()):
         if not meta["in_scan"]:
             continue
@@ -224,7 +248,7 @@ def render_index(root, s, cfg):
         if meta["groups"]:
             detail = " (" + ", ".join(f"{k.lower()} {v}"
                                       for k, v in meta["groups"].items()) + ")"
-        L.append(f"- **{_lbl(name, layers)}**: {meta['entries']}{detail}")
+        L.append(f"- **{_lbl(name, layers, cfg)}**: {meta['entries']}{detail}")
     if s["glossary_terms"] and "glossary" not in (s.get("_single") or {}):
         L.append(f"- **Glossary terms**: {s['glossary_terms']}")
     L.append("")
@@ -244,7 +268,25 @@ def render_index(root, s, cfg):
         template = spec.get("index_line")
         if not template:
             missing_template.append(name)
-        L += [f"## {name.replace('_', ' ').title()}", ""]
+        # A layer can declare which field orders it, and the order that
+        # field's values take. An urgency-tiered layer carrying the priority
+        # signal is the case that needs it: sorted by filename, a `now` item
+        # can sit below a `watching` one in the file every skill reads first,
+        # which defeats the point of tiering it. Ordering by a declared enum is
+        # deterministic, so it stays on the bookkeeping side of the line -- the
+        # script is not deciding what is urgent, only reading what the config
+        # already said.
+        order_by = spec.get("order_by")
+        if order_by:
+            values = (spec.get("entry_schema", {}).get(order_by, {})
+                      .get("values") or [])
+            rank = {v: i for i, v in enumerate(values)}
+            files = sorted(
+                files,
+                key=lambda f: (rank.get(frontmatter(f).get(order_by), len(rank)),
+                               os.path.basename(f)))
+
+        L += [f"## {_lbl(name, layers, cfg)}", ""]
         for f in files:
             fm = frontmatter(f)
             fallback = os.path.basename(f)[:-3].replace("-", " ")
@@ -269,7 +311,7 @@ def render_index(root, s, cfg):
     for name, meta in sorted(s.get("_single", {}).items()):
         if not meta["in_scan"] or not meta["groups"]:
             continue
-        L += [f"## {_lbl(name, layers)}", "",
+        L += [f"## {_lbl(name, layers, cfg)}", "",
               f"{meta['entries']} entries in [`{meta['path']}`]({meta['path']}), "
               "grouped as:", ""]
         for g, n in meta["groups"].items():

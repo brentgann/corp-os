@@ -73,7 +73,8 @@
         }
       },
       "index_line": "{id} \u2014 {question} \u00b7 {urgency}",
-      "decay": "60d"
+      "decay": "60d",
+      "order_by": "urgency"
     },
     "playbooks": {
       "enabled": true,

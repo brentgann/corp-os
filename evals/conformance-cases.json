@@ -323,6 +323,110 @@
         }
       ],
       "_note": "Three runs, three locations, a log every time -- including one that named it 'redaction-record'. The skill keeps its recommended path so the person has somewhere consistent to look, but the check now asserts what actually matters: a private log exists, locally, alongside the cleaned copy."
+    },
+    {
+      "id": "pull-broken-connector",
+      "skill": "corp-os-pull",
+      "fixture": "examples/fixture-register",
+      "prompt": "Catch me up — pull whatever is new since last time.",
+      "answers": "yes, everything since each source's recorded cutoff, and don't stop to ask me about each one",
+      "expect_changed": [
+        {
+          "name": "the broken connector was recorded as broken, not silently skipped",
+          "prefix": "connectors.md",
+          "why": "the meeting-notes connector has been dead since July. A run that quietly pulls from email and reports success leaves the person believing they are covered on a source that has returned nothing for six weeks -- which is the specific way an OS starts mistaking silence for absence"
+        }
+      ],
+      "expect_untouched": [
+        {
+          "name": "the hand-maintained source layer was not touched",
+          "prefix": "playbooks/",
+          "why": "pull writes to raw/ and the index; it has no business anywhere near a source layer"
+        }
+      ],
+      "_note": "The point is the failure path, not the happy one. No connector resolves in a sandbox, so every source fails -- and the skill says to mark each broken with the specific failure and carry on with the others. A run that aborts on the first dead connector, or reports success having pulled nothing, both fail here."
+    },
+    {
+      "id": "glossary-competing-definitions",
+      "skill": "corp-os-glossary",
+      "fixture": "examples/fixture-os",
+      "prompt": "Add a term: 'active seat'. Finance counts anyone with a login in the last 90 days; the product team counts anyone who took an action in the last 30. I keep getting burned in meetings because we all say it like it means one thing.",
+      "answers": "yes, record both definitions, and yes go ahead once you've shown me the entry",
+      "expect_added": [
+        {
+          "name": "a proposal was filed before the entry was written",
+          "prefix": "proposals/",
+          "why": "glossary entries are derived-layer like anything else"
+        }
+      ],
+      "expect_output": [
+        {
+          "name": "both definitions survived",
+          "needle": "finance",
+          "why": "a glossary that flattens a real disagreement into one authoritative-looking entry makes things worse than no entry: it gives two teams the same word and the confidence that they agree"
+        }
+      ]
+    },
+    {
+      "id": "connect-blind-spots",
+      "skill": "corp-os-connect",
+      "fixture": "examples/fixture-register",
+      "prompt": "I want to add my calendar as a source. What would that give me?",
+      "answers": "yes, register it, on-demand cadence — and yes I want the blind spots written down",
+      "expect_changed": [
+        {
+          "name": "the registry gained the source",
+          "prefix": "connectors.md",
+          "why": "registering is the deliverable; a conversation about a source that never reaches the registry has left nothing behind"
+        }
+      ],
+      "expect_output": [
+        {
+          "name": "the blind spots question was actually asked",
+          "needle": "blind",
+          "why": "a registry listing only what each source provides quietly implies full coverage, which is never true. This is the field that later explains why an open item never got answered, which is why it belongs in the registry rather than in someone's head"
+        }
+      ]
+    },
+    {
+      "id": "setup-from-empty",
+      "skill": "corp-os-setup",
+      "fixture": "empty",
+      "prompt": "I want to set up a work OS. I'm a contracts manager — most of my work is vendor agreements: what's in them, when they renew, who owns each relationship. Three or four live at a time. Set it up.",
+      "answers": "keep the interrogation short, make reasonable assumptions and say what you assumed, and yes go ahead and scaffold it — I'd rather see something and adjust than answer twenty questions",
+      "expect_added": [
+        {
+          "name": "an INDEX.md was written",
+          "prefix": "INDEX.md",
+          "why": "the scan contract's entry point; without it nothing else in the suite can find the OS at all"
+        },
+        {
+          "name": "meta.json was written",
+          "prefix": "meta.json",
+          "why": "counts, cutoffs and the dated history every later run reads"
+        },
+        {
+          "name": "config.json was written",
+          "prefix": "config.json",
+          "why": "this is what makes the OS the person's shape rather than the shipped one, and it is the file every other skill reads first"
+        },
+        {
+          "name": "the append-only source layer exists",
+          "prefix": "raw/",
+          "why": "mandatory; the invariant everything else rests on"
+        },
+        {
+          "name": "the review gate has somewhere to write",
+          "prefix": "proposals/",
+          "why": "the gate is persisted, not conversational, so the folder is not optional"
+        },
+        {
+          "name": "the shipped scripts were copied in",
+          "prefix": "scripts/",
+          "why": "four steps that must happen every time now live in code, and an OS without them is one where each gets done by hand or not at all"
+        }
+      ],
+      "_note": "The only case that starts from an empty directory. It cannot answer the question anyone actually cares about -- whether a nine-area interrogation lands on a real person who did not design it -- but it can answer the machine-checkable half: is what comes out a valid OS. The first run of this case answered no, and produced scaffold.py."
     }
   ]
 }

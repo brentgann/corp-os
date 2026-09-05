@@ -268,6 +268,24 @@ def render_index(root, s, cfg):
         template = spec.get("index_line")
         if not template:
             missing_template.append(name)
+        # A layer can declare which field orders it, and the order that
+        # field's values take. An urgency-tiered layer carrying the priority
+        # signal is the case that needs it: sorted by filename, a `now` item
+        # can sit below a `watching` one in the file every skill reads first,
+        # which defeats the point of tiering it. Ordering by a declared enum is
+        # deterministic, so it stays on the bookkeeping side of the line -- the
+        # script is not deciding what is urgent, only reading what the config
+        # already said.
+        order_by = spec.get("order_by")
+        if order_by:
+            values = (spec.get("entry_schema", {}).get(order_by, {})
+                      .get("values") or [])
+            rank = {v: i for i, v in enumerate(values)}
+            files = sorted(
+                files,
+                key=lambda f: (rank.get(frontmatter(f).get(order_by), len(rank)),
+                               os.path.basename(f)))
+
         L += [f"## {_lbl(name, layers, cfg)}", ""]
         for f in files:
             fm = frontmatter(f)

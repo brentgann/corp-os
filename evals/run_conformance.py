@@ -242,7 +242,13 @@ def check(case, before, after, work, output=""):
 def run(case, model, timeout, keep, fixture):
     tmp = tempfile.mkdtemp(prefix=f"conf-{case['id']}-")
     work = os.path.join(tmp, "os")
-    shutil.copytree(fixture, work)
+    if case.get("fixture") == "empty":
+        # corp-os-setup starts from nothing, so its case has to as well.
+        # Everything else here checks what a skill did to an OS; this one
+        # checks whether what came out *is* one.
+        os.makedirs(work)
+    else:
+        shutil.copytree(fixture, work)
     before = digest(work)
     skill = os.path.join(PLUGIN, "skills", case["skill"], "SKILL.md")
     ans = case.get("answers")
@@ -302,8 +308,9 @@ def main():
         futs = {}
         for c in cases:
             for _ in range(a.repeats):
-                fx = (os.path.join(PLUGIN, c["fixture"]) if c.get("fixture")
-                      else a.fixture)
+                fx = (a.fixture if not c.get("fixture")
+                      else "" if c["fixture"] == "empty"
+                      else os.path.join(PLUGIN, c["fixture"]))
                 futs[ex.submit(run, c, a.model, a.timeout, a.keep, fx)] = c
         for f in as_completed(futs):
             res = f.result()
@@ -337,7 +344,8 @@ def main():
     total = sum(len(r["results"]) for r in out)
     passed = sum(1 for r in out for x in r["results"] if x["passed"])
 
-    shapes = sorted({c.get("fixture", "examples/fixture-os") for c in cases})
+    shapes = sorted({c.get("fixture", "examples/fixture-os") for c in cases}
+                    - {"empty"}) or ["an empty directory"]
     L = ["# Conformance", "",
          f"Model `{a.model}` · {len(out)} cases · each against a fresh copy of "
          + ", ".join(f"`{s}`" for s in shapes), "",

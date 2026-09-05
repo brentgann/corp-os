@@ -107,7 +107,8 @@ def main():
 
     # --- shipped assets parse
     for script in ("scripts/build_index.py", "scripts/write_export.py",
-                   "scripts/log_run.py", "scripts/delete_source.py"):
+                   "scripts/log_run.py", "scripts/delete_source.py",
+                   "scripts/scaffold.py"):
         try:
             ast.parse(open(script, encoding="utf-8").read())
         except SyntaxError as e:
@@ -303,32 +304,35 @@ def main():
                 err(f"{fixture} has no scripts/{script} — corp-os-setup puts "
                     "one in every OS it scaffolds, and skills that reach for "
                     "it will fail against a fixture that does not")
-        # Every fixture file must be tracked by git, not merely present on
-        # disk. The repo ignores `raw/`, `usage/log.md`, `proposals/` and
-        # `sensitive.md` so nobody commits a real OS -- and the fixtures are
-        # made of exactly those. Without a negation rule they commit
-        # incomplete, the build passes locally, and the first person to clone
-        # gets a broken one. That failure only ever shows up on someone else's
-        # machine, which is the kind worth spending a check on.
-        rel_root = os.path.join("plugins", "corp-os", fixture).replace(os.sep, "/")
+        # No fixture file may be IGNORED by git. The repo ignores `raw/`,
+        # `usage/log.md`, `proposals/` and `sensitive.md` so nobody commits a
+        # real OS -- and the fixtures are made of exactly those. Without a
+        # negation rule they commit incomplete, the build passes locally, and
+        # the first person to clone gets a broken one. That failure only ever
+        # shows up on someone else's machine, which is the kind worth spending
+        # a check on.
+        #
+        # The question is "would git ignore this", not "has it been committed
+        # yet" -- an uncommitted new fixture file is ordinary work in progress
+        # and failing the build on it makes the check something people route
+        # around.
         try:
-            r0 = subprocess.run(["git", "ls-files", rel_root], cwd=ROOT,
-                                capture_output=True, text=True, timeout=30)
-            listed = {x.strip() for x in r0.stdout.split("\n") if x.strip()}
-            if r0.returncode == 0 and listed:
-                on_disk = set()
-                for dp, _, fn in os.walk(fixture):
-                    for f in fn:
-                        # dp is relative to PLUGIN (validate.py chdir'd there),
-                        # so prefix it to get the repo-relative path git uses.
-                        on_disk.add(("plugins/corp-os/" +
-                                     os.path.join(dp, f).replace(os.sep, "/")
-                                     .lstrip("./")))
-                untracked = sorted(on_disk - listed)
-                if untracked:
-                    err(f"{fixture}: {len(untracked)} file(s) on disk but not "
-                        f"tracked by git — a clone gets a broken fixture. "
-                        f"Check .gitignore: {untracked[:4]}")
+            paths = []
+            for dp, _, fn in os.walk(fixture):
+                for f in fn:
+                    paths.append("plugins/corp-os/" +
+                                 os.path.join(dp, f).replace(os.sep, "/")
+                                 .lstrip("./"))
+            if paths:
+                r0 = subprocess.run(["git", "check-ignore", "--stdin"], cwd=ROOT,
+                                    input="\n".join(paths), capture_output=True,
+                                    text=True, timeout=30)
+                ignored = sorted(x.strip() for x in r0.stdout.split("\n")
+                                 if x.strip())
+                if ignored:
+                    err(f"{fixture}: {len(ignored)} file(s) would be ignored by "
+                        f"git — a clone gets a broken fixture. Add a negation "
+                        f"to .gitignore: {ignored[:4]}")
         except (subprocess.TimeoutExpired, OSError):
             pass
 

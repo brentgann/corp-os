@@ -46,7 +46,18 @@ Name what is deliberately being left out and why — a declined source is a deci
 
 ## Step 3 — scaffold
 
-Create the mandatory core: `raw/README.md`, `INDEX.md`, `meta.json`, `profile.md`, `jobs/INDEX.md`, `usage/log.md`, `usage/proposals.md`, and one job record per job from Step 1.
+**Run the scaffolder. Do not hand-build the skeleton.**
+
+```bash
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/scaffold.py --root <where the OS lives> \
+    --profile <profile> --layers <what they asked for> --vocab claim=<their word>
+```
+
+It writes the mandatory core — `config.json`, `INDEX.md`, `meta.json`, `raw/` with its append-only README, `proposals/`, `usage/` — declares the optional layers they asked for, and copies the four shipped scripts in.
+
+**Why this is a script and not a list.** Measured against an empty directory, this skill produced a *contracts filing system*: sensible folders for someone in contract management, a template, a couple of playbooks — and no `INDEX.md`, no `meta.json`, no `config.json`, no `raw/`. Not a Corp-OS, so nothing else in the suite could operate on it. Adapting to a person's own vocabulary and domain is right, and this skill should keep doing it. The five invariants are not vocabulary, and a scaffold that drops them has produced a folder.
+
+The skeleton is deliberately empty. Everything that makes it *theirs* — the README in their words, the jobs or open items, the connectors and their blind spots — is the rest of this skill's job.
 
 Create `proposals/` alongside them — the review gate writes there, so it is not optional.
 
@@ -112,6 +123,16 @@ Follow `${CLAUDE_PLUGIN_ROOT}/reference/dashboard-patterns.md` and hand off the 
 
 Verify programmatically: every file the spec calls for exists, every job in `jobs/` appears in `jobs/INDEX.md` with a one-liner, counts in `meta.json` and `INDEX.md` match an actual count.
 
-Close the run with the script you just copied in — `python3 scripts/log_run.py --skill corp-os-setup --scope "<the shape they chose>" --friction "<where the interrogation stalled>" --event "scaffolded from the <profile> profile"`. It writes the log row and the history entry together. Using it here also shows the person the tool exists, on the one run where they are watching.
+Close the run with the script the scaffolder copied in:
+
+```bash
+python3 scripts/log_run.py --skill corp-os-setup --scope "<the shape they chose>" \
+    --friction "<where the interrogation stalled, or 'none'>" \
+    --event "scaffolded from the <profile> profile"
+```
+
+It writes the `usage/log.md` row and the dated `meta.json` history entry together. Use it here rather than writing either by hand — this is the one run where the person is watching, so it is also where they learn the tool exists.
+
+The friction field matters more on this run than on any other. "Could not state a definition of done for two of three jobs", "had no idea what their connectors were called" — that is what `corp-os-improve` reads later, and setup is the only run that sees the person before they have adapted to the system.
 
 Then name **one** next action and offer to do it — pulling from their highest-value connector, or adding the meeting notes from this week. Do not leave someone with an empty, well-organized folder and a list of options.
