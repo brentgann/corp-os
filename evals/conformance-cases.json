@@ -426,7 +426,7 @@
           "why": "four steps that must happen every time now live in code, and an OS without them is one where each gets done by hand or not at all"
         }
       ],
-      "_note": "The only case that starts from an empty directory. It cannot answer the question anyone actually cares about -- whether a nine-area interrogation lands on a real person who did not design it -- but it can answer the machine-checkable half: is what comes out a valid OS. The first run of this case answered no, and produced scaffold.py."
+      "_note": "The only case that starts from an empty directory, and the only one that has not been made to pass. Six runs across three configurations -- the scaffolder unmentioned, the scaffolder called in Step 3, the scaffolder as Step 0 before any question -- all produced a domain-shaped folder (agreements/, renewals.md, vendors/, a template, a clause checklist) and none of the five invariants. 2/9 to 3/10 every time.\n\nTwo readings, and they are worth separating before anyone 'fixes' this again. It may be the skill: with no existing OS to anchor to and a request dense with domain content, the structure loses to the vocabulary. Or it may be this harness: the frame says 'the skill is at <path>, read it and follow it', which a model may treat as reference material rather than as the procedure it must execute. Fifteen of sixteen cases follow their skill closely, which argues for the first reading -- but every one of those fifteen starts from an existing OS, so none of them tests what this one tests.\n\nThe way to tell them apart is to install the plugin and run /corp-os in a real session against an empty folder. Until that is done, this is recorded as unresolved rather than patched again."
     }
   ]
 }

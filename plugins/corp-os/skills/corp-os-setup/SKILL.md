@@ -17,7 +17,25 @@ The files outrank memory. Where anything recalled conflicts with what is written
 
 Read `config.json` first — it is the authority on this OS's layers, vocabulary, decay windows, retention policy, and gate strictness. Fall back to the shipped defaults only where it is silent, and speak the person's own labels back to them rather than this plugin's.
 
-## Step 0 — check nothing already exists
+## Step 0 — scaffold first, then interrogate
+
+**Before the first question, run the scaffolder.** Check nothing already exists (below), then:
+
+```bash
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/scaffold.py --root <where the OS lives> --profile minimal
+```
+
+Say what you did in one line — "there's a working OS at that path now; the interrogation is about making it yours" — and move on. It takes a second and it is the difference between a session that ends with an OS and one that ends with a folder.
+
+**Why this order, when the interrogation is supposed to shape the scaffold.** Measured against an empty directory, three runs out of three: asked to set up an OS for a contracts manager, this skill produced a *contracts filing system* — `agreements/`, `renewals.md`, `vendors/`, a template, a clause checklist. Sensible, useful to that person, and not a Corp-OS: no `INDEX.md`, no `meta.json`, no `config.json`, no `raw/`. Nothing else in the suite could operate on it. Adding the scaffolder to Step 3 and telling this skill to run it did not change the outcome, because by Step 3 the domain has already taken over.
+
+Two pressures cause it and both are legitimate. A person describes their work in their own vocabulary and this skill is *right* to adapt to it. And a person who says "I'd rather see something than answer twenty questions" is asking for exactly what they should get. Neither is a reason to hand back something the rest of the suite cannot read. Scaffolding first satisfies both: the invariants are on disk before the domain can push them off it, and the person sees something immediately.
+
+It also fixes the more common failure. The likeliest way this skill fails is not a wrong answer, it is someone abandoning the interrogation halfway — and scaffolding first means they still have a working OS when they do.
+
+The scaffold is minimal and empty on purpose. Everything after this makes it theirs: the layers they actually need, their vocabulary, their decay windows, their README in their words.
+
+## Step 0.5 — check nothing already exists
 
 Look for an existing Corp-OS root — `INDEX.md` + `meta.json`, with `config.json` beside them as confirmation — wherever the person means. If one exists, stop and say so: this skill does not re-scaffold over a live OS. Offer `corp-os-jobs` to add jobs, `corp-os-configure` to reshape structure, or `corp-os-rebuild` to re-derive.
 
@@ -44,20 +62,18 @@ Summarize back, in plain language: the jobs, which sources feed which jobs, whic
 
 Name what is deliberately being left out and why — a declined source is a decision worth recording, and saying it out loud now prevents it being re-litigated monthly.
 
-## Step 3 — scaffold
+## Step 3 — shape the scaffold to the answers
 
-**Run the scaffolder. Do not hand-build the skeleton.**
+The skeleton is already on disk from Step 0. This step makes it theirs.
+
+Re-run the scaffolder with what the interrogation actually established — it is safe to point at the same root with `--force` since nothing has been written into it yet:
 
 ```bash
-python3 ${CLAUDE_PLUGIN_ROOT}/scripts/scaffold.py --root <where the OS lives> \
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/scaffold.py --root <path> --force \
     --profile <profile> --layers <what they asked for> --vocab claim=<their word>
 ```
 
-It writes the mandatory core — `config.json`, `INDEX.md`, `meta.json`, `raw/` with its append-only README, `proposals/`, `usage/` — declares the optional layers they asked for, and copies the four shipped scripts in.
-
-**Why this is a script and not a list.** Measured against an empty directory, this skill produced a *contracts filing system*: sensible folders for someone in contract management, a template, a couple of playbooks — and no `INDEX.md`, no `meta.json`, no `config.json`, no `raw/`. Not a Corp-OS, so nothing else in the suite could operate on it. Adapting to a person's own vocabulary and domain is right, and this skill should keep doing it. The five invariants are not vocabulary, and a scaffold that drops them has produced a folder.
-
-The skeleton is deliberately empty. Everything that makes it *theirs* — the README in their words, the jobs or open items, the connectors and their blind spots — is the rest of this skill's job.
+Anything the shipped model has no name for is a **custom layer**, and the scaffolder deliberately refuses to guess at one. Declare it in `config.json` by hand with its own `entry_schema` and `index_line`, per `${CLAUDE_PLUGIN_ROOT}/reference/configuration.md`. A layer with no `index_line` is invisible to the scan contract.
 
 Create `proposals/` alongside them — the review gate writes there, so it is not optional.
 

@@ -148,6 +148,23 @@ Neither exercises judgment; they write what they are handed, including the frict
 
 The redaction assertion now counts outputs instead of matching a name, because chasing the name was testing a convention rather than the behavior that matters: two files, one of them private.
 
+### The one that has not been made to pass
+
+`setup-from-empty` is the only case that starts from an empty directory, and the only one still failing. Asked to set up an OS for a contracts manager, `corp-os-setup` produces a contracts filing system — `agreements/`, `renewals.md`, `vendors/`, a template, a clause checklist. Sensible for that person. None of the five invariants: no `INDEX.md`, no `meta.json`, no `config.json`, no `raw/`. Nothing else in the suite can operate on it.
+
+**Six runs, three configurations, no movement.** The scaffolder unmentioned; the scaffolder called in Step 3; the scaffolder as Step 0, before a single question, with the reasoning written out. 2/9 to 3/10 every time.
+
+That is a negative result worth the space, because the obvious next move — write the instruction more forcefully — has now been tried twice and is what this repo already learned does not work.
+
+Two readings, and separating them is the actual next step:
+
+- **It may be the skill.** With no existing OS to anchor to and a request dense with the person's own domain vocabulary, the structure loses to the vocabulary. Both pressures are legitimate: adapting to how someone describes their work is something `corp-os-setup` should do, and "I'd rather see something than answer twenty questions" is a reasonable thing to say.
+- **It may be this harness.** The frame says *the skill is at this path, read it and follow it* — which a model may reasonably treat as reference material rather than as a procedure to execute. Fifteen of sixteen cases follow their skill closely, which argues against this. But all fifteen start from an existing OS, so none of them tests what this one tests.
+
+The way to tell: install the plugin and run `/corp-os` in a real session against an empty folder. If it scaffolds correctly there, the harness is the problem and this case needs a different shape. If it does not, the fix is structural — the command runs `scaffold.py` itself before handing off, so the invariants land before the domain can push them off the disk.
+
+Recorded as unresolved rather than patched a third time.
+
 ### Where to take it next
 
 Twelve cases across nine skills. The ten skills with no case are the remaining gap, and none of them now has an irreversible path — those were the priority and they are covered. What is left is mostly the input side (`pull`, `connect`, `company`, `glossary`) plus the meta skills (`improve`, `audit`, `guide`, `setup`).
