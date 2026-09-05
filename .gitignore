@@ -1,0 +1,22 @@
+# build output
+dist/
+*.plugin
+
+# os / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# never commit a real corp-os instance -- these hold private work content
+**/raw/
+**/sensitive.md
+**/usage/log.md
+**/proposals/

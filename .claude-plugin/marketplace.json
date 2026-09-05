@@ -1,0 +1,15 @@
+{
+  "name": "brentgann",
+  "owner": { "name": "Brent Gann" },
+  "metadata": {
+    "description": "Skills for building and running a portable personal work OS.",
+    "version": "0.5.0"
+  },
+  "plugins": [
+    {
+      "name": "corp-os",
+      "source": "./plugins/corp-os",
+      "description": "A portable, configurable personal work OS: setup interrogation, ingestion, citable claims with decay, recall with provenance, dashboards, and a two-way audit."
+    }
+  ]
+}

@@ -1,0 +1,151 @@
+{
+  "corpos_version": "0.3.0",
+  "profile": "custom",
+  "vocabulary": {
+    "claim": "entry",
+    "confidence": [
+      "confirmed",
+      "needs_review",
+      "reconstructed"
+    ],
+    "sensitivity": [
+      "internal",
+      "sensitive"
+    ],
+    "tags": [
+      "Product",
+      "Strategy",
+      "Tech",
+      "Process",
+      "UX",
+      "Team"
+    ],
+    "tiers": [
+      "Leadership",
+      "Product",
+      "Design",
+      "Engineering",
+      "Go-to-market"
+    ],
+    "answer_status": [
+      "already building",
+      "signal exists",
+      "partial answer",
+      "open"
+    ]
+  },
+  "layers": {
+    "raw": {
+      "enabled": true,
+      "role": "source"
+    },
+    "jobs": {
+      "enabled": false
+    },
+    "claims": {
+      "enabled": false
+    },
+    "people": {
+      "enabled": true,
+      "role": "derived",
+      "gated": true,
+      "index_line": "{role} \u00b7 {tier} \u00b7 {status}",
+      "fields": [
+        "name",
+        "role",
+        "tier",
+        "status",
+        "tags",
+        "aliases"
+      ]
+    },
+    "topics": {
+      "enabled": true,
+      "role": "derived",
+      "gated": true,
+      "index_line": "{name} \u2014 {tags}"
+    },
+    "insights": {
+      "enabled": true,
+      "role": "derived",
+      "gated": true,
+      "index_line": "{title} \u2014 {timing}",
+      "promotion_bar": "5I: informative AND instructive AND insightful AND immediate. All four, or it stays a topic entry.",
+      "label_field": "title"
+    },
+    "gaps": {
+      "enabled": true,
+      "role": "derived",
+      "gated": true,
+      "path": "gaps.md",
+      "grouping": "level",
+      "levels": [
+        "critical",
+        "medium",
+        "low",
+        "resolved"
+      ]
+    },
+    "themes": {
+      "enabled": true,
+      "role": "derived",
+      "gated": true,
+      "path": "themes.md",
+      "grouping": "category"
+    },
+    "questions": {
+      "enabled": true,
+      "role": "derived",
+      "gated": true,
+      "path": "questions.md",
+      "grouping": "answer_status",
+      "entry_marker": "- **"
+    },
+    "glossary": {
+      "enabled": true,
+      "role": "derived",
+      "gated": true,
+      "path": "glossary.md",
+      "entry_marker": "- **"
+    },
+    "sensitive": {
+      "enabled": true,
+      "role": "derived",
+      "in_scan_path": false,
+      "path": "sensitive.md"
+    },
+    "proposals": {
+      "enabled": true,
+      "role": "record"
+    }
+  },
+  "decay": {
+    "enabled": false
+  },
+  "retention": {
+    "raw": {
+      "policy": "keep",
+      "ttl": null
+    }
+  },
+  "gate": {
+    "mode": "propose",
+    "persist_proposals": true
+  },
+  "confidence_ceilings": [
+    {
+      "cohort": "2026-07-08 migration from a previous tool's export",
+      "ceiling": "reconstructed",
+      "raw_marker": "reconstructed: true",
+      "count": 32,
+      "note": "processed gap-log summaries, not verbatim source"
+    }
+  ],
+  "scan": {
+    "index_first": true,
+    "excluded_from_scan": [
+      "sensitive.md"
+    ]
+  },
+  "_note": "A verified worked example, not a template to copy. It expresses a real four-month-old personal knowledge base -- 214 sources, 45 people, 28 topics, 137 open items across four urgency levels, 18 recurring themes, 63 glossary terms, 20 promoted insights, a quarantine file and persisted proposals -- that was built independently of corp-os and shares none of its layer names. Content, vocabulary and domain have been replaced with neutral equivalents; only the SHAPE is real. Note what it disables: jobs and claims are both off. The open-items layer plays the role claims would, urgency-tiering plays the role a job's evidence list would, and decay is off because most entries trace to summaries no re-read could confirm. build_index.py renders all of it unchanged. The point of shipping this is that a system can score well on every dimension that matters while using none of the model's default layers."
+}
