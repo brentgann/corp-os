@@ -19,7 +19,7 @@ Read `config.json` first — it is the authority on this OS's layers, vocabulary
 
 ## Step 0 — scan, and check the registry first
 
-Read `config.json` first — its `layers` block says what exists to render, `design` says what governs the look, and `dashboards.default_target` says whether output persists as an artifact or as a local file. Then `INDEX.md`, `jobs/INDEX.md`, `claims/INDEX.md`, `connectors.md`, and `dashboards/registry.md`.
+Read `config.json` first — its `layers` block says what exists to render, `design` says what governs the look, and `dashboards.default_target` says whether output persists as an artifact or as a local file. Then `INDEX.md`, `jobs/INDEX.md`, `claims/INDEX.md`, `connectors.md`, and `dashboards.md`.
 
 A custom layer is dashboard material like any other: if its `index_line` renders, it can be a panel.
 
@@ -27,7 +27,7 @@ Check the registry before building anything. If the requested dashboard already 
 
 ## Step 1 — pick from the person's jobs, not from the catalogue
 
-The patterns reference lists seven views. Do not offer all seven. Read their active jobs and propose the one or two that serve them:
+The patterns reference lists eight views. Do not offer all eight. Read their active jobs and propose the one or two that serve them:
 
 - Jobs blocked on missing information → **evidence gaps**.
 - Jobs running on old claims → **claim health**.
@@ -38,6 +38,10 @@ The patterns reference lists seven views. Do not offer all seven. Read their act
 - Uncertainty about what is even feeding the OS → **source coverage**.
 
 Build one well. Two half-built dashboards is worse than one, because neither gets trusted.
+
+**Once a second dashboard already exists**, offer a home/index view linking to all of them, plus the single most consequential thing across the OS right now. That does not compete with "build one well" — it is a thin hub, not another analytical view. Do not offer it before a second real dashboard exists; a homepage linking to one dashboard is not worth the second URL.
+
+**If a pattern needs a layer this OS has not declared** — a stakeholder map with no person layer, a decision log with no decisions layer — do not invent one inline to get the dashboard built. Hand off to `corp-os-configure` first; the `relationship` profile in `${CLAUDE_PLUGIN_ROOT}/reference/configuration.md` carries a worked `people` declaration. A layer improvised to serve a rendering is a layer declared without the interrogation that catches shape mistakes, and those are expensive to unpick once entries are in it.
 
 ## Step 2 — build each panel from named files
 
@@ -75,7 +79,7 @@ Build it theme-aware and responsive: define the light palette as tokens, redefin
 
 ## Step 5 — publish and register
 
-Publish as an artifact, since a dashboard exists to be returned to and shared. Then record it in `dashboards/registry.md`: name, URL, owning job, source files, cadence, last built.
+Publish as an artifact, since a dashboard exists to be returned to and shared. Then record it in `dashboards.md`: name, URL, owning job, source files, cadence, last built.
 
 On refresh, republish to the same URL and update `last built`. Never create a second artifact for the same dashboard.
 

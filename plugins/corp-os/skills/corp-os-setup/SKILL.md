@@ -27,7 +27,9 @@ python3 ${CLAUDE_PLUGIN_ROOT}/scripts/scaffold.py --root <where the OS lives> --
 
 Say what you did in one line — "there's a working OS at that path now; the interrogation is about making it yours" — and move on. It takes a second and it is the difference between a session that ends with an OS and one that ends with a folder.
 
-**Why this order, when the interrogation is supposed to shape the scaffold.** Measured against an empty directory, three runs out of three: asked to set up an OS for a contracts manager, this skill produced a *contracts filing system* — `agreements/`, `renewals.md`, `vendors/`, a template, a clause checklist. Sensible, useful to that person, and not a Corp-OS: no `INDEX.md`, no `meta.json`, no `config.json`, no `raw/`. Nothing else in the suite could operate on it. Adding the scaffolder to Step 3 and telling this skill to run it did not change the outcome, because by Step 3 the domain has already taken over.
+**Why this order, when the interrogation is supposed to shape the scaffold.** Run against an empty directory and asked to set up an OS for a contracts manager, this skill produced a *contracts filing system* — `agreements/`, `renewals.md`, `vendors/`, a template, a clause checklist. Sensible, useful to that person, and not a Corp-OS: no `INDEX.md`, no `meta.json`, no `config.json`, no `raw/`. Nothing else in the suite could operate on it.
+
+That observation stands. The measurement that used to be cited here does not, and the correction matters more than the paragraph. Six runs were read as *"scaffolding first did not fix it, so the domain must be overpowering the instruction"* — and the scaffolder had in fact never executed, because the eval harness could not run a script at all (ARCHITECTURE §4.27). With that fixed, this skill produces a valid OS in every run. **Scaffolding first works.** Nothing here needed the three instruction passes that were made when the failure looked real.
 
 Two pressures cause it and both are legitimate. A person describes their work in their own vocabulary and this skill is *right* to adapt to it. And a person who says "I'd rather see something than answer twenty questions" is asking for exactly what they should get. Neither is a reason to hand back something the rest of the suite cannot read. Scaffolding first satisfies both: the invariants are on disk before the domain can push them off it, and the person sees something immediately.
 
@@ -77,7 +79,7 @@ Anything the shipped model has no name for is a **custom layer**, and the scaffo
 
 Create `proposals/` alongside them — the review gate writes there, so it is not optional.
 
-Then create only the optional layers they asked for: `claims/`, `glossary.md`, `company/`, `connectors.md`, `design.md`, `dashboards/registry.md`.
+Then create only the optional layers they asked for: `claims/`, `glossary.md`, `company/`, `connectors.md`, `design.md`, `dashboards.md`.
 
 **Do not scaffold a layer you cannot write a schema for.** A person layer, a topic layer, anything the interrogation turned up that the shipped model has no name for — each is a declared layer with its own `entry_schema` and `index_line`, or it is not created. A folder that exists, appears in `INDEX.md`, and has no stated record shape fills with whatever the first session to touch it invented. If area 4 called for one, write the declaration now per `${CLAUDE_PLUGIN_ROOT}/reference/configuration.md`; the `relationship` profile carries a worked `people` declaration to copy.
 
@@ -85,12 +87,11 @@ Sensitivity is two fields, not one — `sensitivity` for what must not leave, `b
 
 If area 9 turned up anything sensitive, create `sensitive.md` now and write into `INDEX.md` that it exists but is deliberately **not** linked from the scan path. A quarantine file added after the fact means retrofitting content out of files it has already been scanned and shared from.
 
-Copy both shipped scripts into the OS's `scripts/`:
+**The scripts are already in `scripts/` — the scaffolder copied them in Step 3.** Do not copy them again by hand, and do not maintain a list of them here: this instruction listed two of them for three releases after there were four, which is the same defect it is written to prevent. `scaffold.py` is the one place that list lives.
 
-- `${CLAUDE_PLUGIN_ROOT}/scripts/build_index.py` — a thirty-second deterministic recount they can run after any manual edit. It reads nothing from `raw/` and retags nothing, which is what makes it safe.
-- `${CLAUDE_PLUGIN_ROOT}/scripts/write_export.py` — writes a redaction's cleaned copy and its private log together, and refuses to write one without the other.
+They all exist for the same reason: a step that has to happen every time, that nothing else will catch if it is skipped, belongs in code rather than in an instruction. Point the person at them once, in their own README, so they know the counts are regenerated rather than hand-kept.
 
-Both exist for the same reason: a step that has to happen every time, that nothing else will catch if it is skipped, belongs in code rather than in an instruction.
+They also mean this OS keeps working when the plugin is not loaded — and that the OS will not receive plugin fixes on its own. `corp-os-upgrade` is what closes that gap later; there is nothing to do about it now.
 
 Use the shapes in `data-model.md` exactly for frontmatter and field names — every other skill in this suite depends on finding them where the spec says. Adapt prose and section wording to the person's own vocabulary.
 

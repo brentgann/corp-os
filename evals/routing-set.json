@@ -349,6 +349,42 @@
       "expect": "corp-os-company",
       "probes": "hard:sequence",
       "query": "research Kestrel and then build me a one-pager I can bring into the meeting"
+    },
+    {
+      "id": "upgrade-1",
+      "expect": "corp-os-upgrade",
+      "probes": "coverage:upgrade",
+      "query": "i just updated the plugin. does my OS need anything doing to it?"
+    },
+    {
+      "id": "upgrade-2",
+      "expect": "corp-os-upgrade",
+      "probes": "coverage:upgrade",
+      "query": "my dashboards count says 1 and there are definitely three of them. this started after i reinstalled corp-os"
+    },
+    {
+      "id": "upgrade-3",
+      "expect": "corp-os-upgrade",
+      "probes": "coverage:upgrade",
+      "query": "this folder was set up back on an old version and i don't think it's ever been brought forward"
+    },
+    {
+      "id": "upgrade-near-1",
+      "expect": "corp-os-configure",
+      "probes": "pair:upgrade-vs-configure",
+      "query": "i want to move my dashboards registry to a different place and update the config to match"
+    },
+    {
+      "id": "upgrade-near-2",
+      "expect": "corp-os-rebuild",
+      "probes": "pair:upgrade-vs-rebuild",
+      "query": "the claims in here have drifted a long way from what's actually in raw. regenerate the whole derived layer"
+    },
+    {
+      "id": "upgrade-near-3",
+      "expect": "corp-os-setup",
+      "probes": "pair:upgrade-vs-setup",
+      "query": "i installed the plugin, now what — i don't have one of these folders yet"
     }
   ]
 }

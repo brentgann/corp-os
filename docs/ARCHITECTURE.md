@@ -2,8 +2,8 @@
 
 The working document for this project. It records what Corp-OS is, every consequential decision and the reasoning behind it, what has been tested and how, and what is still open. Written so a session that has never seen this repo can pick it up cold and make correct changes.
 
-**Status:** v0.10.0 · 19 skills · 9 reference specs · 4 shipped scripts · 8 commands · 3 eval harnesses · 2 fixtures
-**Last substantive change:** the fourth script closed the last unreliable path, and a one-minute harness made the command set something that could be iterated on rather than guessed at.
+**Status:** v0.11.0 · 21 skills · 9 reference specs · 6 shipped scripts · 8 commands · 3 eval harnesses · 3 fixtures
+**Last substantive change:** an upgrade path for existing OSes — and, found while testing it, the discovery that no shipped script had ever executed in a conformance run.
 
 ---
 
@@ -44,7 +44,7 @@ corp-os/
 │   ├── README.md                     # user-facing; the "what and why"
 │   ├── CONNECTORS.md                 # tool-category conventions
 │   ├── commands/*.md                 # 8 slash commands over the daily path
-│   ├── skills/<name>/SKILL.md        # 19 skills
+│   ├── skills/<name>/SKILL.md        # 21 skills
 │   ├── reference/*.md                # 9 shared specs, referenced via ${CLAUDE_PLUGIN_ROOT}
 │   ├── scripts/build_index.py        # shipped into each user's OS
 │   ├── scripts/write_export.py       # ditto -- redaction's two outputs, together
@@ -59,7 +59,7 @@ corp-os/
 └── docs/ARCHITECTURE.md              # this file
 ```
 
-**Conventions.** `Corp-OS` is the product name in prose; `corp-os-*` is the identifier form for skills and never gets title-cased. **All nineteen skills carry the prefix** — `improve-corp-os` was renamed to `corp-os-improve` in 0.6.0, because the prefix is what lets someone guess a skill name instead of consulting the guide, and one exception costs that for the whole suite. Reference files are shared across skills and addressed as `${CLAUDE_PLUGIN_ROOT}/reference/<file>.md` — never a relative path, which breaks once the plugin is installed elsewhere.
+**Conventions.** `Corp-OS` is the product name in prose; `corp-os-*` is the identifier form for skills and never gets title-cased. **All twenty-one skills carry the prefix** — `improve-corp-os` was renamed to `corp-os-improve` in 0.6.0, because the prefix is what lets someone guess a skill name instead of consulting the guide, and one exception costs that for the whole suite. Reference files are shared across skills and addressed as `${CLAUDE_PLUGIN_ROOT}/reference/<file>.md` — never a relative path, which breaks once the plugin is installed elsewhere.
 
 **`build.sh` gotcha, already handled:** it zips to a temp dir and copies in with `cat >` rather than `mv`. Synced and mounted filesystems commonly permit writes but refuse deletes, and `mv -f` needs an unlink.
 
@@ -349,6 +349,60 @@ It paid immediately. Four of the five things the first runs surfaced were the ha
 
 **The static half is not an afterthought.** `validate.py` checks what needs no model: description length (they sit one line each in a picker), no two descriptions opening alike, every command naming a real skill, `$ARGUMENTS` handled, and the no-args path stated rather than left to chance. That last one caught two commands that never said what an empty invocation does — the path most people take first.
 
+### 4.24 The first bug found by using it
+
+**Reported (0.10.1):** day one of a real OS. Three dashboards registered, `INDEX.md` reporting one, no warning.
+
+`build_index.py` branches its counting on the *shape* of a layer's declared path: ending in `/` means one file per entry, ending in `.md` means one file of many headers. The shipped model put the registry at `dashboards/registry.md` — a directory-shaped path over a single-file-shaped layer. With one dashboard registered both readings give 1, so it was invisible for five releases and only appeared on the second entry. Dashboards were also absent from `DEFAULT_LAYERS`, which is the same gap: the layer nobody counted is the layer nobody noticed was miscounted.
+
+**Fixed** by moving the registry to a root-level `dashboards.md`, beside `glossary.md`, `connectors.md` and `design.md`. The bug existed only because dashboards broke a convention the other three already kept, and the consistency is the actual repair.
+
+**And argued back.** The report explicitly declined a generic path/shape check in `build_index.py`, on the grounds that the layout fix removes the class more cheaply than a heuristic needing its own maintenance. That is right about the shipped layers and wrong about the ones that matter: `corp-os-configure` Step 3 walks people through declaring custom layers *with their own paths*, so the class recurs on shapes no layout fix reaches. The check is in, with the disagreement recorded in a comment beside it. It survives the objection because it is not a heuristic — a directory path holding exactly one file with more than one entry header is an exact condition — and because it warns rather than fails.
+
+Adding it exposed a second one immediately: a layer whose path points at a file *inside* a directory left that directory in the "undeclared directories" list, so anyone following the new warning's advice earned a second complaint for the same layer. Fixed in the same pass. A warning that makes the tree noisier when obeyed is a warning people learn to skip.
+
+**Also from the same report:** a home/index dashboard as the eighth pattern, gated on a second dashboard already existing, and a hand-off to `corp-os-configure` from `corp-os-intake` and `corp-os-dashboard` when material implies a layer that has not been declared.
+
+### 4.25 A hand-off that instruction does not reach
+
+`dashboard-missing-layer` asks for a stakeholder map against an OS with no person layer. Five runs, three behaviors: one declared `people/` with role, schema, `index_line`, `order_by` and decay behind a written proposal; one filed the proposal and built the view from what already existed; three built the view and mentioned the gap only in the answer, where it died with the session. **2/5.**
+
+The first two versions of this case's assertion were wrong about the skill rather than the reverse, which is now the fifth time in this suite. v1 checked that the answer contained the string `corp-os-configure` — it failed the run that did everything right and simply never said the name. v2 checked that `config.json` changed — that picks a winner between two legitimate paths. What survives is what both correct runs did and no incorrect one did: leave a proposal behind, and leave no layer in the incomplete-index banner.
+
+A wording pass making the proposal requirement explicit was tried and measured at **0/2**, and reverted. Prose that does not move the number is churn, and §4.21's rule does not apply here: this is not a close-out step a script can take over. Deciding a layer is warranted is judgment, and the runs that miss it leave nothing mechanical to catch — no dangling reference, no undeclared directory, because they infer the view from layers that do exist. Recorded as an open number rather than patched a third time.
+
+### 4.26 Updating the plugin updated nobody's OS
+
+**Decision (0.11.0):** `upgrade_os.py`, the fifth shipped script, and `corp-os-upgrade`, the twentieth skill.
+
+Every Corp-OS carries its own copies of the shipped scripts. That is deliberate twice over: an OS should keep working when the plugin is not loaded, and sixteen skills call `log_run.py` at the OS path rather than the plugin path, so the OS has to have one. The consequence went unnoticed for eleven releases. **Updating the plugin updates nothing inside anyone's OS.** 0.10.1 fixed how `build_index.py` counts a single-file layer; every OS built before it kept the copy that counts wrong, and there was no mechanism, no warning, and no release note that would have told anyone.
+
+Three parts, and the split between them is the decision:
+
+**Bookkeeping goes in the script.** Comparing four files, copying what differs, stamping a version, appending a history row. It has to happen every time, nothing else catches it when skipped, so it is code — the same rule that produced `build_index.py`, `write_export.py`, `log_run.py` and `delete_source.py`. The comparison is by **content, not mtime**: a copy restored from a backup has a new date and old behavior, and the date is the thing a person would naturally check.
+
+**Judgment stays in a skill, and the skill hands it on.** A layout migration moves the person's own files. `upgrade_os.py` detects and names them and refuses to perform them, and `corp-os-upgrade` routes them to `corp-os-configure`, which already treats a migration as a migration: enumerate, plan, confirm. The temptation here is sharper than anywhere else in the suite, because the fix is one `mv` and the person literally asked to bring the folder in line. That is precisely why the script is not allowed to do it.
+
+**Migrations are detected from disk, never from the recorded version.** Every OS built before this release records no version at all, and those are exactly the ones that need the check. A migration keyed on a version string would have been invisible to its entire audience.
+
+**Two smaller bugs of the same species, found while fixing this one.** `scaffold.py` hard-coded the version it stamped into every OS it created, and it was already a release stale — it reads `plugin.json` now, because a wrong recorded version is worse than none once something compares against it. And `corp-os-setup` carried a prose list of the scripts to copy that said *"both shipped scripts"* and named two, three releases after there were four. The list is deleted rather than corrected: `scaffold.py` already does the copying, so the prose was duplicating a fact it had no way to keep. What survives is a validator check that the two remaining copies of that list — `scaffold.py`'s `SHIPPED` and `upgrade_os.py`'s — still agree.
+
+**A third fixture, asserted to stay broken.** `fixture-stale` is an OS two releases behind: an older `build_index.py`, no `delete_source.py`, version `0.9.0`, and the pre-0.10.1 dashboards layout. The validator asserts all four are *still wrong*, because the failure mode for a deliberately-broken fixture is somebody tidying it — and a repaired fixture leaves the upgrade case passing against an OS with nothing to upgrade, which reads as coverage and is worse than no case at all. It is also kept out of the `build_index` execution loop on purpose: running the counter over it warns every time, and a validator that always warns has taught everyone to skip its output.
+
+### 4.27 No script had ever run in a conformance run
+
+**Found (0.11.0):** while diagnosing why `corp-os-upgrade` wrote nothing at all.
+
+The harness invokes `claude -p ... --permission-mode acceptEdits`. That auto-approves file edits and **nothing else**. Every `python3 scripts/...` invocation, in every skill, in every conformance run since the harness was written, was answered with `This command requires approval` and never executed.
+
+Verified three ways before believing it: the plugin-root path, a bare relative path with the workspace as cwd, and with the plugin directory added to `--add-dir`, which changed nothing because the gate is the tool rather than the path. `--allowedTools Bash` fixes it, confirmed by watching `build_index.py` actually print its output.
+
+**What this invalidates, and what it does not.** The file-level outcomes were real: a check that looked for a `usage/log.md` row was looking at a real file that really had a row. What was never measured is *what put it there*. The model, told to run a script and blocked from running it, wrote the row by hand — competently, which is why nothing looked wrong. So every claim in this record of the form "the script landed the step" was measuring the model imitating the script's output. §4.21 and §4.22 are written as if the script ran. They should be read as: with the script present and the instruction pointing at it, the outcome improved. That is a weaker and different claim.
+
+**What it cost.** `setup-from-empty` sat at 2/9–3/10 across six runs and three configurations, and §7 carried it as the top open question with the diagnosis that the skill "loses structure to vocabulary." `corp-os-setup` Step 3 runs `scaffold.py`, which had never once executed. Three instruction passes were made against a harness defect, and one of them wrote a paragraph into the skill explaining a failure that was not happening. With the fix: **9/10, twice.** The remaining failure was the universal raw-file check counting `raw/README.md` as an entry — the scaffolder writes it, and `build_index.py`'s own `md_files()` has always excluded `README.md` and `INDEX.md` from every layer. The check now excludes them too.
+
+**The lesson is not "check the permission mode."** It is that this suite spent six runs and three rewrites treating a consistent, plausible failure as evidence about the skill, without once testing the instrument. The harness had been trusted because it had found real defects — which it had, and which made it harder to suspect. A number that will not move after two honest attempts is evidence about the measurement at least as often as about the thing measured, and the cost of checking is one minute.
+
 ## 5. The skills
 
 | Skill | Job |
@@ -397,8 +451,12 @@ Being explicit, because much of this is unexercised.
 - `build_index.py --check` against a minimal no-config tree, exercising the reduced `DEFAULT_LAYERS` after `people`/`topics` were removed.
 - `scripts/validate.py` passes: frontmatter, name/directory match, cross-references, `${CLAUDE_PLUGIN_ROOT}` targets, step ordering, leakage.
 - **`build_index.py` is now executed by the build**, not merely parsed. `validate.py` copies `examples/fixture-os/` to a temp dir, runs the script against it, and asserts the counts, the custom layer's rendered `index_line`, the unprocessed queue, config-driven exclusions, the omission of the disabled layer, and that a second `--check` run finds no drift. Building the fixture immediately caught a real bug: an unrecognized key under `scan` fell back to defaults silently and rendered a plausible, wrong "not in the scan path" section. It is a warning now.
+- **The routing eval at 20 skills**: 64 queries × 3 repeats, **100%**, including three near-miss pairs written to pull `corp-os-upgrade` toward `configure`, `rebuild` and `setup`. `evals/runs/routing-v4.md`.
+- **The whole conformance suite re-run under the fixed harness** (§4.27), the first numbers in this repo where the shipped scripts actually executed: **114/122 across 19 cases, 16 skills and 3 fixtures**, at one repeat — a baseline, not rates. `setup-from-empty` 9/9 and `upgrade-stale-os` 10/10 replace 3/10 and 5/10. The eight remaining failures are the honest starting point for the next round rather than a regression, because there is no comparable earlier number to regress from.
 - **The routing eval**, three times. 44 queries × 3 repeats at first, then 58 after hardening: 93%, then 100%, then 100% over the harder set. Every run is committed under `evals/runs/` — the reports, not just the scores, because the confusion table is the part that says *which* pair collided.
 - **The command harness**, five times inside twenty minutes, ending at **100% over 23 cases × 3 repeats** including seven picker cases. Cheap enough that four of its five early findings were about the harness itself and were fixed in the same sitting.
+- **The upgrade path**, against a fixture built to be broken: an older counter copy, a missing script, a stale version and the pre-0.10.1 layout. The script was exercised in both directions before the skill existed — dry run, apply, re-run for idempotence, the migration performed by hand, and the counter then reading 3 where it had read 1.
+- **The dashboard pair**, added after the first real-use defect report. `dashboard-hub-and-registry` at **7/7** — the registry entry lands in the root file and no `dashboards/` directory is recreated. `dashboard-missing-layer` at **4/5**, deliberately (§4.25).
 - **The conformance harness**, ten times across five rounds of fixes, the last three at three repeats so the numbers are rates rather than coin flips. Six skills — `intake`, `claims`, `decide`, `recall`, `reality-check`, `brief` — each run against a fresh copy of the fixture, then scored on what changed on disk. Twelve cases across nine skills and two fixture shapes. 27/35 on the first full run; 68/75 checks at 100% when rates replaced pass/fail; 73/75 after the scripts landed. Six real defects, one model contradiction, and four of the harness's own assertions corrected along the way. `evals/runs/conformance-rates-after.md` is the current state, and `conformance-rates-before.md` is kept beside it because the delta is the evidence.
 - **Every 0.6.0 validator check was negative-tested** — the defect it guards against was reintroduced, the check was confirmed to fire, and the tree restored. Checks covered: missing `## Pre-flight`, a skill that stops reading `config.json`, an optional layer used as an existence test, a stated count that no longer matches its headings, plugin/marketplace version parity, a missing version-history entry, and the guide dropping a skill from its routing table. A check that has never been seen to fail is not a check.
 
@@ -414,14 +472,16 @@ And untested by construction: the setup interrogation, which needs a person who 
 
 Ordered by how much they would change. Items keep leaving this list by being answered rather than argued: `usage/log.md` does get written, routing is not this suite's risk (§4.17), `sensitive.md` was insufficient and is now two axes (§4.18), multi-person is out of scope rather than unresolved (§4.20), and eight commands are distinguishable rather than too many (§4.23).
 
-1. **`corp-os-setup` does not produce a Corp-OS from an empty directory.** Six runs, three configurations — the scaffolder unmentioned, called in Step 3, and made Step 0 before any question — all produced a domain-shaped folder with none of the five invariants. This is the skill every user runs first, on the one path with nothing to anchor to. Next step is not another instruction pass: install the plugin and run `/corp-os` against an empty folder in a real session, which separates "the skill loses structure to vocabulary" from "the conformance frame does not exercise a skill the way an invocation does." `evals/README.md` has the evidence.
+1. **Every conformance number predates the harness fix.** Until 0.11.0 no shipped script had ever executed in a run (§4.27), so each one measured the model producing a script's output by hand. The two cases re-run so far both moved: `setup-from-empty` 3/10 → 9/9, `upgrade-stale-os` 5/10 → 10/10. The rest of the suite needs re-measuring before any figure in §6 is quoted again, and the script-landed-it claims in §4.21 and §4.22 need re-reading as the weaker claim they actually support.
 2. **Six skills still have no conformance case.** The irreversible paths are now covered — `rebuild` leaves a `role: source` layer alone in every run, the delete sequence re-cites before destroying, and redaction never touches the original. What is left is the input side (`pull`, `connect`, `company`, `glossary`) and the meta skills. `corp-os-setup` is the interesting one: it starts from nothing, so its case begins with an empty directory, and the only machine-checkable claim is that what comes out is a valid OS.
-3. **The fixtures are two shapes.** The default and a register-profile OS. Still missing: an OS mid-migration with a cohort ceiling being actively worked, and one large enough that the scan contract is doing real work rather than being trivially satisfiable at four entries. Fixture work, not harness work — the runner already takes `--fixture`.
+3. **The fixtures are three shapes.** The default, a register-profile OS, and one deliberately two releases behind. Still missing: an OS mid-migration with a cohort ceiling being actively worked, and one large enough that the scan contract is doing real work rather than being trivially satisfiable at four entries. Fixture work, not harness work — the runner already takes `--fixture`.
 4. **Does the setup interrogation land?** Nine areas, never run on anyone who did not design it. The likely failure is abandonment partway, and no check catches that. A conformance case could at least establish that a run started from nothing produces a valid scaffold, which is weaker but not nothing.
 5. **`corp-os-decide` has been tested on one axis.** It survives the roster and one conformance case; whether it fires in a session full of other installed skills is unmeasured.
-6. **Should `build_index.py` be able to repair, not just report?** It flags undeclared directories, missing `index_line`s and unknown config keys. Auto-fixing would cross the bookkeeping/judgment line that makes it safe to run casually — probably keep as-is.
-7. ~~**Does an urgency-tiered layer need ordered rendering?**~~ Done: a layer declares `order_by` and `build_index.py` sorts by that field's declared enum. `now` renders above `watching`. The script reads what the config already said rather than deciding what is urgent, so it stays bookkeeping.
-8. **Which commands get used?** Whether the eight are *distinguishable* is settled (§4.23). Whether all eight get reached for in practice is a usage question, and `corp-os-improve` should be able to answer it from the log — which now gets written reliably enough to trust.
+6. **The `corp-os-configure` hand-off lands 2 times in 5** (§4.25). Not a bookkeeping step, so not scriptable; three instruction passes have not moved it. The next honest move is a person watching a real session take that path, not a fourth wording.
+7. **Should `build_index.py` be able to repair, not just report?** It flags undeclared directories, missing `index_line`s and unknown config keys. Auto-fixing would cross the bookkeeping/judgment line that makes it safe to run casually — probably keep as-is.
+8. ~~**Does an urgency-tiered layer need ordered rendering?**~~ Done: a layer declares `order_by` and `build_index.py` sorts by that field's declared enum. `now` renders above `watching`. The script reads what the config already said rather than deciding what is urgent, so it stays bookkeeping.
+9. **Nothing tells a person their OS is behind.** `corp-os-upgrade` works once someone runs it, and `corp-os-guide` routes "something looks wrong since I updated" to it. Nobody is told unprompted. The cheapest fix is `build_index.py` — it runs constantly and already reads `config.json` — printing a line when the recorded version is behind the plugin's. It was left out of 0.11.0 because the script has no business knowing where the plugin is, and a version check that guesses at a path is worse than none.
+10. **Which commands get used?** Whether the eight are *distinguishable* is settled (§4.23). Whether all eight get reached for in practice is a usage question, and `corp-os-improve` should be able to answer it from the log — which now gets written reliably enough to trust.
 
 ## 8. Deliberately rejected
 

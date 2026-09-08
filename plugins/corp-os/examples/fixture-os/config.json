@@ -92,6 +92,11 @@
       },
       "index_line": "{id} \u2014 {statement} \u00b7 {owner} \u00b7 by {decide_by}",
       "decay": "none"
+    },
+    "dashboards": {
+      "enabled": true,
+      "role": "record",
+      "path": "dashboards.md"
     }
   },
   "decay": {

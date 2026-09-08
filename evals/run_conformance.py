@@ -180,7 +180,12 @@ def check(case, before, after, work, output=""):
     # scoped to files still carrying `processed: false`. (The first version of
     # this check ignored that and failed a run that had done everything right;
     # it encoded a wrong idea of what the index holds.)
-    new_raw = [f for f in added if f.startswith("raw/") and f.endswith(".md")]
+    # README.md is not an entry -- build_index.py's md_files() excludes it and
+    # INDEX.md from every layer, because they describe the folder rather than
+    # living in it. The scaffolder writes raw/README.md, so without this the
+    # check fails every corp-os-setup run for the sin of documenting the layer.
+    new_raw = [f for f in added if f.startswith("raw/") and f.endswith(".md")
+               and os.path.basename(f) not in ("README.md", "INDEX.md")]
     if new_raw:
         idx_path = os.path.join(work, "INDEX.md")
         idx = open(idx_path, encoding="utf-8").read() if os.path.exists(idx_path) else ""
@@ -257,8 +262,22 @@ def run(case, model, timeout, keep, fixture):
         answers=("\n\nIf it helps, the person would say: " + ans) if ans else "")
     try:
         r = subprocess.run(
+            # --allowedTools Bash is not a convenience. Without it,
+            # `acceptEdits` auto-approves file edits and nothing else, so every
+            # `python3 scripts/...` invocation in every skill was answered with
+            # "This command requires approval" and never ran. Verified directly:
+            # a bare `python3 scripts/build_index.py` inside the workspace was
+            # blocked, and adding the plugin to --add-dir did not change it,
+            # because the gate is the tool, not the path.
+            #
+            # For eleven releases this harness was measuring what the model
+            # could produce BY HAND in place of a script it was told to run --
+            # a log row it wrote itself passes a check that looks for a log row.
+            # Everything the record says about a shipped script landing a step
+            # was measured through that. See ARCHITECTURE §4.27.
             ["claude", "-p", prompt, "--model", model,
-             "--permission-mode", "acceptEdits", "--add-dir", tmp],
+             "--permission-mode", "acceptEdits",
+             "--allowedTools", "Bash", "--add-dir", tmp],
             capture_output=True, text=True, timeout=timeout, cwd=tmp)
         err = None if r.returncode == 0 else (r.stderr or r.stdout)[:300]
         transcript = (r.stdout or "")[-8000:]

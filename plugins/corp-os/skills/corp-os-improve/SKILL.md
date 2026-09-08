@@ -93,7 +93,7 @@ That last boundary has a clean test: **if a proposal could have been a config se
 
 ## Step 7 — write the improvement packet
 
-For anything in the model-change bucket, plus any structure the person invented that the shipped model lacks, write `usage/improvement-packet-<date>.md` per the reference format.
+For anything in the model-change bucket, plus any structure the person invented that the shipped model lacks, write `usage/improvement-packet-<date>.md` per the reference format — unless the person maintains the corp-os plugin themselves, or is handing this straight to someone who does. In that case, don't write prose here at all: hand off to `corp-os-contribute`, which reads the plugin's actual source and produces apply-ready diffs instead of an anonymized note. Ask, if it isn't already clear from context, rather than assuming either way.
 
 Two rules, both absolute:
 

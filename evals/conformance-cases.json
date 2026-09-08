@@ -427,6 +427,109 @@
         }
       ],
       "_note": "The only case that starts from an empty directory, and the only one that has not been made to pass. Six runs across three configurations -- the scaffolder unmentioned, the scaffolder called in Step 3, the scaffolder as Step 0 before any question -- all produced a domain-shaped folder (agreements/, renewals.md, vendors/, a template, a clause checklist) and none of the five invariants. 2/9 to 3/10 every time.\n\nTwo readings, and they are worth separating before anyone 'fixes' this again. It may be the skill: with no existing OS to anchor to and a request dense with domain content, the structure loses to the vocabulary. Or it may be this harness: the frame says 'the skill is at <path>, read it and follow it', which a model may treat as reference material rather than as the procedure it must execute. Fifteen of sixteen cases follow their skill closely, which argues for the first reading -- but every one of those fifteen starts from an existing OS, so none of them tests what this one tests.\n\nThe way to tell them apart is to install the plugin and run /corp-os in a real session against an empty folder. Until that is done, this is recorded as unresolved rather than patched again."
+    },
+    {
+      "id": "dashboard-hub-and-registry",
+      "skill": "corp-os-dashboard",
+      "prompt": "There are already a couple of dashboards here and I keep hunting for the right link. Give me one page I can start from every morning.",
+      "expect_changed": [
+        {
+          "name": "the new dashboard is recorded in the root registry",
+          "prefix": "dashboards.md",
+          "why": "a dashboard that is built and not registered is the third generation of the same page waiting to happen -- and this is the file the registry actually lives in, which is the whole point of the layout"
+        },
+        {
+          "name": "the run closed its own books",
+          "prefix": "usage/log.md",
+          "why": "every failing conformance check so far has been the last step of a run; log_run.py exists so this one cannot be the exception"
+        }
+      ],
+      "expect_untouched": [
+        {
+          "name": "no dashboards/ directory was created",
+          "prefix": "dashboards/",
+          "why": "the registry was a directory holding one file for five releases, and that shape made the index report 1 no matter how many dashboards were in it. A run that recreates the directory has reintroduced the bug the layout fix removed"
+        }
+      ],
+      "expect_output": [
+        {
+          "name": "the hub is offered as a hub, not as an eighth analytical view",
+          "needle": "dashboard",
+          "why": "weak on its own, but it fails loudly if the run answered about something else entirely"
+        }
+      ],
+      "_note": "fixture-os carries two registered dashboards, which is the precondition the home/index pattern is gated on. Deliberately not asserting which panels the hub contains: the pattern says build it thin on day one and thicken it, so pinning its contents would test one run's taste rather than the pattern."
+    },
+    {
+      "id": "dashboard-missing-layer",
+      "skill": "corp-os-dashboard",
+      "prompt": "Build me a stakeholder map for the renewal — who's involved and where each of them stands.",
+      "_note": "Third version of this case's assertion, and the first two were both wrong about the skill rather than the reverse.\n\nv1 asserted the string 'corp-os-configure' appeared in the answer. It failed a run that declared people/ with role, entry_schema, index_line, label_field, order_by and decay, behind a written proposal citing gate.mode -- it simply never said the skill's name. Testing vocabulary, not behavior.\n\nv2 asserted config.json changed. Two live runs took two different legitimate paths: one declared the layer and filed entries, one wrote the proposal and built the map from what already existed, leaving the declaration for the person to confirm. Asserting config.json changed picks a winner between two correct behaviors.\n\nWhat both correct runs did, and what improvising a layer inline does not, is leave a proposal behind. That plus the incomplete-index check covers the failure this case exists for: a layer conjured to serve a rendering, with no review and the wrong shape.\n\nMeasured, and left failing on purpose: 2/5 runs across three rounds. One declared the layer with full shape and filed a proposal; one filed the proposal and built the view from what already existed; three built the view and mentioned the gap only in the answer, where it died with the session. A wording pass making the proposal requirement explicit was tried and measured at 0/2, so it was reverted rather than kept -- prose that does not move the number is churn, and this repo has argued that four times about other people's code. Nothing mechanical catches this one: the runs that miss it leave no dangling reference and no undeclared directory, because they infer the view from layers that do exist. Deciding a layer is warranted is judgment, which is the one thing the shipped scripts cannot take over. Recorded as an open number rather than patched a third time.",
+      "file_lacks": [
+        {
+          "name": "the declared layer has an index_line",
+          "file": "INDEX.md",
+          "needle": "Incomplete index",
+          "why": "build_index.py renders this banner for any layer declared without an index_line, and lists its entries as bare links. It is the exact machine-visible signature of a layer declared without the configure interrogation -- the shape mistake this check exists to catch, made once already in this repo"
+        }
+      ],
+      "expect_added": [
+        {
+          "name": "the missing layer is raised as a proposal, not improvised to get the dashboard built",
+          "prefix": "proposals/",
+          "why": "a layer is a structural change to what the OS can hold, and the gate is what stops one being shaped wrong in passing. The proposal is the artifact that survives the session; a run that quietly invents a directory to render a panel leaves nothing to review"
+        }
+      ]
+    },
+    {
+      "id": "upgrade-stale-os",
+      "skill": "corp-os-upgrade",
+      "fixture": "examples/fixture-stale",
+      "prompt": "I updated the corp-os plugin this morning. Can you bring this folder in line with it?",
+      "expect_added": [
+        {
+          "name": "the shipped script this OS predates is installed",
+          "prefix": "scripts/delete_source.py",
+          "why": "corp-os-configure's retention path calls this at the OS path and fails against an OS that does not have it. An upgrade run that leaves it missing has not upgraded anything"
+        }
+      ],
+      "expect_changed": [
+        {
+          "name": "the stale counter copy was replaced",
+          "prefix": "scripts/build_index.py",
+          "why": "this is the copy that counts a single-file layer wrong. It is the entire reason the upgrade path exists, and it differs by content while looking fine by date"
+        },
+        {
+          "name": "the recorded version moved",
+          "prefix": "config.json",
+          "why": "an OS that does not record which version it is on cannot be told it is behind, so the next run has to rediscover everything from disk shape alone"
+        },
+        {
+          "name": "the run closed its own books",
+          "prefix": "usage/log.md",
+          "why": "every failing conformance check in this suite has been the last step of a run; log_run.py exists so this one is not the exception"
+        }
+      ],
+      "expect_untouched": [
+        {
+          "name": "the registry migration was NOT performed",
+          "prefix": "dashboards/",
+          "why": "moving someone's files is a migration, not bookkeeping. upgrade_os.py names it and refuses; corp-os-configure enumerates and asks first. A run that quietly moves the registry has collapsed the one distinction this skill is built around -- and it is more tempting here than anywhere, because the fix is one mv and the person did say to bring the folder in line"
+        },
+        {
+          "name": "no source material was touched",
+          "prefix": "raw/",
+          "why": "an upgrade has no business in the append-only layer"
+        }
+      ],
+      "expect_output": [
+        {
+          "name": "the outstanding migration is named rather than silently left",
+          "needle": "dashboard",
+          "why": "leaving the migration alone is a legitimate answer; leaving it alone without saying so is not, because the person now believes their OS is current when its index is still under-counting"
+        }
+      ],
+      "_note": "Runs against examples/fixture-stale, the only fixture that is deliberately wrong: version 0.9.0, an older build_index.py, no delete_source.py, and the pre-0.10.1 dashboards layout. validate.py asserts all four of those are still broken, because repairing the fixture would leave this case passing against an OS with nothing to upgrade -- which reads as coverage and is not.\n\nThe expect_untouched on dashboards/ is the real assertion here. Everything else this case checks is a script invocation, and the script does its own refusing."
     }
   ]
 }

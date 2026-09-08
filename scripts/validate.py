@@ -5,6 +5,7 @@ Checks structure, frontmatter, cross-references, step numbering, and that no
 private content has leaked in. Exits non-zero on any error.
 """
 import ast
+import filecmp
 import glob
 import json
 import shutil
@@ -108,13 +109,53 @@ def main():
     # --- shipped assets parse
     for script in ("scripts/build_index.py", "scripts/write_export.py",
                    "scripts/log_run.py", "scripts/delete_source.py",
-                   "scripts/scaffold.py"):
+                   "scripts/scaffold.py", "scripts/upgrade_os.py"):
         try:
             ast.parse(open(script, encoding="utf-8").read())
         except SyntaxError as e:
             err(f"{script} syntax error: {e}")
         except OSError as e:
             err(f"{script} missing: {e}")
+
+    # --- the list of scripts an OS carries lives in exactly two places, and
+    # they have to agree. scaffold.py puts them there; upgrade_os.py refreshes
+    # them. A name in one and not the other means either a new OS gets a script
+    # that never updates, or an upgrade tries to refresh one that was never
+    # installed. corp-os-setup used to carry a third copy of this list in prose
+    # and it went stale within one release, which is why the prose copy is gone
+    # rather than synced.
+    def shipped_tuple(path):
+        try:
+            tree = ast.parse(open(path, encoding="utf-8").read())
+        except (OSError, SyntaxError):
+            return None
+        for node in tree.body:
+            if not isinstance(node, ast.Assign):
+                continue
+            if any(isinstance(t_, ast.Name) and t_.id == "SHIPPED"
+                   for t_ in node.targets):
+                try:
+                    return tuple(ast.literal_eval(node.value))
+                except ValueError:
+                    return None
+        return None
+
+    a_ = shipped_tuple("scripts/scaffold.py")
+    b_ = shipped_tuple("scripts/upgrade_os.py")
+    if a_ is None or b_ is None:
+        err("could not read SHIPPED from scaffold.py and upgrade_os.py — the "
+            "two lists of what an OS carries can no longer be compared")
+    elif set(a_) != set(b_):
+        err(f"scaffold.py SHIPPED {sorted(a_)} != upgrade_os.py SHIPPED "
+            f"{sorted(b_)} — an OS would be scaffolded with scripts the "
+            "upgrade path never refreshes, or asked to refresh scripts it "
+            "was never given")
+    else:
+        for s in a_:
+            if not os.path.exists(os.path.join("scripts", s)):
+                err(f"SHIPPED names scripts/{s}, which does not exist — every "
+                    "OS scaffolded from here would silently lack it")
+
     for p in ("examples/config-worked-example.json",):
         try:
             json.load(open(p, encoding="utf-8"))
@@ -260,6 +301,11 @@ def main():
              "the claims heading uses the person's vocabulary, not the "
              "plugin's -- this config renames claim to finding"),
             ("**Decisions**: 2", "custom-layer count"),
+            ("**Dashboards**: 2",
+             "the dashboards registry is one file of many entry headers -- "
+             "counted by header, not by file. It shipped as a directory-shaped "
+             "path holding one file for five releases, which read as 1 no "
+             "matter how many dashboards were registered"),
             ("dec-001", "custom-layer entries render"),
             ("· Priya Raman · by 2026-11-01",
              "custom index_line template is applied, not a bare link"),
@@ -368,6 +414,64 @@ def main():
             err(f"build_index.py timed out on {fixture}")
         finally:
             shutil.rmtree(tmp, ignore_errors=True)
+
+
+    # --- fixture-stale is asserted to still be broken.
+    # It is the only fixture that is deliberately wrong, and the danger with a
+    # deliberately-wrong fixture is somebody tidying it: repair it and the
+    # corp-os-upgrade case passes against an OS with nothing to upgrade, which
+    # is worse than no case at all because it reads as coverage.
+    #
+    # It is kept out of the build_index execution loop above on purpose. Its
+    # dashboards layer carries the pre-0.10.1 path shape, so running the
+    # counter over it warns every single time, and a validator that always
+    # warns has taught everyone to skip its output.
+    STALE = "examples/fixture-stale"
+    if not os.path.isdir(STALE):
+        err(f"{STALE} is missing — corp-os-upgrade then has nothing to be "
+            "tested against except a healthy OS, where it has nothing to find")
+    else:
+        try:
+            paths = sorted(os.path.join(PLUGIN, dp, f).replace(ROOT + os.sep, "")
+                           for dp, _, fns in os.walk(STALE) for f in fns)
+            if paths:
+                r0 = subprocess.run(["git", "check-ignore", "--stdin"], cwd=ROOT,
+                                    input="\n".join(paths), capture_output=True,
+                                    text=True, timeout=30)
+                ig = sorted(x.strip() for x in r0.stdout.split("\n") if x.strip())
+                if ig:
+                    err(f"{STALE}: {len(ig)} file(s) would be ignored by git — "
+                        f"a clone gets a broken fixture: {ig[:4]}")
+        except (subprocess.TimeoutExpired, OSError):
+            pass
+
+        try:
+            scfg = json.load(open(os.path.join(STALE, "config.json"),
+                                  encoding="utf-8"))
+        except (OSError, ValueError) as e:
+            err(f"{STALE}/config.json unreadable: {e}")
+            scfg = {}
+        if scfg.get("corpos_version") == manifest.get("version"):
+            err(f"{STALE} records the current version — it is supposed to be "
+                "behind, and an upgrade run against it now finds nothing")
+        reg = os.path.join(STALE, "dashboards", "registry.md")
+        if not os.path.exists(reg):
+            err(f"{STALE} no longer carries the pre-0.10.1 dashboards layout, "
+                "which is the migration corp-os-upgrade must refuse to perform")
+        elif sum(1 for ln in open(reg, encoding="utf-8")
+                 if ln.startswith("### ")) < 2:
+            err(f"{STALE}/dashboards/registry.md needs more than one entry — "
+                "with one, the miscount is invisible and the fixture proves "
+                "nothing")
+        if os.path.exists(os.path.join(STALE, "scripts", "delete_source.py")):
+            err(f"{STALE} is supposed to be missing delete_source.py — that is "
+                "the 'shipped script this OS predates' case")
+        a_ = os.path.join("scripts", "build_index.py")
+        b_ = os.path.join(STALE, "scripts", "build_index.py")
+        if os.path.exists(b_) and filecmp.cmp(a_, b_, shallow=False):
+            err(f"{STALE}/scripts/build_index.py is identical to the shipped "
+                "one — it is supposed to be an older copy, which is the drift "
+                "corp-os-upgrade detects by content rather than by date")
 
     # --- no private content.
     # The denylist is deliberately NOT in this file: a hardcoded list of real

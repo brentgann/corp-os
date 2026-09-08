@@ -43,6 +43,14 @@ A single-page rendering of `company/<slug>.md` — what they sell, users versus 
 ### Decision log
 Claims of kind `decision`, in reverse chronological order, each with its rationale citation and what it superseded. The panel that saves the most time six months out, and the one almost nobody builds until they have been burned.
 
+### Home / index
+
+Only once two or more dashboards are registered — a single dashboard does not need a hub to itself. One page: the single most consequential thing across the whole OS right now, a card per registered dashboard (name, one-liner, cadence, last built, linking out), and a compact snapshot of what sits underneath them — job readiness, connector health, open proposals.
+
+**Never re-derive that headline number.** Cite it from wherever it is already computed, the same discipline that keeps a company record from re-deriving what a claim already established. A hub that recalculates is a second source of truth for the same figure, and the two will disagree at the worst moment.
+
+Built from `dashboards.md` plus whatever each linked dashboard already surfaces. This is the one dashboard that is fine to build thin on day one and thicken as the others accumulate — it has nothing of its own to be thin *about*.
+
 ## Composition
 
 - **One page, scannable in fifteen seconds.** If it needs a legend, it is two dashboards.
@@ -59,7 +67,7 @@ Never invent a second palette for a second dashboard in the same OS. Consistency
 
 ## Publishing and refresh
 
-Dashboards persist as published artifacts by default, because a dashboard exists to be returned to. Record every one in `dashboards/registry.md`:
+Dashboards persist as published artifacts by default, because a dashboard exists to be returned to. Record every one in `dashboards.md`:
 
 ```markdown
 ### Job board

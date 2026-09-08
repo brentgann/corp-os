@@ -76,6 +76,10 @@ Read the material against the open evidence lists and say plainly whether it mov
 
 Then write the proposal to `proposals/PROPOSAL-<date>-<slug>.md` and present it — each claim with full provenance and an explicit recommendation (enrich an existing claim, create a new one, flag a conflict, decline). Hand the writing to `corp-os-claims`.
 
+**If the material's natural shape does not fit any layer that exists**, do not force it into a claim just because `claims/` is what is there. A directory of people, a set of live decisions, a register of obligations — each has its own shape, and a claim distorts it. Hand off to `corp-os-configure` to declare the layer properly first, then come back and propose entries into it.
+
+A layer improvised inline skips the interrogation that catches shape mistakes — the wrong `role`, a missing `index_line`, a path that looks like a directory but behaves like a single grouped file. That last one shipped in this plugin for five releases and silently undercounted the moment a second entry landed. The interrogation exists because those errors are cheap to prevent and expensive to unpick.
+
 Three honest outcomes, and thin is the most common:
 
 - **Substantive** — propose the claims.

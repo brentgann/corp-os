@@ -69,8 +69,7 @@ Two rules that come before every operation, because getting them wrong silently 
 ├── glossary.md
 ├── connectors.md           # what is connected, by what protocol, feeding what
 ├── design.md               # which design system governs rendered output
-├── dashboards/
-│   └── registry.md         # name, URL, source files, cadence, owning job
+├── dashboards.md           # registry of published dashboards: name, URL, source files, cadence, owning job
 ├── scripts/
 │   └── build_index.py      # deterministic recount — bookkeeping, not judgment
 └── usage/

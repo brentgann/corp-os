@@ -53,6 +53,8 @@ Adjust the emphasis to what the person said they wanted. Do not recite it verbat
 | Clean something before it leaves their hands | `corp-os-redact` |
 | Find out how the OS itself should improve | `corp-os-improve` |
 | Assess someone else's knowledge system | `corp-os-audit` |
+| Bring an OS in line with a newer plugin version | `corp-os-upgrade` |
+| Turn diagnosed friction into an apply-ready diff against the plugin's own source | `corp-os-contribute` |
 
 ## Step 3 — when the ask is ambiguous, resolve it by looking
 
@@ -63,6 +65,8 @@ Common collisions, and how to settle them:
 - **Anything with "decide" in it** — read the tense. A choice still open is `corp-os-decide`; a choice already made is a `decision` claim via `corp-os-claims`; an outcome they are working toward ("decide how to handle renewals") is a job, so `corp-os-jobs`. Getting this wrong is why forks sit open for months: filed as a job, nothing ever forces the date.
 - **"Update my OS"** — read `usage/log.md` and the unprocessed queue in `INDEX.md`. If raw material is waiting, `corp-os-pull` or `corp-os-claims`. If the structure itself is the complaint, `corp-os-improve`.
 - **"This is a mess"** — one drifted file is a manual fix; stale counts are `build_index.py`; a drifted taxonomy is `corp-os-rebuild`; a shape that never fit is `corp-os-configure`; recurring friction is `corp-os-improve`.
+- **"Something looks wrong since I updated"** — `corp-os-upgrade` first, before diagnosing anything else. An OS keeps its own copies of the shipped scripts, so a plugin update reaches none of them, and a count that changed or a warning that appeared after an update is usually that gap rather than the content.
+- **"Write this up for the plugin" / "give me a diff"** — `corp-os-improve` studies this OS's own usage and proposes changes to it; `corp-os-contribute` turns something already diagnosed into a diff against the plugin's own source, for someone who maintains it. If nothing has been diagnosed yet, start with `corp-os-improve` or `corp-os-audit` — `corp-os-contribute` does not mine the usage log itself.
 - **"This doesn't fit how I work"** — `corp-os-configure`, not `corp-os-rebuild`. Rebuilding faithfully reproduces a shape that was wrong; configuring changes the shape.
 
 ## Step 4 — answer with a next action

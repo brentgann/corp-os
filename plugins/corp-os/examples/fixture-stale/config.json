@@ -1,0 +1,97 @@
+{
+  "corpos_version": "0.9.0",
+  "profile": "minimal",
+  "vocabulary": {
+    "confidence": [
+      "confirmed",
+      "needs_review",
+      "reconstructed",
+      "disputed",
+      "retired"
+    ],
+    "sensitivity": [
+      "internal",
+      "sensitive"
+    ],
+    "bearing": [
+      "incidental",
+      "load_bearing"
+    ],
+    "tags": []
+  },
+  "layers": {
+    "raw": {
+      "enabled": true,
+      "role": "source",
+      "path": "raw/"
+    },
+    "proposals": {
+      "enabled": true,
+      "role": "record",
+      "path": "proposals/"
+    },
+    "claims": {
+      "enabled": true,
+      "role": "derived",
+      "gated": true,
+      "path": "claims/"
+    },
+    "glossary": {
+      "enabled": true,
+      "role": "derived",
+      "gated": true,
+      "path": "glossary.md"
+    },
+    "jobs": {
+      "enabled": false
+    },
+    "company": {
+      "enabled": false
+    },
+    "decisions": {
+      "enabled": false
+    },
+    "people": {
+      "enabled": false
+    },
+    "topics": {
+      "enabled": false
+    },
+    "dashboards": {
+      "enabled": true,
+      "role": "record",
+      "path": "dashboards/",
+      "entry_schema": [
+        "name",
+        "url",
+        "cadence"
+      ],
+      "index_line": "{name} · {cadence}"
+    }
+  },
+  "decay": {
+    "enabled": true,
+    "default": "90d",
+    "applies_to": "sourced",
+    "by_kind": {
+      "decision": "none",
+      "constraint": "none"
+    }
+  },
+  "retention": {
+    "raw": {
+      "policy": "keep",
+      "measure_from": "frontmatter_date"
+    }
+  },
+  "gate": {
+    "mode": "propose"
+  },
+  "confidence_ceilings": {},
+  "scan": {
+    "excluded_from_scan": [
+      "usage/",
+      "sensitive.md"
+    ]
+  }
+}

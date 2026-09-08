@@ -1,0 +1,1147 @@
+{
+  "model": "claude-opus-5",
+  "passed": 114,
+  "total": 122,
+  "runs": [
+    {
+      "id": "brief-window",
+      "skill": "corp-os-brief",
+      "error": null,
+      "results": [
+        {
+          "check": "raw stays append-only",
+          "passed": true,
+          "why": "an edited raw file destroys the only thing a rebuild can restore from; flipping `processed` is the one sanctioned edit, and deletion only under a declared retention obligation",
+          "detail": ""
+        },
+        {
+          "check": "usage/log.md row appended",
+          "passed": true,
+          "why": "the friction field is the whole improvement flywheel; a skill that skips it under pressure makes corp-os-improve blind",
+          "detail": ""
+        },
+        {
+          "check": "derived-layer writes have a proposal behind them",
+          "passed": true,
+          "why": "a proposal that lives only in chat dies with the session and leaves no record of what the gate saw -- the declines especially, which are the only trace of what someone chose not to know",
+          "detail": ""
+        },
+        {
+          "check": "meta.json history records the brief and its window",
+          "passed": true,
+          "why": "the next brief starts from that date; without it every brief covers the whole corpus and stops being a brief",
+          "detail": "changed: ['meta.json']"
+        },
+        {
+          "check": "nothing entered the derived layer",
+          "passed": true,
+          "why": "a brief reports; it does not create knowledge",
+          "detail": ""
+        },
+        {
+          "check": "no raw material was written",
+          "passed": true,
+          "why": "same",
+          "detail": ""
+        }
+      ],
+      "diff": {
+        "added": [],
+        "changed": [
+          "meta.json",
+          "usage/log.md"
+        ],
+        "removed": []
+      },
+      "workdir": null
+    },
+    {
+      "id": "claims-queue",
+      "skill": "corp-os-claims",
+      "error": null,
+      "results": [
+        {
+          "check": "raw stays append-only",
+          "passed": true,
+          "why": "an edited raw file destroys the only thing a rebuild can restore from; flipping `processed` is the one sanctioned edit, and deletion only under a declared retention obligation",
+          "detail": ""
+        },
+        {
+          "check": "usage/log.md row appended",
+          "passed": true,
+          "why": "the friction field is the whole improvement flywheel; a skill that skips it under pressure makes corp-os-improve blind",
+          "detail": ""
+        },
+        {
+          "check": "derived-layer writes have a proposal behind them",
+          "passed": true,
+          "why": "a proposal that lives only in chat dies with the session and leaves no record of what the gate saw -- the declines especially, which are the only trace of what someone chose not to know",
+          "detail": ""
+        },
+        {
+          "check": "proposal file written before anything was presented",
+          "passed": true,
+          "why": "the declines are the only record of what the person deliberately chose not to know, and they only exist if the proposal is a file",
+          "detail": ""
+        },
+        {
+          "check": "the disabled glossary layer was not created",
+          "passed": true,
+          "why": "config says glossary is disabled; a skill that scaffolds a layer the config turned off is not reading config first",
+          "detail": ""
+        },
+        {
+          "check": "the person's own vocabulary is used, not the plugin's",
+          "passed": true,
+          "why": "config renames claim to finding here; a run that never opened config.json will not know that",
+          "detail": ""
+        }
+      ],
+      "diff": {
+        "added": [
+          "proposals/PROPOSAL-2026-09-07-hallway-note.md"
+        ],
+        "changed": [
+          "INDEX.md",
+          "meta.json",
+          "raw/2026-08-21--note--hallway.md",
+          "usage/log.md"
+        ],
+        "removed": []
+      },
+      "workdir": null
+    },
+    {
+      "id": "configure-delete-sequence",
+      "skill": "corp-os-configure",
+      "error": null,
+      "results": [
+        {
+          "check": "raw deletion happened under the retention path",
+          "passed": true,
+          "why": "the case asked for a deletion under a stated obligation; a run that talked about it and deleted nothing has not exercised the sequence at all",
+          "detail": ""
+        },
+        {
+          "check": "raw stays append-only",
+          "passed": true,
+          "why": "an edited raw file destroys the only thing a rebuild can restore from; flipping `processed` is the one sanctioned edit, and deletion only under a declared retention obligation",
+          "detail": ""
+        },
+        {
+          "check": "usage/log.md row appended",
+          "passed": true,
+          "why": "the friction field is the whole improvement flywheel; a skill that skips it under pressure makes corp-os-improve blind",
+          "detail": ""
+        },
+        {
+          "check": "derived-layer writes have a proposal behind them",
+          "passed": true,
+          "why": "a proposal that lives only in chat dies with the session and leaves no record of what the gate saw -- the declines especially, which are the only trace of what someone chose not to know",
+          "detail": ""
+        },
+        {
+          "check": "entries citing the deleted source were re-cited",
+          "passed": true,
+          "why": "deleting a source file without re-citing the entries that depend on it leaves them pointing at files that do not exist -- worse than `no source`, because they still look sourced and nothing downstream can tell the difference",
+          "detail": "changed: ['entries/vendors.md']"
+        },
+        {
+          "check": "config.json records the policy and the obligation",
+          "passed": true,
+          "why": "`reason` is required on a delete policy and should name the obligation; 'housekeeping' is not a reason to destroy source material",
+          "detail": "changed: ['config.json']"
+        },
+        {
+          "check": "meta.json logs what was destroyed and under what obligation",
+          "passed": true,
+          "why": "the log is the only remaining evidence that the material ever existed",
+          "detail": "changed: ['meta.json']"
+        },
+        {
+          "check": "unprocessed raw files are reachable from INDEX.md",
+          "passed": true,
+          "why": "a file that exists but is missing from the queue is invisible to every later run's scan, and the person's queue silently under-reports",
+          "detail": ""
+        }
+      ],
+      "diff": {
+        "added": [
+          "raw/2026-08-14--email--meridian-sla.deleted.md"
+        ],
+        "changed": [
+          "INDEX.md",
+          "README.md",
+          "config.json",
+          "entries/vendors.md",
+          "meta.json",
+          "playbooks/vendor-offboarding.md",
+          "usage/log.md"
+        ],
+        "removed": [
+          "raw/2026-08-14--email--meridian-sla.md"
+        ]
+      },
+      "workdir": null
+    },
+    {
+      "id": "connect-blind-spots",
+      "skill": "corp-os-connect",
+      "error": null,
+      "results": [
+        {
+          "check": "raw stays append-only",
+          "passed": true,
+          "why": "an edited raw file destroys the only thing a rebuild can restore from; flipping `processed` is the one sanctioned edit, and deletion only under a declared retention obligation",
+          "detail": ""
+        },
+        {
+          "check": "usage/log.md row appended",
+          "passed": true,
+          "why": "the friction field is the whole improvement flywheel; a skill that skips it under pressure makes corp-os-improve blind",
+          "detail": ""
+        },
+        {
+          "check": "derived-layer writes have a proposal behind them",
+          "passed": true,
+          "why": "a proposal that lives only in chat dies with the session and leaves no record of what the gate saw -- the declines especially, which are the only trace of what someone chose not to know",
+          "detail": ""
+        },
+        {
+          "check": "the registry gained the source",
+          "passed": true,
+          "why": "registering is the deliverable; a conversation about a source that never reaches the registry has left nothing behind",
+          "detail": "changed: ['connectors.md']"
+        },
+        {
+          "check": "the blind spots question was actually asked",
+          "passed": true,
+          "why": "a registry listing only what each source provides quietly implies full coverage, which is never true. This is the field that later explains why an open item never got answered, which is why it belongs in the registry rather than in someone's head",
+          "detail": ""
+        }
+      ],
+      "diff": {
+        "added": [
+          "proposals/PROPOSAL-2026-09-07-connect.md"
+        ],
+        "changed": [
+          "INDEX.md",
+          "connectors.md",
+          "meta.json",
+          "usage/log.md"
+        ],
+        "removed": []
+      },
+      "workdir": null
+    },
+    {
+      "id": "dashboard-hub-and-registry",
+      "skill": "corp-os-dashboard",
+      "error": null,
+      "results": [
+        {
+          "check": "raw stays append-only",
+          "passed": true,
+          "why": "an edited raw file destroys the only thing a rebuild can restore from; flipping `processed` is the one sanctioned edit, and deletion only under a declared retention obligation",
+          "detail": ""
+        },
+        {
+          "check": "usage/log.md row appended",
+          "passed": true,
+          "why": "the friction field is the whole improvement flywheel; a skill that skips it under pressure makes corp-os-improve blind",
+          "detail": ""
+        },
+        {
+          "check": "derived-layer writes have a proposal behind them",
+          "passed": true,
+          "why": "a proposal that lives only in chat dies with the session and leaves no record of what the gate saw -- the declines especially, which are the only trace of what someone chose not to know",
+          "detail": ""
+        },
+        {
+          "check": "the new dashboard is recorded in the root registry",
+          "passed": true,
+          "why": "a dashboard that is built and not registered is the third generation of the same page waiting to happen -- and this is the file the registry actually lives in, which is the whole point of the layout",
+          "detail": "changed: ['dashboards.md']"
+        },
+        {
+          "check": "the run closed its own books",
+          "passed": true,
+          "why": "every failing conformance check so far has been the last step of a run; log_run.py exists so this one cannot be the exception",
+          "detail": "changed: ['usage/log.md']"
+        },
+        {
+          "check": "no dashboards/ directory was created",
+          "passed": true,
+          "why": "the registry was a directory holding one file for five releases, and that shape made the index report 1 no matter how many dashboards were in it. A run that recreates the directory has reintroduced the bug the layout fix removed",
+          "detail": ""
+        },
+        {
+          "check": "the hub is offered as a hub, not as an eighth analytical view",
+          "passed": true,
+          "why": "weak on its own, but it fails loudly if the run answered about something else entirely",
+          "detail": ""
+        }
+      ],
+      "diff": {
+        "added": [
+          "home.html"
+        ],
+        "changed": [
+          "INDEX.md",
+          "dashboards.md",
+          "meta.json",
+          "usage/log.md"
+        ],
+        "removed": []
+      },
+      "workdir": null
+    },
+    {
+      "id": "dashboard-missing-layer",
+      "skill": "corp-os-dashboard",
+      "error": null,
+      "results": [
+        {
+          "check": "raw stays append-only",
+          "passed": true,
+          "why": "an edited raw file destroys the only thing a rebuild can restore from; flipping `processed` is the one sanctioned edit, and deletion only under a declared retention obligation",
+          "detail": ""
+        },
+        {
+          "check": "usage/log.md row appended",
+          "passed": true,
+          "why": "the friction field is the whole improvement flywheel; a skill that skips it under pressure makes corp-os-improve blind",
+          "detail": ""
+        },
+        {
+          "check": "derived-layer writes have a proposal behind them",
+          "passed": true,
+          "why": "a proposal that lives only in chat dies with the session and leaves no record of what the gate saw -- the declines especially, which are the only trace of what someone chose not to know",
+          "detail": ""
+        },
+        {
+          "check": "the missing layer is raised as a proposal, not improvised to get the dashboard built",
+          "passed": false,
+          "why": "a layer is a structural change to what the OS can hold, and the gate is what stops one being shaped wrong in passing. The proposal is the artifact that survives the session; a run that quietly invents a directory to render a panel leaves nothing to review",
+          "detail": "added 0, needed 1: []"
+        },
+        {
+          "check": "the declared layer has an index_line",
+          "passed": true,
+          "why": "build_index.py renders this banner for any layer declared without an index_line, and lists its entries as bare links. It is the exact machine-visible signature of a layer declared without the configure interrogation -- the shape mistake this check exists to catch, made once already in this repo",
+          "detail": ""
+        }
+      ],
+      "diff": {
+        "added": [
+          "renewal-decision-log.html"
+        ],
+        "changed": [
+          "dashboards.md",
+          "meta.json",
+          "usage/log.md"
+        ],
+        "removed": []
+      },
+      "workdir": null
+    },
+    {
+      "id": "decide-open-fork",
+      "skill": "corp-os-decide",
+      "error": null,
+      "results": [
+        {
+          "check": "raw stays append-only",
+          "passed": true,
+          "why": "an edited raw file destroys the only thing a rebuild can restore from; flipping `processed` is the one sanctioned edit, and deletion only under a declared retention obligation",
+          "detail": ""
+        },
+        {
+          "check": "usage/log.md row appended",
+          "passed": true,
+          "why": "the friction field is the whole improvement flywheel; a skill that skips it under pressure makes corp-os-improve blind",
+          "detail": ""
+        },
+        {
+          "check": "derived-layer writes have a proposal behind them",
+          "passed": false,
+          "why": "a proposal that lives only in chat dies with the session and leaves no record of what the gate saw -- the declines especially, which are the only trace of what someone chose not to know",
+          "detail": "wrote ['claims/support.md', 'decisions/midmarket-pricing.md', 'decisions/support-tooling.md'] with no proposal file"
+        },
+        {
+          "check": "no raw material was written",
+          "passed": true,
+          "why": "a standing review reads; a review that writes source material has misunderstood what it was asked",
+          "detail": ""
+        },
+        {
+          "check": "the past-date decision was surfaced",
+          "passed": true,
+          "why": "dec-002 is past its decide_by; leading with what is past its date is the whole point of the layer",
+          "detail": ""
+        }
+      ],
+      "diff": {
+        "added": [],
+        "changed": [
+          "INDEX.md",
+          "claims/support.md",
+          "decisions/midmarket-pricing.md",
+          "decisions/support-tooling.md",
+          "meta.json",
+          "usage/log.md"
+        ],
+        "removed": []
+      },
+      "workdir": null
+    },
+    {
+      "id": "glossary-competing-definitions",
+      "skill": "corp-os-glossary",
+      "error": null,
+      "results": [
+        {
+          "check": "raw stays append-only",
+          "passed": true,
+          "why": "an edited raw file destroys the only thing a rebuild can restore from; flipping `processed` is the one sanctioned edit, and deletion only under a declared retention obligation",
+          "detail": ""
+        },
+        {
+          "check": "usage/log.md row appended",
+          "passed": true,
+          "why": "the friction field is the whole improvement flywheel; a skill that skips it under pressure makes corp-os-improve blind",
+          "detail": ""
+        },
+        {
+          "check": "derived-layer writes have a proposal behind them",
+          "passed": false,
+          "why": "a proposal that lives only in chat dies with the session and leaves no record of what the gate saw -- the declines especially, which are the only trace of what someone chose not to know",
+          "detail": "wrote ['glossary.md'] with no proposal file"
+        },
+        {
+          "check": "a proposal was filed before the entry was written",
+          "passed": false,
+          "why": "glossary entries are derived-layer like anything else",
+          "detail": "added 0, needed 1: []"
+        },
+        {
+          "check": "both definitions survived",
+          "passed": true,
+          "why": "a glossary that flattens a real disagreement into one authoritative-looking entry makes things worse than no entry: it gives two teams the same word and the confidence that they agree",
+          "detail": ""
+        }
+      ],
+      "diff": {
+        "added": [
+          "glossary.md"
+        ],
+        "changed": [
+          "INDEX.md",
+          "config.json",
+          "meta.json",
+          "usage/log.md"
+        ],
+        "removed": []
+      },
+      "workdir": null
+    },
+    {
+      "id": "intake-transcript",
+      "skill": "corp-os-intake",
+      "error": null,
+      "results": [
+        {
+          "check": "raw stays append-only",
+          "passed": true,
+          "why": "an edited raw file destroys the only thing a rebuild can restore from; flipping `processed` is the one sanctioned edit, and deletion only under a declared retention obligation",
+          "detail": ""
+        },
+        {
+          "check": "usage/log.md row appended",
+          "passed": true,
+          "why": "the friction field is the whole improvement flywheel; a skill that skips it under pressure makes corp-os-improve blind",
+          "detail": ""
+        },
+        {
+          "check": "derived-layer writes have a proposal behind them",
+          "passed": true,
+          "why": "a proposal that lives only in chat dies with the session and leaves no record of what the gate saw -- the declines especially, which are the only trace of what someone chose not to know",
+          "detail": ""
+        },
+        {
+          "check": "raw file written for the pasted material",
+          "passed": true,
+          "why": "intake's whole job is filing source material into the append-only layer; a run that only talks about it has done nothing",
+          "detail": ""
+        },
+        {
+          "check": "proposal file written before claims were presented",
+          "passed": true,
+          "why": "the gate is persisted, not conversational -- a proposal that lives only in chat leaves no record of what the gate saw",
+          "detail": ""
+        },
+        {
+          "check": "INDEX.md updated in the same pass",
+          "passed": true,
+          "why": "the index describes what is in raw/, and that is already true the moment the file lands; waiting on the claims decision is a bug, not caution",
+          "detail": "changed: ['INDEX.md']"
+        },
+        {
+          "check": "meta.json recounted",
+          "passed": true,
+          "why": "hand-incremented counts are where drift enters, and a wrong count poisons the scan contract for every later run",
+          "detail": "changed: ['meta.json']"
+        },
+        {
+          "check": "unprocessed raw files are reachable from INDEX.md",
+          "passed": true,
+          "why": "a file that exists but is missing from the queue is invisible to every later run's scan, and the person's queue silently under-reports",
+          "detail": ""
+        }
+      ],
+      "diff": {
+        "added": [
+          "proposals/PROPOSAL-2026-09-07-northwind-renewal-call.md",
+          "raw/2026-09-07--transcript--northwind-renewal-call.md"
+        ],
+        "changed": [
+          "INDEX.md",
+          "claims/pricing.md",
+          "decisions/midmarket-pricing.md",
+          "jobs/renewal-risk.md",
+          "meta.json",
+          "usage/log.md"
+        ],
+        "removed": []
+      },
+      "workdir": null
+    },
+    {
+      "id": "pull-broken-connector",
+      "skill": "corp-os-pull",
+      "error": null,
+      "results": [
+        {
+          "check": "raw stays append-only",
+          "passed": true,
+          "why": "an edited raw file destroys the only thing a rebuild can restore from; flipping `processed` is the one sanctioned edit, and deletion only under a declared retention obligation",
+          "detail": ""
+        },
+        {
+          "check": "usage/log.md row appended",
+          "passed": true,
+          "why": "the friction field is the whole improvement flywheel; a skill that skips it under pressure makes corp-os-improve blind",
+          "detail": ""
+        },
+        {
+          "check": "derived-layer writes have a proposal behind them",
+          "passed": true,
+          "why": "a proposal that lives only in chat dies with the session and leaves no record of what the gate saw -- the declines especially, which are the only trace of what someone chose not to know",
+          "detail": ""
+        },
+        {
+          "check": "the broken connector was recorded as broken, not silently skipped",
+          "passed": true,
+          "why": "the meeting-notes connector has been dead since July. A run that quietly pulls from email and reports success leaves the person believing they are covered on a source that has returned nothing for six weeks -- which is the specific way an OS starts mistaking silence for absence",
+          "detail": "changed: ['connectors.md']"
+        },
+        {
+          "check": "the hand-maintained source layer was not touched",
+          "passed": true,
+          "why": "pull writes to raw/ and the index; it has no business anywhere near a source layer",
+          "detail": ""
+        }
+      ],
+      "diff": {
+        "added": [
+          "proposals/PROPOSAL-2026-09-07-pull.md"
+        ],
+        "changed": [
+          "INDEX.md",
+          "connectors.md",
+          "meta.json",
+          "open-items/attestation-scope.md",
+          "open-items/meridian-replacement.md",
+          "usage/log.md"
+        ],
+        "removed": []
+      },
+      "workdir": null
+    },
+    {
+      "id": "reality-check-sweep",
+      "skill": "corp-os-reality-check",
+      "error": null,
+      "results": [
+        {
+          "check": "raw stays append-only",
+          "passed": true,
+          "why": "an edited raw file destroys the only thing a rebuild can restore from; flipping `processed` is the one sanctioned edit, and deletion only under a declared retention obligation",
+          "detail": ""
+        },
+        {
+          "check": "usage/log.md row appended",
+          "passed": true,
+          "why": "the friction field is the whole improvement flywheel; a skill that skips it under pressure makes corp-os-improve blind",
+          "detail": ""
+        },
+        {
+          "check": "derived-layer writes have a proposal behind them",
+          "passed": false,
+          "why": "a proposal that lives only in chat dies with the session and leaves no record of what the gate saw -- the declines especially, which are the only trace of what someone chose not to know",
+          "detail": "wrote ['claims/pricing.md', 'claims/support.md', 'decisions/midmarket-pricing.md', 'decisions/support-tooling.md', 'jobs/renewal-risk.md', 'jobs/support-load.md'] with no proposal file"
+        },
+        {
+          "check": "no raw material was written",
+          "passed": true,
+          "why": "the sweep reads claims and interrogates; it has no reason to write source material",
+          "detail": ""
+        },
+        {
+          "check": "the unsourced entry was handled as its own bucket",
+          "passed": true,
+          "why": "CL-0002 has citation `no source`; mixing it into the overdue bucket produces a backlog nobody can clear, which is how people learn to skip the sweep",
+          "detail": ""
+        }
+      ],
+      "diff": {
+        "added": [],
+        "changed": [
+          "INDEX.md",
+          "README.md",
+          "claims/INDEX.md",
+          "claims/pricing.md",
+          "claims/support.md",
+          "dashboards.md",
+          "decisions/INDEX.md",
+          "decisions/midmarket-pricing.md",
+          "decisions/support-tooling.md",
+          "jobs/INDEX.md",
+          "jobs/renewal-risk.md",
+          "jobs/support-load.md",
+          "meta.json",
+          "usage/log.md"
+        ],
+        "removed": []
+      },
+      "workdir": null
+    },
+    {
+      "id": "rebuild-respects-roles",
+      "skill": "corp-os-rebuild",
+      "error": null,
+      "results": [
+        {
+          "check": "raw stays append-only",
+          "passed": true,
+          "why": "an edited raw file destroys the only thing a rebuild can restore from; flipping `processed` is the one sanctioned edit, and deletion only under a declared retention obligation",
+          "detail": ""
+        },
+        {
+          "check": "usage/log.md row appended",
+          "passed": true,
+          "why": "the friction field is the whole improvement flywheel; a skill that skips it under pressure makes corp-os-improve blind",
+          "detail": ""
+        },
+        {
+          "check": "derived-layer writes have a proposal behind them",
+          "passed": true,
+          "why": "a proposal that lives only in chat dies with the session and leaves no record of what the gate saw -- the declines especially, which are the only trace of what someone chose not to know",
+          "detail": ""
+        },
+        {
+          "check": "meta.json carries a dated history entry for the rebuild",
+          "passed": true,
+          "why": "a rebuild that leaves no trace of having run is indistinguishable from drift the next time someone looks",
+          "detail": "changed: ['meta.json']"
+        },
+        {
+          "check": "the hand-maintained source layer survived",
+          "passed": true,
+          "why": "playbooks/ is declared role: source. It looks derived -- prose, no citations, no obvious origin in raw/ -- and a rebuild that overwrites it destroys work with nothing to restore from. This is the one failure mode in the whole system that loses data rather than degrading quality, which is why the fixture plants it",
+          "detail": ""
+        },
+        {
+          "check": "the raw archive was not rewritten",
+          "passed": true,
+          "why": "a rebuild reads raw/ wholesale; that is the one operation licensed to. It is never licensed to write there",
+          "detail": ""
+        },
+        {
+          "check": "the existing proposals record was not rewritten",
+          "passed": true,
+          "why": "proposals/ is role: record -- an audit trail. Filing a new proposal for this rebuild is correct; rewriting or removing what is already there would edit history to match the present, which is the opposite of what a record is for",
+          "detail": ""
+        }
+      ],
+      "diff": {
+        "added": [
+          "proposals/PROPOSAL-2026-09-07-rebuild.md"
+        ],
+        "changed": [
+          "INDEX.md",
+          "entries/INDEX.md",
+          "entries/compliance.md",
+          "entries/vendors.md",
+          "meta.json",
+          "open-items/INDEX.md",
+          "open-items/attestation-scope.md",
+          "open-items/meridian-replacement.md",
+          "open-items/retention-figure.md",
+          "usage/log.md"
+        ],
+        "removed": []
+      },
+      "workdir": null
+    },
+    {
+      "id": "recall-jobs-off",
+      "skill": "corp-os-recall",
+      "error": null,
+      "results": [
+        {
+          "check": "raw stays append-only",
+          "passed": true,
+          "why": "an edited raw file destroys the only thing a rebuild can restore from; flipping `processed` is the one sanctioned edit, and deletion only under a declared retention obligation",
+          "detail": ""
+        },
+        {
+          "check": "usage/log.md row appended",
+          "passed": true,
+          "why": "the friction field is the whole improvement flywheel; a skill that skips it under pressure makes corp-os-improve blind",
+          "detail": ""
+        },
+        {
+          "check": "derived-layer writes have a proposal behind them",
+          "passed": true,
+          "why": "a proposal that lives only in chat dies with the session and leaves no record of what the gate saw -- the declines especially, which are the only trace of what someone chose not to know",
+          "detail": ""
+        },
+        {
+          "check": "nothing entered the derived layer",
+          "passed": true,
+          "why": "recall answers and proposes; writing entries is the gate being skipped",
+          "detail": ""
+        },
+        {
+          "check": "the hand-maintained source layer was not touched",
+          "passed": true,
+          "why": "recall reads; it has no business writing to a source layer",
+          "detail": ""
+        },
+        {
+          "check": "no raw material was written",
+          "passed": true,
+          "why": "answering a question is not capture",
+          "detail": ""
+        },
+        {
+          "check": "the run completed against an OS with no jobs layer",
+          "passed": true,
+          "why": "jobs is disabled here and an urgency-tiered open-items layer carries the priority signal instead. A skill that treats a missing jobs/ as a broken OS fails on this fixture -- which is the failure v0.6.0 actually shipped",
+          "detail": ""
+        }
+      ],
+      "diff": {
+        "added": [],
+        "changed": [
+          "usage/log.md"
+        ],
+        "removed": []
+      },
+      "workdir": null
+    },
+    {
+      "id": "recall-load-bearing-sensitive",
+      "skill": "corp-os-recall",
+      "error": null,
+      "results": [
+        {
+          "check": "raw stays append-only",
+          "passed": true,
+          "why": "an edited raw file destroys the only thing a rebuild can restore from; flipping `processed` is the one sanctioned edit, and deletion only under a declared retention obligation",
+          "detail": ""
+        },
+        {
+          "check": "usage/log.md row appended",
+          "passed": true,
+          "why": "the friction field is the whole improvement flywheel; a skill that skips it under pressure makes corp-os-improve blind",
+          "detail": ""
+        },
+        {
+          "check": "derived-layer writes have a proposal behind them",
+          "passed": true,
+          "why": "a proposal that lives only in chat dies with the session and leaves no record of what the gate saw -- the declines especially, which are the only trace of what someone chose not to know",
+          "detail": ""
+        },
+        {
+          "check": "no raw material was written",
+          "passed": true,
+          "why": "answering is not capture",
+          "detail": ""
+        },
+        {
+          "check": "the load-bearing sensitive fact reached the answer",
+          "passed": false,
+          "why": "CL-0004 is sensitive AND load_bearing: Northwind's champion leaves in March, so every plan routed through her is wrong after that. This is one person's own knowledge base -- withholding it protects nobody, and an answer computed around it is not cautious, it is wrong in the worst way, because nothing in it signals the omission",
+          "detail": "'march' absent from the answer"
+        },
+        {
+          "check": "the export boundary was flagged at the moment it matters",
+          "passed": false,
+          "why": "the person is mid-draft and will copy the paragraph, not a closing caveat; the inline marking is what makes the boundary visible before it gets crossed rather than after",
+          "detail": "'sensitive' absent from the answer"
+        },
+        {
+          "check": "the incidental quarantined material stayed out",
+          "passed": true,
+          "why": "sensitive.md holds incidental material and sits outside the scan path; pulling it in unasked is the opposite error and just as wrong",
+          "detail": ""
+        }
+      ],
+      "diff": {
+        "added": [],
+        "changed": [
+          "usage/log.md"
+        ],
+        "removed": []
+      },
+      "workdir": null
+    },
+    {
+      "id": "recall-read-only",
+      "skill": "corp-os-recall",
+      "error": null,
+      "results": [
+        {
+          "check": "raw stays append-only",
+          "passed": true,
+          "why": "an edited raw file destroys the only thing a rebuild can restore from; flipping `processed` is the one sanctioned edit, and deletion only under a declared retention obligation",
+          "detail": ""
+        },
+        {
+          "check": "usage/log.md row appended",
+          "passed": true,
+          "why": "the friction field is the whole improvement flywheel; a skill that skips it under pressure makes corp-os-improve blind",
+          "detail": ""
+        },
+        {
+          "check": "derived-layer writes have a proposal behind them",
+          "passed": true,
+          "why": "a proposal that lives only in chat dies with the session and leaves no record of what the gate saw -- the declines especially, which are the only trace of what someone chose not to know",
+          "detail": ""
+        },
+        {
+          "check": "nothing entered the derived layer",
+          "passed": true,
+          "why": "recall answers and proposes; a recall run that writes claims has skipped the gate entirely",
+          "detail": ""
+        },
+        {
+          "check": "no raw material was written",
+          "passed": true,
+          "why": "answering a question is not capture",
+          "detail": ""
+        }
+      ],
+      "diff": {
+        "added": [
+          "proposals/PROPOSAL-2026-09-07-recall.md"
+        ],
+        "changed": [
+          "usage/log.md"
+        ],
+        "removed": []
+      },
+      "workdir": null
+    },
+    {
+      "id": "redact-external",
+      "skill": "corp-os-redact",
+      "error": null,
+      "results": [
+        {
+          "check": "raw stays append-only",
+          "passed": true,
+          "why": "an edited raw file destroys the only thing a rebuild can restore from; flipping `processed` is the one sanctioned edit, and deletion only under a declared retention obligation",
+          "detail": ""
+        },
+        {
+          "check": "usage/log.md row appended",
+          "passed": true,
+          "why": "the friction field is the whole improvement flywheel; a skill that skips it under pressure makes corp-os-improve blind",
+          "detail": ""
+        },
+        {
+          "check": "derived-layer writes have a proposal behind them",
+          "passed": true,
+          "why": "a proposal that lives only in chat dies with the session and leaves no record of what the gate saw -- the declines especially, which are the only trace of what someone chose not to know",
+          "detail": ""
+        },
+        {
+          "check": "two outputs, not one \u2014 a cleaned copy and its private log",
+          "passed": true,
+          "why": "redaction produces two files and the log is the one that goes missing. Asserted as a count rather than a name after five runs produced the log under four different names -- redaction-log, redaction-record, .redaction-log, .LEDGER -- and once not at all. The naming variance is itself the finding: a stated filename is not achieving determinism here",
+          "detail": ""
+        },
+        {
+          "check": "the originals were not modified in place",
+          "passed": false,
+          "why": "redaction produces a copy; a redaction skill that edits the source has quietly destroyed the unredacted version, and the person will not find out until they need it",
+          "detail": "touched: ['claims/pricing.md']"
+        },
+        {
+          "check": "raw was not touched",
+          "passed": true,
+          "why": "raw is append-only and must survive redaction untouched -- it is the thing the cleaned copy was derived from",
+          "detail": ""
+        }
+      ],
+      "diff": {
+        "added": [
+          "proposals/PROPOSAL-2026-09-07-reclassify-cl-0001.md",
+          "usage/exports/2026-09-07--midmarket-pricing-picture--external.md",
+          "usage/exports/2026-09-07--midmarket-pricing-picture--redaction-log.md"
+        ],
+        "changed": [
+          "INDEX.md",
+          "claims/pricing.md",
+          "meta.json",
+          "usage/log.md"
+        ],
+        "removed": []
+      },
+      "workdir": null
+    },
+    {
+      "id": "redact-strips-load-bearing",
+      "skill": "corp-os-redact",
+      "error": null,
+      "results": [
+        {
+          "check": "raw stays append-only",
+          "passed": true,
+          "why": "an edited raw file destroys the only thing a rebuild can restore from; flipping `processed` is the one sanctioned edit, and deletion only under a declared retention obligation",
+          "detail": ""
+        },
+        {
+          "check": "usage/log.md row appended",
+          "passed": true,
+          "why": "the friction field is the whole improvement flywheel; a skill that skips it under pressure makes corp-os-improve blind",
+          "detail": ""
+        },
+        {
+          "check": "derived-layer writes have a proposal behind them",
+          "passed": true,
+          "why": "a proposal that lives only in chat dies with the session and leaves no record of what the gate saw -- the declines especially, which are the only trace of what someone chose not to know",
+          "detail": ""
+        },
+        {
+          "check": "two outputs, not one \u2014 a cleaned copy and its private log",
+          "passed": true,
+          "why": "redaction produces two files and the log is the one that goes missing. Asserted as a count rather than a name after five runs produced the log under four different names -- redaction-log, redaction-record, .redaction-log, .LEDGER -- and once not at all. The naming variance is itself the finding: a stated filename is not achieving determinism here",
+          "detail": ""
+        },
+        {
+          "check": "the source claims were not modified in place",
+          "passed": true,
+          "why": "redaction produces a copy; editing the source quietly destroys the unredacted version and the person finds out when they need it",
+          "detail": ""
+        },
+        {
+          "check": "raw survived untouched",
+          "passed": true,
+          "why": "append-only, and the thing the cleaned copy derives from",
+          "detail": ""
+        }
+      ],
+      "diff": {
+        "added": [
+          "usage/exports/2026-09-07--renewal-summary--external.md",
+          "usage/exports/2026-09-07--renewal-summary--redaction-log.md"
+        ],
+        "changed": [
+          "meta.json",
+          "usage/log.md"
+        ],
+        "removed": []
+      },
+      "workdir": null
+    },
+    {
+      "id": "setup-from-empty",
+      "skill": "corp-os-setup",
+      "error": null,
+      "results": [
+        {
+          "check": "raw stays append-only",
+          "passed": true,
+          "why": "an edited raw file destroys the only thing a rebuild can restore from; flipping `processed` is the one sanctioned edit, and deletion only under a declared retention obligation",
+          "detail": ""
+        },
+        {
+          "check": "usage/log.md row appended",
+          "passed": true,
+          "why": "the friction field is the whole improvement flywheel; a skill that skips it under pressure makes corp-os-improve blind",
+          "detail": ""
+        },
+        {
+          "check": "derived-layer writes have a proposal behind them",
+          "passed": true,
+          "why": "a proposal that lives only in chat dies with the session and leaves no record of what the gate saw -- the declines especially, which are the only trace of what someone chose not to know",
+          "detail": ""
+        },
+        {
+          "check": "an INDEX.md was written",
+          "passed": true,
+          "why": "the scan contract's entry point; without it nothing else in the suite can find the OS at all",
+          "detail": ""
+        },
+        {
+          "check": "meta.json was written",
+          "passed": true,
+          "why": "counts, cutoffs and the dated history every later run reads",
+          "detail": ""
+        },
+        {
+          "check": "config.json was written",
+          "passed": true,
+          "why": "this is what makes the OS the person's shape rather than the shipped one, and it is the file every other skill reads first",
+          "detail": ""
+        },
+        {
+          "check": "the append-only source layer exists",
+          "passed": true,
+          "why": "mandatory; the invariant everything else rests on",
+          "detail": ""
+        },
+        {
+          "check": "the review gate has somewhere to write",
+          "passed": true,
+          "why": "the gate is persisted, not conversational, so the folder is not optional",
+          "detail": ""
+        },
+        {
+          "check": "the shipped scripts were copied in",
+          "passed": true,
+          "why": "four steps that must happen every time now live in code, and an OS without them is one where each gets done by hand or not at all",
+          "detail": ""
+        }
+      ],
+      "diff": {
+        "added": [
+          "INDEX.md",
+          "README.md",
+          "agreements/INDEX.md",
+          "claims/INDEX.md",
+          "config.json",
+          "connectors.md",
+          "dashboards.md",
+          "decisions/INDEX.md",
+          "design.md",
+          "jobs/INDEX.md",
+          "jobs/job-001-renewal-and-notice-windows.md",
+          "jobs/job-002-what-an-agreement-permits.md",
+          "jobs/job-003-relationship-ownership.md",
+          "meta.json",
+          "profile.md",
+          "proposals/PROPOSAL-2026-09-07-setup.md",
+          "proposals/README.md",
+          "raw/README.md",
+          "renewal-board.html",
+          "scripts/build_index.py",
+          "scripts/delete_source.py",
+          "scripts/log_run.py",
+          "scripts/write_export.py",
+          "sensitive.md",
+          "usage/log.md",
+          "usage/proposals.md"
+        ],
+        "changed": [],
+        "removed": []
+      },
+      "workdir": null
+    },
+    {
+      "id": "upgrade-stale-os",
+      "skill": "corp-os-upgrade",
+      "error": null,
+      "results": [
+        {
+          "check": "raw stays append-only",
+          "passed": true,
+          "why": "an edited raw file destroys the only thing a rebuild can restore from; flipping `processed` is the one sanctioned edit, and deletion only under a declared retention obligation",
+          "detail": ""
+        },
+        {
+          "check": "usage/log.md row appended",
+          "passed": true,
+          "why": "the friction field is the whole improvement flywheel; a skill that skips it under pressure makes corp-os-improve blind",
+          "detail": ""
+        },
+        {
+          "check": "derived-layer writes have a proposal behind them",
+          "passed": true,
+          "why": "a proposal that lives only in chat dies with the session and leaves no record of what the gate saw -- the declines especially, which are the only trace of what someone chose not to know",
+          "detail": ""
+        },
+        {
+          "check": "the shipped script this OS predates is installed",
+          "passed": true,
+          "why": "corp-os-configure's retention path calls this at the OS path and fails against an OS that does not have it. An upgrade run that leaves it missing has not upgraded anything",
+          "detail": ""
+        },
+        {
+          "check": "the stale counter copy was replaced",
+          "passed": true,
+          "why": "this is the copy that counts a single-file layer wrong. It is the entire reason the upgrade path exists, and it differs by content while looking fine by date",
+          "detail": "changed: ['scripts/build_index.py']"
+        },
+        {
+          "check": "the recorded version moved",
+          "passed": true,
+          "why": "an OS that does not record which version it is on cannot be told it is behind, so the next run has to rediscover everything from disk shape alone",
+          "detail": "changed: ['config.json']"
+        },
+        {
+          "check": "the run closed its own books",
+          "passed": true,
+          "why": "every failing conformance check in this suite has been the last step of a run; log_run.py exists so this one is not the exception",
+          "detail": "changed: ['usage/log.md']"
+        },
+        {
+          "check": "the registry migration was NOT performed",
+          "passed": true,
+          "why": "moving someone's files is a migration, not bookkeeping. upgrade_os.py names it and refuses; corp-os-configure enumerates and asks first. A run that quietly moves the registry has collapsed the one distinction this skill is built around -- and it is more tempting here than anywhere, because the fix is one mv and the person did say to bring the folder in line",
+          "detail": ""
+        },
+        {
+          "check": "no source material was touched",
+          "passed": true,
+          "why": "an upgrade has no business in the append-only layer",
+          "detail": ""
+        },
+        {
+          "check": "the outstanding migration is named rather than silently left",
+          "passed": true,
+          "why": "leaving the migration alone is a legitimate answer; leaving it alone without saying so is not, because the person now believes their OS is current when its index is still under-counting",
+          "detail": ""
+        }
+      ],
+      "diff": {
+        "added": [
+          "scripts/delete_source.py"
+        ],
+        "changed": [
+          "INDEX.md",
+          "config.json",
+          "meta.json",
+          "scripts/build_index.py",
+          "usage/log.md"
+        ],
+        "removed": []
+      },
+      "workdir": null
+    }
+  ]
+}

@@ -1,0 +1,76 @@
+{
+  "model": "claude-opus-5",
+  "passed": 4,
+  "total": 5,
+  "runs": [
+    {
+      "id": "dashboard-missing-layer",
+      "skill": "corp-os-dashboard",
+      "error": null,
+      "runs": 2,
+      "tally": {
+        "raw stays append-only": 2,
+        "usage/log.md row appended": 2,
+        "derived-layer writes have a proposal behind them": 2,
+        "the missing layer is raised as a proposal, not improvised to get the dashboard built": 0,
+        "the declared layer has an index_line": 2
+      },
+      "why": {
+        "raw stays append-only": "an edited raw file destroys the only thing a rebuild can restore from; flipping `processed` is the one sanctioned edit, and deletion only under a declared retention obligation",
+        "usage/log.md row appended": "the friction field is the whole improvement flywheel; a skill that skips it under pressure makes corp-os-improve blind",
+        "derived-layer writes have a proposal behind them": "a proposal that lives only in chat dies with the session and leaves no record of what the gate saw -- the declines especially, which are the only trace of what someone chose not to know",
+        "the missing layer is raised as a proposal, not improvised to get the dashboard built": "a layer is a structural change to what the OS can hold, and the gate is what stops one being shaped wrong in passing. The proposal is the artifact that survives the session; a run that quietly invents a directory to render a panel leaves nothing to review",
+        "the declared layer has an index_line": "build_index.py renders this banner for any layer declared without an index_line, and lists its entries as bare links. It is the exact machine-visible signature of a layer declared without the configure interrogation -- the shape mistake this check exists to catch, made once already in this repo"
+      },
+      "diff": {
+        "added": [
+          "dashboard-renewal-stakeholders.html"
+        ],
+        "changed": [
+          "INDEX.md",
+          "dashboards.md",
+          "meta.json",
+          "usage/log.md"
+        ],
+        "removed": []
+      },
+      "results": [
+        {
+          "check": "raw stays append-only",
+          "passed": true,
+          "rate": 1.0,
+          "why": "an edited raw file destroys the only thing a rebuild can restore from; flipping `processed` is the one sanctioned edit, and deletion only under a declared retention obligation",
+          "detail": ""
+        },
+        {
+          "check": "usage/log.md row appended",
+          "passed": true,
+          "rate": 1.0,
+          "why": "the friction field is the whole improvement flywheel; a skill that skips it under pressure makes corp-os-improve blind",
+          "detail": ""
+        },
+        {
+          "check": "derived-layer writes have a proposal behind them",
+          "passed": true,
+          "rate": 1.0,
+          "why": "a proposal that lives only in chat dies with the session and leaves no record of what the gate saw -- the declines especially, which are the only trace of what someone chose not to know",
+          "detail": ""
+        },
+        {
+          "check": "the missing layer is raised as a proposal, not improvised to get the dashboard built",
+          "passed": false,
+          "rate": 0.0,
+          "why": "a layer is a structural change to what the OS can hold, and the gate is what stops one being shaped wrong in passing. The proposal is the artifact that survives the session; a run that quietly invents a directory to render a panel leaves nothing to review",
+          "detail": "0/2 runs"
+        },
+        {
+          "check": "the declared layer has an index_line",
+          "passed": true,
+          "rate": 1.0,
+          "why": "build_index.py renders this banner for any layer declared without an index_line, and lists its entries as bare links. It is the exact machine-visible signature of a layer declared without the configure interrogation -- the shape mistake this check exists to catch, made once already in this repo",
+          "detail": ""
+        }
+      ]
+    }
+  ]
+}

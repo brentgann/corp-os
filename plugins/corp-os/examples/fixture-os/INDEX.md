@@ -2,7 +2,7 @@
 
 Scan this first. Most questions should be answerable from this file alone; open a detail file only when the one-liners here are not enough.
 
-_Regenerated 2026-09-05 by scripts/build_index.py (counts and listings only — no retagging)._
+_Regenerated 2026-09-06 by scripts/build_index.py (counts and listings only — no retagging)._
 
 ## Counts
 
@@ -11,6 +11,7 @@ _Regenerated 2026-09-05 by scripts/build_index.py (counts and listings only — 
 - **Findings**: 4
 - **Decisions**: 2
 - **Proposals**: 1
+- **Dashboards**: 2
 
 ## Jobs
 

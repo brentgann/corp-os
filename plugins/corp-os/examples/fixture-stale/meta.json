@@ -1,0 +1,12 @@
+{
+  "created": "2026-09-07",
+  "next_claim_id": 1,
+  "cutoff": {},
+  "confidence_ceilings": {},
+  "history": [
+    {
+      "date": "2026-09-07",
+      "event": "scaffolded from the minimal profile by corp-os 0.10.1"
+    }
+  ]
+}

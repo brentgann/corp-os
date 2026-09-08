@@ -1,0 +1,70 @@
+{
+  "model": "claude-opus-5",
+  "passed": 7,
+  "total": 7,
+  "runs": [
+    {
+      "id": "dashboard-hub-and-registry",
+      "skill": "corp-os-dashboard",
+      "error": null,
+      "results": [
+        {
+          "check": "raw stays append-only",
+          "passed": true,
+          "why": "an edited raw file destroys the only thing a rebuild can restore from; flipping `processed` is the one sanctioned edit, and deletion only under a declared retention obligation",
+          "detail": ""
+        },
+        {
+          "check": "usage/log.md row appended",
+          "passed": true,
+          "why": "the friction field is the whole improvement flywheel; a skill that skips it under pressure makes corp-os-improve blind",
+          "detail": ""
+        },
+        {
+          "check": "derived-layer writes have a proposal behind them",
+          "passed": true,
+          "why": "a proposal that lives only in chat dies with the session and leaves no record of what the gate saw -- the declines especially, which are the only trace of what someone chose not to know",
+          "detail": ""
+        },
+        {
+          "check": "the new dashboard is recorded in the root registry",
+          "passed": true,
+          "why": "a dashboard that is built and not registered is the third generation of the same page waiting to happen -- and this is the file the registry actually lives in, which is the whole point of the layout",
+          "detail": "changed: ['dashboards.md']"
+        },
+        {
+          "check": "the run closed its own books",
+          "passed": true,
+          "why": "every failing conformance check so far has been the last step of a run; log_run.py exists so this one cannot be the exception",
+          "detail": "changed: ['usage/log.md']"
+        },
+        {
+          "check": "no dashboards/ directory was created",
+          "passed": true,
+          "why": "the registry was a directory holding one file for five releases, and that shape made the index report 1 no matter how many dashboards were in it. A run that recreates the directory has reintroduced the bug the layout fix removed",
+          "detail": ""
+        },
+        {
+          "check": "the hub is offered as a hub, not as an eighth analytical view",
+          "passed": true,
+          "why": "weak on its own, but it fails loudly if the run answered about something else entirely",
+          "detail": ""
+        }
+      ],
+      "diff": {
+        "added": [
+          "morning-start.html",
+          "proposals/PROPOSAL-2026-09-06-dashboard.md"
+        ],
+        "changed": [
+          "INDEX.md",
+          "dashboards.md",
+          "meta.json",
+          "usage/log.md"
+        ],
+        "removed": []
+      },
+      "workdir": null
+    }
+  ]
+}

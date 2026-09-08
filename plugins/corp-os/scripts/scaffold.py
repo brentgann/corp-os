@@ -30,7 +30,24 @@ import sys
 from datetime import date
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+PLUGIN_ROOT = os.path.dirname(HERE)
 SHIPPED = ("build_index.py", "write_export.py", "log_run.py", "delete_source.py")
+
+
+def plugin_version():
+    """Read the version rather than carry a second copy of it.
+
+    It was hard-coded here and went stale within one release, which is the
+    same class of bug as everything else this repo has found: a fact that has
+    to be updated every time, that nothing catches when it is not. The version
+    an OS records is what `upgrade_os.py` compares against, so a wrong one is
+    worse than none.
+    """
+    p = os.path.join(PLUGIN_ROOT, ".claude-plugin", "plugin.json")
+    try:
+        return json.load(open(p, encoding="utf-8")).get("version")
+    except (OSError, ValueError):
+        return None
 
 # Not configurable. These are the five invariants made concrete: an append-only
 # source layer, a place for the review gate's record, and the index and counts
@@ -80,7 +97,7 @@ def main():
 
     # -- config.json: the file every skill reads first
     cfg = {
-        "corpos_version": "0.10.0",
+        "corpos_version": plugin_version(),
         "profile": a.profile,
         "vocabulary": {
             **({"claim": vocab["claim"]} if "claim" in vocab else {}),
@@ -115,7 +132,8 @@ def main():
         "cutoff": {},
         "confidence_ceilings": {},
         "history": [{"date": today,
-                     "event": f"scaffolded from the {a.profile} profile"}],
+                     "event": f"scaffolded from the {a.profile} profile "
+                              f"by corp-os {plugin_version() or '(unknown)'}"}],
     }, indent=2) + "\n")
 
     write(os.path.join(root, "INDEX.md"),
