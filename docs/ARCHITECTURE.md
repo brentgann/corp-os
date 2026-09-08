@@ -3,7 +3,7 @@
 The working document for this project. It records what Corp-OS is, every consequential decision and the reasoning behind it, what has been tested and how, and what is still open. Written so a session that has never seen this repo can pick it up cold and make correct changes.
 
 **Status:** v0.11.0 · 21 skills · 9 reference specs · 6 shipped scripts · 8 commands · 3 eval harnesses · 3 fixtures
-**Last substantive change:** an upgrade path for existing OSes — and, found while testing it, the discovery that no shipped script had ever executed in a conformance run.
+**Last substantive change:** the skill map ships with the repo, generated rather than written, because a hand-kept one would have been the fifth instance of the defect this project keeps finding in itself.
 
 ---
 
@@ -403,6 +403,22 @@ Verified three ways before believing it: the plugin-root path, a bare relative p
 
 **The lesson is not "check the permission mode."** It is that this suite spent six runs and three rewrites treating a consistent, plausible failure as evidence about the skill, without once testing the instrument. The harness had been trusted because it had found real defects — which it had, and which made it harder to suspect. A number that will not move after two honest attempts is evidence about the measurement at least as often as about the thing measured, and the cost of checking is one minute.
 
+### 4.28 The skill map is generated, because a written one would go stale
+
+**Decision (0.11.1):** `scripts/build_skill_map.py` &rarr; `docs/skill-map.html`, checked by `validate.py`.
+
+A one-page map of the suite is the thing a new operator wants and the thing a maintainer keeps re-deriving in their head. Written by hand and committed, it is also a file that states how many skills exist, what each does, what each refuses, and what the eval numbers are — every one of which is a fact already true somewhere else.
+
+This project has now found that same defect four times: `corp-os-setup` saying *"both shipped scripts"* three releases after there were four; `scaffold.py` hard-coding a version that was stale within one release; `corpos_version` living in six files with six different values; and a dashboards registry that counted 1 for five releases. A static skill map would have been the fifth, and it would have gone wrong the same week someone added a skill.
+
+So the page is generated. Descriptions are parsed out of the frontmatter that already holds them — and split three ways, because a description already carries three separate things: what the skill does, the phrases that should reach it, and what it refuses. The counts are `len()`. The command roster reads the command files and resolves which skill each names. What each script makes deterministic is its own docstring. Which scripts an OS carries is read from `scaffold.py`'s `SHIPPED`, the same single source the upgrade path uses. The invariants are parsed from the README, so the page says *five* because it counted them. Even the eval figures are read from the committed run reports, because a page that hard-codes **100%** keeps saying it after the number moves.
+
+**What is declared by hand is the part that is judgment.** Which phase a skill belongs to cannot be derived from anything, so it is stated once, in the generator, and the generator **refuses to run** if a skill on disk has not been placed. Add a twenty-second skill and the build fails until someone decides where it goes. That is the correct amount of friction: placing it takes ten seconds, and it is the only part of the page a person is needed for.
+
+**The phases themselves are a claim worth arguing with.** Thirteen skills form a loop — Capture, Curate, Consult, Correct, Release — and the other eight act on the OS rather than on what it holds, so they are not a sequence and are not numbered. That split is not invented for the page; it is the one already made in &sect;4.23, when the command set deliberately left out `setup`, `configure`, `rebuild`, `audit` and `improve` as rare and deliberate enough to name.
+
+**The page and the published artifact are the same bytes.** `--fragment` emits the head-less form an Artifact wants; `docs/skill-map.html` is the standalone document a browser opens off disk. One template, so the shared link and the repo cannot drift.
+
 ## 5. The skills
 
 | Skill | Job |
@@ -513,9 +529,10 @@ Recorded so they do not get re-proposed.
 6. **A wording change means `evals/run_commands.py`** — a minute, and it is the only loop short enough to actually use while writing.
 7. **Negative-test any check you add.** Reintroduce the defect, confirm the check fires, restore. A check that has never been seen to fail is not a check.
 8. **An instruction that touches a source layer means grepping the invariant it sits under.** "Never edited" and "flip `processed: true`" both shipped for four releases and could not both be true. A contradiction like that does not announce itself; it gets read in whichever direction the reader arrives from. See §4.15.
-9. **Changing a skill's behavior means adding or rerunning its conformance case** — `python3 evals/run_conformance.py --case <id>`. If the skill has no case, that is the moment to write one.
-10. **Adding or rewording a skill description means rerunning `evals/run_routing.py`.** Add coverage queries for the new skill and at least one query that should route *elsewhere* but sits near it. `corp-os-decide` shipped with a description that swallowed two other skills' queries and it took the eval, not review, to see it.
-11. If the change came from real use, write an **improvement packet** per `reference/improvement-packet.md` — and apply its config test first: *if it could have been a config setting, it is not a model change.*
+9. **Adding a skill means placing it on the map.** `scripts/build_skill_map.py` will not render until the new skill is in a phase or on the workbench, and `validate.py` runs it. Everything else on that page regenerates itself.
+10. **Changing a skill's behavior means adding or rerunning its conformance case** — `python3 evals/run_conformance.py --case <id>`. If the skill has no case, that is the moment to write one.
+11. **Adding or rewording a skill description means rerunning `evals/run_routing.py`.** Add coverage queries for the new skill and at least one query that should route *elsewhere* but sits near it. `corp-os-decide` shipped with a description that swallowed two other skills' queries and it took the eval, not review, to see it.
+12. If the change came from real use, write an **improvement packet** per `reference/improvement-packet.md` — and apply its config test first: *if it could have been a config setting, it is not a model change.*
 
 ---
 

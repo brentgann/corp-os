@@ -1,0 +1,500 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Corp-OS Skill Map</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+:root{
+  --ink:#17132B; --ink-soft:#4A4459; --ink-faint:#8A8399;
+  --paper:#FBF8F4; --paper-raised:#FFFFFF;
+  --line:#9ED3DE; --line-soft:#C9E8ED; --line-pink:#EAB8D2;
+  --p1:#4B3F95; --p1-tint:#EAE8F8;
+  --p2:#2D6CAD; --p2-tint:#E4EEF7;
+  --p3:#1F9C82; --p3-tint:#E1F3EE;
+  --p4:#DC9E2E; --p4-tint:#FBF0DC;
+  --p5:#E2604F; --p5-tint:#FCE7E3;
+  --pink:#C7488E; --pink-tint:#FAE5F0;
+  --cyan:#0FB8C9; --cyan-tint:#DFF6F8;
+  --navy:#1B3A5C; --navy-tint:#E4EBF1;
+  --navy-text:#1B3A5C;
+  --p1-text:#4B3F95; --p2-text:#2D6CAD; --p3-text:#177561;
+  --p4-text:#8a6512; --p5-text:#A9483B;
+  --pink-text:#A93D78; --cyan-text:#087580;
+  --radius-sm:8px; --radius-md:14px; --radius-lg:22px; --radius-pill:999px;
+  --font-display:'Space Grotesk','Segoe UI',sans-serif;
+  --font-body:'Inter','Segoe UI',system-ui,sans-serif;
+  --font-mono:'IBM Plex Mono','SF Mono',ui-monospace,monospace;
+  --shadow-sm:0 1px 2px rgba(23,19,43,0.06);
+  --shadow-md:0 8px 24px rgba(23,19,43,0.08);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ink:#F2EEFA; --ink-soft:#C6BFDA; --ink-faint:#8A82A3;
+    --paper:#130F24; --paper-raised:#1D1836;
+    --line:#204656; --line-soft:#173039; --line-pink:#4A2A45;
+    --p1-tint:#241E42; --p2-tint:#17293B; --p3-tint:#123028;
+    --p4-tint:#3A2A0E; --p5-tint:#3B1D16;
+    --pink-tint:#341728; --cyan-tint:#0E2C30;
+    --navy-tint:rgba(111,182,222,0.16); --navy-text:#6FB6DE;
+    --p1-text:#938BBF; --p2-text:#6C98C5; --p3-text:#47AD98;
+    --p4-text:#DFA742; --p5-text:#E46F60;
+    --pink-text:#D370A6; --cyan-text:#27BFCE;
+    --shadow-sm:0 1px 2px rgba(0,0,0,0.4);
+    --shadow-md:0 8px 24px rgba(0,0,0,0.45);
+  }
+}
+:root[data-theme="dark"]{
+  --ink:#F2EEFA; --ink-soft:#C6BFDA; --ink-faint:#8A82A3;
+  --paper:#130F24; --paper-raised:#1D1836;
+  --line:#204656; --line-soft:#173039; --line-pink:#4A2A45;
+  --p1-tint:#241E42; --p2-tint:#17293B; --p3-tint:#123028;
+  --p4-tint:#3A2A0E; --p5-tint:#3B1D16;
+  --pink-tint:#341728; --cyan-tint:#0E2C30;
+  --navy-tint:rgba(111,182,222,0.16); --navy-text:#6FB6DE;
+  --p1-text:#938BBF; --p2-text:#6C98C5; --p3-text:#47AD98;
+  --p4-text:#DFA742; --p5-text:#E46F60;
+  --pink-text:#D370A6; --cyan-text:#27BFCE;
+  --shadow-sm:0 1px 2px rgba(0,0,0,0.4);
+  --shadow-md:0 8px 24px rgba(0,0,0,0.45);
+}
+*{box-sizing:border-box}
+body{margin:0; background:var(--paper); color:var(--ink);
+  font-family:var(--font-body); font-size:15px; line-height:1.6;
+  -webkit-font-smoothing:antialiased}
+.wrap{max-width:1120px; margin:0 auto; padding:44px 24px 80px}
+h1,h2,h3,h4{font-family:var(--font-display); text-wrap:balance; margin:0}
+p{margin:0}
+code,.mono{font-family:var(--font-mono); font-size:.92em}
+.eyebrow{font-family:var(--font-mono); font-size:11.5px; font-weight:600;
+  letter-spacing:.1em; text-transform:uppercase; color:var(--ink-faint)}
+header{display:flex; flex-direction:column; gap:16px}
+h1{font-size:44px; font-weight:700; line-height:1.08; letter-spacing:-.02em}
+.thesis{font-size:17px; color:var(--ink-soft); max-width:64ch}
+.thesis strong{color:var(--ink); font-weight:600}
+.facts{display:flex; flex-wrap:wrap; margin-top:8px;
+  border:1px solid var(--line-soft); border-radius:var(--radius-md);
+  background:var(--paper-raised); overflow:hidden}
+.fact{flex:1 1 130px; padding:12px 16px; border-right:1px solid var(--line-soft)}
+.fact:last-child{border-right:none}
+.fact b{display:block; font-family:var(--font-display); font-size:22px;
+  font-weight:700; line-height:1.2; font-variant-numeric:tabular-nums}
+.fact span{font-family:var(--font-mono); font-size:11px; letter-spacing:.08em;
+  text-transform:uppercase; color:var(--ink-faint)}
+.rail-block{margin:44px 0 8px}
+.rail{display:grid; grid-template-columns:repeat(5,1fr); gap:10px}
+.step{border:1px solid var(--line-soft); border-top:3px solid var(--sc);
+  border-radius:var(--radius-md); background:var(--paper-raised);
+  padding:14px 14px 16px; display:flex; flex-direction:column; gap:6px;
+  box-shadow:var(--shadow-sm)}
+.step .n{font-family:var(--font-mono); font-size:11px; font-weight:600;
+  letter-spacing:.1em; color:var(--st)}
+.step h4{font-size:17px; font-weight:600; letter-spacing:-.01em}
+.step p{font-size:13px; color:var(--ink-soft); line-height:1.5}
+.loopnote{display:flex; align-items:center; gap:10px; margin-top:14px;
+  font-family:var(--font-mono); font-size:11.5px; letter-spacing:.04em;
+  color:var(--ink-faint)}
+.loopnote svg{flex:0 0 auto}
+.phase{margin-top:40px; scroll-margin-top:20px}
+.phase-head{display:flex; align-items:baseline; gap:14px; flex-wrap:wrap;
+  padding-bottom:10px; border-bottom:2px solid var(--sc)}
+.phase-head .n{font-family:var(--font-mono); font-size:12px; font-weight:600;
+  letter-spacing:.12em; color:var(--st)}
+.phase-head h2{font-size:29px; font-weight:700; letter-spacing:-.02em}
+.count{margin-left:auto; font-family:var(--font-mono); font-size:11.5px;
+  color:var(--ink-faint); letter-spacing:.06em}
+.phase-why{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:14px 0 18px}
+.phase-why div{padding:12px 14px; border-radius:var(--radius-sm);
+  background:var(--sb); font-size:14px; color:var(--ink-soft); line-height:1.55}
+.phase-why b{display:block; font-family:var(--font-mono); font-size:10.5px;
+  letter-spacing:.1em; text-transform:uppercase; color:var(--st);
+  margin-bottom:4px; font-weight:600}
+.cards{display:grid; grid-template-columns:repeat(auto-fit,minmax(310px,1fr)); gap:14px}
+.card{border:1px solid var(--line-soft); border-radius:var(--radius-md);
+  background:var(--paper-raised); padding:16px 18px 14px;
+  display:flex; flex-direction:column; gap:9px}
+.card .name{font-family:var(--font-mono); font-size:13.5px; font-weight:600;
+  color:var(--ink); letter-spacing:-.01em; word-break:break-word}
+.card .does{font-size:14px; line-height:1.55; color:var(--ink-soft)}
+.trig{display:flex; flex-wrap:wrap; gap:5px}
+.trig span{font-size:12px; color:var(--ink-faint); font-style:italic;
+  background:var(--sb,transparent); padding:1px 7px; border-radius:var(--radius-pill);
+  border:1px solid var(--line-soft)}
+.card .not{font-size:12.5px; line-height:1.5; color:var(--ink-faint);
+  padding-left:11px; border-left:2px solid var(--line)}
+.meta{display:flex; flex-wrap:wrap; gap:6px; margin-top:auto; padding-top:4px}
+.chip{font-family:var(--font-mono); font-size:10.5px; font-weight:600;
+  letter-spacing:.05em; padding:3px 8px; border-radius:var(--radius-pill);
+  border:1px solid var(--line); color:var(--ink-soft); white-space:nowrap}
+.chip.cmd{background:var(--navy-tint); border-color:transparent; color:var(--navy-text)}
+.bench{margin-top:52px; padding:26px; border:1px solid var(--line-pink);
+  border-radius:var(--radius-lg); background:var(--pink-tint)}
+.bench-head{display:flex; align-items:baseline; gap:14px; flex-wrap:wrap}
+.bench-head h2{font-size:29px; font-weight:700; letter-spacing:-.02em}
+.bench-head .eyebrow{color:var(--pink-text)}
+.bench > p{margin:12px 0 20px; font-size:15px; color:var(--ink-soft); max-width:70ch}
+.bench .card{border-color:var(--line-pink)}
+.layer{margin-top:52px}
+.layer h2{font-size:29px; font-weight:700; letter-spacing:-.02em}
+.layer > p{margin:10px 0 18px; color:var(--ink-soft); max-width:72ch}
+.scroll{overflow-x:auto; border:1px solid var(--line-soft);
+  border-radius:var(--radius-md); background:var(--paper-raised)}
+table{border-collapse:collapse; width:100%; min-width:600px}
+th,td{text-align:left; padding:10px 16px; vertical-align:top;
+  border-bottom:1px solid var(--line-soft); font-size:14px}
+thead th{font-family:var(--font-mono); font-size:10.5px; font-weight:600;
+  letter-spacing:.1em; text-transform:uppercase; color:var(--ink-faint);
+  border-bottom:2px solid var(--line-pink)}
+tbody tr:last-child td{border-bottom:none}
+td.mono{font-size:13px; white-space:nowrap; color:var(--ink)}
+td.dim{color:var(--ink-soft)}
+.notes{margin-top:52px; border:1px dashed var(--line);
+  border-radius:var(--radius-md); padding:24px 26px}
+.notes h2{font-size:21px; font-weight:600; letter-spacing:-.01em}
+.notes .eyebrow{margin-bottom:8px}
+.notes > p{margin:10px 0 0; font-size:14px; color:var(--ink-soft); max-width:74ch}
+.notes ul{margin:14px 0 0; padding-left:0; list-style:none;
+  display:flex; flex-direction:column; gap:12px}
+.notes li{font-size:14px; color:var(--ink-soft); line-height:1.55;
+  padding-left:16px; border-left:2px solid var(--line-soft)}
+.notes li b{color:var(--ink); font-weight:600}
+.num{font-family:var(--font-mono); font-variant-numeric:tabular-nums;
+  font-weight:600; color:var(--ink)}
+footer{margin-top:40px; padding-top:18px; border-top:1px solid var(--line-soft);
+  font-family:var(--font-mono); font-size:11.5px; letter-spacing:.05em;
+  color:var(--ink-faint); display:flex; flex-wrap:wrap; gap:8px 20px}
+@media (max-width:860px){
+  .rail{grid-template-columns:repeat(2,1fr)}
+  .phase-why{grid-template-columns:1fr}
+  h1{font-size:34px}
+  .phase-head h2,.bench-head h2,.layer h2{font-size:24px}
+}
+@media (max-width:520px){ .rail{grid-template-columns:1fr} }
+@media (prefers-reduced-motion:no-preference){
+  .card,.step{transition:box-shadow 200ms cubic-bezier(.4,0,.2,1)}
+  .card:hover,.step:hover{box-shadow:var(--shadow-md)}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">corp-os v0.11.1 &nbsp;&middot;&nbsp; generated by <span class="mono">scripts/build_skill_map.py</span></div>
+  <h1>Corp-OS Skill Map</h1>
+  <p class="thesis">21 skills, and only 13 of them are things you do <em>with</em> a knowledge base. The other 8 are things you do <strong>to</strong> it &mdash; and knowing which is which is most of knowing when to reach for what.</p>
+  <div class="facts">
+    <div class="fact"><b>21</b><span>Skills</span></div>
+    <div class="fact"><b>8</b><span>Slash commands</span></div>
+    <div class="fact"><b>6</b><span>Shipped scripts</span></div>
+    <div class="fact"><b>9</b><span>Reference specs</span></div>
+    <div class="fact"><b>5</b><span>Invariants</span></div>
+  </div>
+</header>
+
+<section class="rail-block">
+  <div class="eyebrow" style="margin-bottom:12px">The loop &mdash; what you do with the OS</div>
+  <div class="rail">
+    <div class="step" style="--sc:var(--p1); --st:var(--p1-text)">
+      <div class="n">PHASE 1</div><h4>Capture</h4>
+      <p>Nothing downstream can cite anything.</p>
+    </div>
+    <div class="step" style="--sc:var(--p2); --st:var(--p2-text)">
+      <div class="n">PHASE 2</div><h4>Curate</h4>
+      <p>You have a folder of transcripts.</p>
+    </div>
+    <div class="step" style="--sc:var(--p3); --st:var(--p3-text)">
+      <div class="n">PHASE 3</div><h4>Consult</h4>
+      <p>You have built a write-only diary.</p>
+    </div>
+    <div class="step" style="--sc:var(--p4); --st:var(--p4-text)">
+      <div class="n">PHASE 4</div><h4>Correct</h4>
+      <p>The OS keeps answering with confidence it has not earned since March.</p>
+    </div>
+    <div class="step" style="--sc:var(--p5); --st:var(--p5-text)">
+      <div class="n">PHASE 5</div><h4>Release</h4>
+      <p>The wrong sentence goes out in a paste.</p>
+    </div>
+  </div>
+  <div class="loopnote">
+    <svg width="46" height="18" viewBox="0 0 46 18" aria-hidden="true">
+      <path d="M44 2 L44 9 Q44 13 40 13 L7 13" fill="none" stroke="currentColor" stroke-width="1.5"/>
+      <path d="M11 9 L6.5 13 L11 17" fill="none" stroke="currentColor" stroke-width="1.5"/>
+    </svg>
+    <span>Release returns to Capture &mdash; what you sent out is itself material</span>
+  </div>
+</section>
+
+<section class="phase" id="capture" style="--sc:var(--p1); --st:var(--p1-text); --sb:var(--p1-tint)">
+  <div class="phase-head">
+    <span class="n">PHASE 1</span><h2>Capture</h2>
+    <span class="count">3 skills</span>
+  </div>
+  <div class="phase-why">
+    <div><b>What it is for</b>Getting things said into a layer that is never edited, never summarized in place, never deleted outside a declared obligation. One sanctioned exception: flipping <code>processed</code> to true.</div>
+    <div><b>Skip it and</b>Nothing downstream can cite anything. A claim with no retrievable original is the one thing this model treats as corrosive, because nothing later can detect it.</div>
+  </div>
+  <div class="cards">
+      <div class="card">
+        <div class="name">corp-os-intake</div>
+        <p class="does">Takes material a person pastes, uploads, or hands over directly — a transcript, a chat thread, a document, an email, a personal note, a screenshot of something — and files it into a Corp-OS knowledge base's append-only raw layer with the right type and job tags, then proposes what should become claims.</p>
+<div class="trig"><span>&ldquo;add this&rdquo;</span><span>&ldquo;log this&rdquo;</span><span>&ldquo;capture this conversation&rdquo;</span></div>
+<p class="not">Not for retrieving from a connected source (use corp-os-pull) and not for answering a question about material already captured (use corp-os-recall).</p>
+        <div class="meta"><span class="chip cmd">/corp-os-capture</span><span class="chip">As it happens</span></div>
+      </div>
+      <div class="card">
+        <div class="name">corp-os-pull</div>
+        <p class="does">Retrieves new material from the sources registered in a Corp-OS knowledge base — meeting notes, chat threads, email, documents, issue trackers — writing each into the append-only raw layer with dedupe, then proposing what should become claims.</p>
+<div class="trig"><span>&ldquo;catch me up&rdquo;</span><span>&ldquo;pull my meetings&rdquo;</span><span>&ldquo;sync my OS&rdquo;</span></div>
+<p class="not">Not for registering a new source (use corp-os-connect), not for pasted or handed-over content (use corp-os-intake), and not for answering a question about material already captured (use corp-os-recall).</p>
+        <div class="meta"><span class="chip cmd">/corp-os-catchup</span><span class="chip">Daily or weekly</span></div>
+      </div>
+      <div class="card">
+        <div class="name">corp-os-connect</div>
+        <p class="does">Registers a data source in a Corp-OS knowledge base — establishing how it connects (MCP connector, API token, browser session, export file, or manual paste), what it feeds, which jobs it serves, its cadence, and critically what it is blind to.</p>
+<div class="trig"><span>&ldquo;connect my meeting notes&rdquo;</span><span>&ldquo;hook up Slack&rdquo;</span><span>&ldquo;add a data source&rdquo;</span></div>
+<p class="not">Not for actually retrieving data from an already-registered source (use corp-os-pull) and not for one-off pasted content (use corp-os-intake).</p>
+        <div class="meta"><span class="chip">Once per source</span></div>
+      </div>
+  </div>
+</section>
+
+<section class="phase" id="curate" style="--sc:var(--p2); --st:var(--p2-text); --sb:var(--p2-tint)">
+  <div class="phase-head">
+    <span class="n">PHASE 2</span><h2>Curate</h2>
+    <span class="count">5 skills</span>
+  </div>
+  <div class="phase-why">
+    <div><b>What it is for</b>Turning a pile into knowledge, behind a review gate written to disk before it is presented. The declines are the valuable part &mdash; the only record of what someone chose not to know.</div>
+    <div><b>Skip it and</b>You have a folder of transcripts. Search finds text; it does not find what you concluded, who said it, or whether it is still true.</div>
+  </div>
+  <div class="cards">
+      <div class="card">
+        <div class="name">corp-os-claims</div>
+        <p class="does">Turns raw material in a Corp-OS knowledge base into reviewed, citable claims — each with a kind, a confidence level, a verbatim citation, the jobs it serves, and a decay window — and promotes, edits, merges, supersedes, or retires existing claims.</p>
+<div class="trig"><span>&ldquo;turn this into claims&rdquo;</span><span>&ldquo;process my unprocessed queue&rdquo;</span><span>&ldquo;what do we actually know&rdquo;</span></div>
+<p class="not">Not for capturing new source material (use corp-os-intake or corp-os-pull) and not for the systematic staleness and contradiction sweep (use corp-os-reality-check).</p>
+        <div class="meta"><span class="chip">Weekly &mdash; work the queue</span></div>
+      </div>
+      <div class="card">
+        <div class="name">corp-os-jobs</div>
+        <p class="does">Adds, sharpens, splits, re-scopes, or retires the jobs to be done in a Corp-OS knowledge base, and keeps each job's evidence list current so intake and recall have a priority signal.</p>
+<div class="trig"><span>&ldquo;add a job&rdquo;</span><span>&ldquo;I have a new thing I'm working on&rdquo;</span><span>&ldquo;this job is too big&rdquo;</span></div>
+<p class="not">Not for setting up an OS from scratch (use corp-os-setup) and not for capturing source material (use corp-os-intake).</p>
+        <div class="meta"><span class="chip">When the work changes</span></div>
+      </div>
+      <div class="card">
+        <div class="name">corp-os-decide</div>
+        <p class="does">Tracks the forks a person has NOT decided yet in a Corp-OS knowledge base — each open choice with its named options, an owner, a decide_by date past which it gets made by default, what it is blocking, and what evidence would settle it — then records the outcome and hands it to corp-os-claims once the call is made. The test is tense: this is only for a choice still open.</p>
+<div class="trig"><span>&ldquo;we're stuck between two options&rdquo;</span><span>&ldquo;what's still open&rdquo;</span><span>&ldquo;what am I waiting on&rdquo;</span></div>
+<p class="not">Not for a decision already made — "we went with X", "why did we decide that" — which is a decision claim via corp-os-claims. Not for an outcome someone is working toward, like "decide how to handle renewals", which is a job (use corp-os-jobs).</p>
+        <div class="meta"><span class="chip cmd">/corp-os-open</span><span class="chip">When a fork opens</span></div>
+      </div>
+      <div class="card">
+        <div class="name">corp-os-glossary</div>
+        <p class="does">Builds and maintains the glossary in a Corp-OS knowledge base — internal jargon, product terms, acronyms, role names, and especially metric definitions — extracted from captured material and confirmed by the person.</p>
+<div class="trig"><span>&ldquo;add this term&rdquo;</span><span>&ldquo;what does X mean here&rdquo;</span><span>&ldquo;build my glossary&rdquo;</span></div>
+<p class="not">Not for company-level facts like pricing or funding (use corp-os-company) and not for general claims (use corp-os-claims).</p>
+        <div class="meta"><span class="chip">As terms surface</span></div>
+      </div>
+      <div class="card">
+        <div class="name">corp-os-company</div>
+        <p class="does">Researches and maintains company context in a Corp-OS knowledge base — what a company sells, users versus buyers, use cases, pricing mechanism, monetization, funding, current status, stated goals, and competitors — combining web research with what the person already knows, and recording each finding as a sourced claim with a decay window.</p>
+<div class="trig"><span>&ldquo;research this company&rdquo;</span><span>&ldquo;what do we know about Acme&rdquo;</span><span>&ldquo;build out my company context&rdquo;</span></div>
+<p class="not">Not for defining internal vocabulary (use corp-os-glossary) and not for filing a call transcript (use corp-os-intake).</p>
+        <div class="meta"><span class="chip">Before a meeting</span></div>
+      </div>
+  </div>
+</section>
+
+<section class="phase" id="consult" style="--sc:var(--p3); --st:var(--p3-text); --sb:var(--p3-tint)">
+  <div class="phase-head">
+    <span class="n">PHASE 3</span><h2>Consult</h2>
+    <span class="count">3 skills</span>
+  </div>
+  <div class="phase-why">
+    <div><b>What it is for</b>Getting the knowledge back out with its provenance still attached. Three shapes, because a question, a standing digest, and a page you return to are genuinely different needs.</div>
+    <div><b>Skip it and</b>You have built a write-only diary. This is the phase that repays the first two, and the one people quietly stop reaching for first.</div>
+  </div>
+  <div class="cards">
+      <div class="card">
+        <div class="name">corp-os-recall</div>
+        <p class="does">Answers questions from a Corp-OS knowledge base with citations, and enriches whatever the person is currently working on with the relevant claims, glossary terms, people history, and company context the OS already holds.</p>
+<div class="trig"><span>&ldquo;what do we know about X&rdquo;</span><span>&ldquo;what did they say about Y&rdquo;</span><span>&ldquo;brief me before this meeting&rdquo;</span></div>
+<p class="not">Not for capturing new material (use corp-os-intake or corp-os-pull) and not for the systematic staleness sweep (use corp-os-reality-check).</p>
+        <div class="meta"><span class="chip cmd">/corp-os-recall</span><span class="chip">Constantly</span></div>
+      </div>
+      <div class="card">
+        <div class="name">corp-os-brief</div>
+        <p class="does">Produces the recurring operating brief for a Corp-OS knowledge base — what came in, which jobs moved, what needs review, what went stale, what is blocked, and the single most useful thing to do next — and can set itself up as a scheduled daily or weekly run.</p>
+<div class="trig"><span>&ldquo;brief me&rdquo;</span><span>&ldquo;what's the state of my OS&rdquo;</span><span>&ldquo;my weekly review&rdquo;</span></div>
+<p class="not">Not for answering a specific question (use corp-os-recall) and not for a visual dashboard (use corp-os-dashboard).</p>
+        <div class="meta"><span class="chip cmd">/corp-os-brief</span><span class="chip">Daily or weekly</span></div>
+      </div>
+      <div class="card">
+        <div class="name">corp-os-dashboard</div>
+        <p class="does">Builds and refreshes dashboards from what a Corp-OS knowledge base actually holds — a job board, evidence gaps, claim health, source coverage, stakeholder map, company brief, or decision log — published as artifacts and recorded in the dashboard registry, following whatever design system the OS binds.</p>
+<div class="trig"><span>&ldquo;build me a dashboard&rdquo;</span><span>&ldquo;show me my jobs&rdquo;</span><span>&ldquo;visualize my OS&rdquo;</span></div>
+<p class="not">Not for a written brief in chat (use corp-os-brief) and not for answering a specific question (use corp-os-recall).</p>
+        <div class="meta"><span class="chip">Build once, refresh on cadence</span></div>
+      </div>
+  </div>
+</section>
+
+<section class="phase" id="correct" style="--sc:var(--p4); --st:var(--p4-text); --sb:var(--p4-tint)">
+  <div class="phase-head">
+    <span class="n">PHASE 4</span><h2>Correct</h2>
+    <span class="count">1 skill</span>
+  </div>
+  <div class="phase-why">
+    <div><b>What it is for</b>The fifth invariant made routine: something has to remove things. Claims past their decay window, claims never verified, contradictions, assumptions still worn as facts.</div>
+    <div><b>Skip it and</b>The OS keeps answering with confidence it has not earned since March. That is worse than having no OS, because you now trust the answer.</div>
+  </div>
+  <div class="cards">
+      <div class="card">
+        <div class="name">corp-os-reality-check</div>
+        <p class="does">Sweeps a Corp-OS knowledge base for knowledge that has drifted from reality — claims past their decay window, claims never verified, contradictions between claims, assumptions still treated as facts, and jobs whose evidence no longer holds — then interrogates the person to resolve each one.</p>
+<div class="trig"><span>&ldquo;is my OS still accurate&rdquo;</span><span>&ldquo;what's stale&rdquo;</span><span>&ldquo;check my claims&rdquo;</span></div>
+<p class="not">Not for creating new claims from source material (use corp-os-claims) and not for regenerating the whole derived layer (use corp-os-rebuild).</p>
+        <div class="meta"><span class="chip cmd">/corp-os-check</span><span class="chip">Monthly</span></div>
+      </div>
+  </div>
+</section>
+
+<section class="phase" id="release" style="--sc:var(--p5); --st:var(--p5-text); --sb:var(--p5-tint)">
+  <div class="phase-head">
+    <span class="n">PHASE 5</span><h2>Release</h2>
+    <span class="count">1 skill</span>
+  </div>
+  <div class="phase-why">
+    <div><b>What it is for</b>One operator, but exports land in multi-person systems. Sensitivity is two axes: <code>sensitivity</code> says what must not leave, <code>bearing</code> says whether the OS can reason correctly without it.</div>
+    <div><b>Skip it and</b>The wrong sentence goes out in a paste. Nothing is silently deleted &mdash; the cleaned copy and a private log of exactly what came out are written together, or neither is.</div>
+  </div>
+  <div class="cards">
+      <div class="card">
+        <div class="name">corp-os-redact</div>
+        <p class="does">Produces a shareable version of anything leaving a Corp-OS knowledge base — a brief, a claim set, a dashboard, a company record, a raw transcript — with personal, personnel, compensation, credential, and confidential material removed, plus a private local log of exactly what was pulled and why.</p>
+<div class="trig"><span>&ldquo;clean this up before I share it&rdquo;</span><span>&ldquo;scrub this&rdquo;</span><span>&ldquo;make this safe to send&rdquo;</span></div>
+<p class="not">Not for deciding what is worth sharing on relevance grounds — that judgment stays with the person.</p>
+        <div class="meta"><span class="chip cmd">/corp-os-share</span><span class="chip">Every time something leaves</span></div>
+      </div>
+  </div>
+</section>
+
+<section class="bench">
+  <div class="bench-head">
+    <span class="eyebrow">Off the loop</span>
+    <h2>The workbench</h2>
+    <span class="count">8 skills</span>
+  </div>
+  <p>These act on the OS itself rather than on what it holds, so they are not a sequence and there is no order to them. Only one has a slash command, and that is deliberate: the commands cover the moments that recur, and these are rare and deliberate enough that you name them.</p>
+  <div class="cards">
+      <div class="card">
+        <div class="name">corp-os-guide</div>
+        <p class="does">Explains what Corp-OS is and routes to the right Corp-OS skill for the situation.</p>
+<div class="trig"><span>&ldquo;what is Corp-OS&rdquo;</span><span>&ldquo;how does this work&rdquo;</span><span>&ldquo;what can my OS do&rdquo;</span></div>
+<p class="not">Not for performing any of the operations itself — this skill only orients and hands off.</p>
+        <div class="meta"><span class="chip cmd">/corp-os</span><span class="chip">Whenever you are unsure</span></div>
+      </div>
+      <div class="card">
+        <div class="name">corp-os-setup</div>
+        <p class="does">Interrogates someone about their role, mandate, jobs to be done, valuable data, input paths, connected tools and protocols, company, design system, and sensitivity needs — then scaffolds a Corp-OS personal work knowledge base tailored to those answers and builds their first dashboard.</p>
+<div class="trig"><span>&ldquo;set up Corp-OS&rdquo;</span><span>&ldquo;build a personal OS&rdquo;</span><span>&ldquo;build a second brain for my work&rdquo;</span></div>
+<p class="not">Not for adding content to an existing OS (use corp-os-intake or corp-os-pull) and not for assessing a system someone already built by other means (use corp-os-audit).</p>
+        <div class="meta"><span class="chip">Once</span></div>
+      </div>
+      <div class="card">
+        <div class="name">corp-os-configure</div>
+        <p class="does">Changes how a Corp-OS is shaped — renaming its vocabulary, adding or disabling layers, defining an entirely new custom layer with its own schema, adjusting decay windows, setting a retention or TTL policy on raw material, and tuning how strict the review gate is — handling any change that needs a migration as a migration.</p>
+<div class="trig"><span>&ldquo;add a layer for X&rdquo;</span><span>&ldquo;call them findings instead of claims&rdquo;</span><span>&ldquo;my raw folder is getting huge&rdquo;</span></div>
+<p class="not">Not for setting up a new OS (use corp-os-setup) and not for content accuracy (use corp-os-reality-check).</p>
+        <div class="meta"><span class="chip">When the shape stops fitting</span></div>
+      </div>
+      <div class="card">
+        <div class="name">corp-os-upgrade</div>
+        <p class="does">Brings an existing Corp-OS up to date with a newer version of the plugin — refreshing the shipped scripts the OS carries its own copies of, recording which version it is now on, and naming the structural migrations the version gap implies.</p>
+<div class="trig"><span>&ldquo;does my OS need anything now&rdquo;</span></div>
+<p class="not">Not for reshaping an OS to fit the person (use corp-os-configure) and not for creating one (use corp-os-setup).</p>
+        <div class="meta"><span class="chip">After every plugin update</span></div>
+      </div>
+      <div class="card">
+        <div class="name">corp-os-rebuild</div>
+        <p class="does">Regenerates the entire derived layer of a Corp-OS knowledge base — claims, jobs, people, topics, glossary, indexes — from scratch out of the full raw archive, splitting overloaded groupings, merging duplicates, retiring what raw no longer supports, and reporting exactly what changed structurally.</p>
+<div class="trig"><span>&ldquo;rebuild my OS&rdquo;</span><span>&ldquo;regenerate my claims&rdquo;</span><span>&ldquo;this has drifted, redo it from source&rdquo;</span></div>
+<p class="not">Not for a targeted staleness sweep (use corp-os-reality-check) and not for adding new material (use corp-os-intake or corp-os-pull).</p>
+        <div class="meta"><span class="chip">Rarely</span></div>
+      </div>
+      <div class="card">
+        <div class="name">corp-os-improve</div>
+        <p class="does">Analyzes how a Corp-OS knowledge base is actually being used — from its usage log, structure, and drift — and proposes specific changes to the OS's own shape, plus an anonymized improvement packet that can be sent back to whoever maintains the Corp-OS model.</p>
+<div class="trig"><span>&ldquo;improve my OS&rdquo;</span><span>&ldquo;this is getting annoying to use&rdquo;</span><span>&ldquo;is this working&rdquo;</span></div>
+<p class="not">Not for fixing content accuracy (use corp-os-reality-check) and not for regenerating the derived layer (use corp-os-rebuild).</p>
+        <div class="meta"><span class="chip">After enough real use</span></div>
+      </div>
+      <div class="card">
+        <div class="name">corp-os-audit</div>
+        <p class="does">Audits any existing personal or team knowledge system — one built from Corp-OS, from a different model, or grown by accident — across ten dimensions, then reports the gaps worth closing, the new skills and workflow changes worth building, and the structures that system has which the Corp-OS model lacks, exporting the generalizable ones as an improvement packet.</p>
+<div class="trig"><span>&ldquo;review my second brain&rdquo;</span><span>&ldquo;audit my knowledge base&rdquo;</span><span>&ldquo;compare my setup to yours&rdquo;</span></div>
+
+        <div class="meta"><span class="chip">On someone else's system</span></div>
+      </div>
+      <div class="card">
+        <div class="name">corp-os-contribute</div>
+        <p class="does">Turns friction already surfaced in a Corp-OS operator's usage — by corp-os-improve, corp-os-audit, or raised directly in conversation — into apply-ready diffs against the corp-os plugin's own source. Reads the plugin's actual SKILL.md files, reference docs, and scripts; never the operator's claim bodies or person records.</p>
+<div class="trig"><span>&ldquo;write this up for the plugin repo&rdquo;</span><span>&ldquo;give me a diff I can apply upstream&rdquo;</span><span>&ldquo;how would I fix corp-os itself&rdquo;</span></div>
+<p class="not">Not for changing this OS's own config (use corp-os-configure) and not for the routine, evidence-gated local-improvement pass (use corp-os-improve) — this skill assumes that work, or its equivalent, already happened.</p>
+        <div class="meta"><span class="chip">Maintainer path</span></div>
+      </div>
+  </div>
+</section>
+
+<section class="layer">
+  <div class="eyebrow">Supporting layer</div>
+  <h2>8 commands, named for the moment</h2>
+  <p>Not one per skill. Someone reaching for the export boundary is thinking <em>share this</em>, not <em>redact</em>. Whether the one-line descriptions are actually distinguishable from each other was measured rather than assumed: picker cases give a person plain English and the roster and nothing else.</p>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Command</th><th>The moment</th><th>Reaches</th></tr></thead>
+      <tbody><tr><td class="mono">/corp-os-brief</td><td class="dim">Run the recurring Corp-OS brief — what moved, what needs a decision, what went stale</td><td class="mono">brief</td></tr><tr><td class="mono">/corp-os-capture</td><td class="dim">File something into your Corp-OS — a transcript, a thread, a document, or a note</td><td class="mono">intake</td></tr><tr><td class="mono">/corp-os-catchup</td><td class="dim">Pull what is new from your connected sources and see what moved</td><td class="mono">pull</td></tr><tr><td class="mono">/corp-os-check</td><td class="dim">Sweep your OS for what has gone stale, contradicted itself, or was never verified</td><td class="mono">reality-check</td></tr><tr><td class="mono">/corp-os-open</td><td class="dim">See the decisions you have open — what is past its date, and what is blocked on whom</td><td class="mono">decide</td></tr><tr><td class="mono">/corp-os-recall</td><td class="dim">Ask your Corp-OS a question, or fold what it knows into what you are working on</td><td class="mono">recall</td></tr><tr><td class="mono">/corp-os-share</td><td class="dim">Make something safe to send — a cleaned copy, plus a private record of what came out</td><td class="mono">redact</td></tr><tr><td class="mono">/corp-os</td><td class="dim">Open Corp-OS — explains the system, finds your OS, and routes to the right operation</td><td class="mono">guide</td></tr></tbody>
+    </table>
+  </div>
+</section>
+
+<section class="layer">
+  <div class="eyebrow">Supporting layer</div>
+  <h2>6 scripts, because instruction stopped working</h2>
+  <p>Each of these was prose first. Each held at a stubborn rate &mdash; 33%, 67% &mdash; through two or more rewrites, and only moved when it became code. The rule they encode: <strong>a step that has to happen every time, that nothing else will catch if it is skipped, belongs in code rather than in an instruction.</strong> Your OS carries its own copies of the ones marked below, which is exactly why <span class="mono">upgrade_os.py</span> had to exist.</p>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Script</th><th>What it makes deterministic</th><th>Lives</th></tr></thead>
+      <tbody><tr><td class="mono">build_index.py</td><td class="dim">Deterministic INDEX.md regenerator and drift checker for a corp-os.</td><td class="dim">In your OS</td></tr><tr><td class="mono">delete_source.py</td><td class="dim">Destroy raw material under a retention obligation, in the right order.</td><td class="dim">In your OS</td></tr><tr><td class="mono">log_run.py</td><td class="dim">Close out a skill run: the usage-log row and the meta.json history entry.</td><td class="dim">In your OS</td></tr><tr><td class="mono">scaffold.py</td><td class="dim">Create the mandatory core of a Corp-OS. Not the content — the skeleton.</td><td class="dim">In the plugin</td></tr><tr><td class="mono">upgrade_os.py</td><td class="dim">Bring an existing Corp-OS up to date with the installed plugin.</td><td class="dim">In the plugin</td></tr><tr><td class="mono">write_export.py</td><td class="dim">Write a redaction's two outputs, together, with fixed names.</td><td class="dim">In your OS</td></tr></tbody>
+    </table>
+  </div>
+</section>
+
+<section class="notes">
+  <div class="eyebrow">Maintainer notes &mdash; skip if you are here to use it</div>
+  <h2>What is measured, and what is not</h2>
+  <p>The honest numbers behind the map above, read at build time from the committed run reports rather than typed in, and kept here rather than woven through, because an operator does not need them and a maintainer should not have to dig.</p>
+  <ul>
+    <li><b>Routing: <span class="num">100%</span></b> over 64 queries &times; 3 repeats at 21 skills, including near-miss pairs written to pull each new skill toward its nearest neighbours. The descriptions can be told apart from each other. Whether a skill fires in a live session competing with everything else installed is a different question, and unmeasured.</li>
+    <li><b>Conformance: <span class="num">114/122</span></b> across 19 cases, 15 skills and 3 fixtures &mdash; at one repeat, so a baseline rather than rates. 6 skills still have no case.</li>
+    <li><b>Every conformance figure before v0.11.0 is void.</b> No shipped script had ever executed in a run: the harness ran with <span class="mono">acceptEdits</span>, which approves file edits and nothing else, so every <span class="mono">python3 scripts/&hellip;</span> was answered with <em>this command requires approval</em>. The file-level results were real; what produced them was never measured, because a model blocked from running a script writes the row by hand. It cost six runs and three instruction passes chasing a setup failure that was the instrument the whole time.</li>
+    <li><b>One hand-off lands 2 times in 5.</b> When a dashboard needs a layer the OS has not declared, the skill should hand off to <span class="mono">corp-os-configure</span> rather than improvise one inline. Five runs, three behaviours. A wording pass making the requirement explicit measured 0/2 and was reverted &mdash; prose that does not move the number is churn. It is on the record at 2/5 rather than reworded a fourth time.</li>
+    <li><b>The interrogation is untested by construction.</b> It needs a person who did not design it. The likeliest way setup fails is not a wrong answer but someone abandoning it halfway, and no check catches that &mdash; which is why the scaffolder runs first, so they still have a working OS when they do.</li>
+    <li><b>This page is generated, and that is the point.</b> A static skill map is a fact maintained in a second place, which is the defect this repo has now found four times. Everything above is read from the plugin at build time; only the phase a skill belongs to is declared by hand, and <span class="mono">validate.py</span> fails if a skill on disk has not been placed.</li>
+  </ul>
+</section>
+
+<footer>
+  <span>corp-os v0.11.1</span>
+  <span>21 skills &middot; 8 commands &middot; 6 scripts &middot; 9 reference specs &middot; 3 fixtures</span>
+  <span>5 invariants: An append-only source layer &middot; Provenance &middot; A review gate &middot; An index that can be scanned &middot; Something that removes things.</span>
+</footer>
+
+</div>
+</body>
+</html>

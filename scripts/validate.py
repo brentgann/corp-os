@@ -473,6 +473,24 @@ def main():
                 "one — it is supposed to be an older copy, which is the drift "
                 "corp-os-upgrade detects by content rather than by date")
 
+
+    # --- docs/skill-map.html is generated, and has to still be current.
+    # A skill map states how many skills exist and what each refuses. Committed
+    # as a static file it becomes the fifth instance of the defect this repo
+    # keeps finding: a fact maintained in a second place that nothing catches
+    # when it drifts. So it is generated from the plugin, and this check is the
+    # thing that catches it -- the same drift check build_index.py runs on an
+    # INDEX. The generator also refuses to run at all if a skill on disk has
+    # not been placed in a phase, which is the part a person is needed for.
+    try:
+        r = subprocess.run(
+            [sys.executable, os.path.join(ROOT, "scripts", "build_skill_map.py"),
+             "--check"], capture_output=True, text=True, timeout=60, cwd=ROOT)
+        if r.returncode != 0:
+            err("skill map: " + (r.stderr or r.stdout).strip()[:300])
+    except (subprocess.TimeoutExpired, OSError) as e:
+        err(f"could not run build_skill_map.py --check: {e}")
+
     # --- no private content.
     # The denylist is deliberately NOT in this file: a hardcoded list of real
     # names and companies, committed to a public repo, publishes exactly what

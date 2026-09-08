@@ -46,10 +46,14 @@ Including the organizing idea itself: the jobs layer is a default, not a require
 plugins/corp-os/     the plugin — skills, reference specs, shipped scripts
 scripts/validate.py  structure, frontmatter, cross-references, the cross-cutting
                      rules every skill must carry, and leakage checks
+scripts/build_skill_map.py  regenerates docs/skill-map.html from the plugin
 .validate-denylist   gitignored; private terms the leakage check greps for
 build.sh             validate + package
 docs/ARCHITECTURE.md the design, every decision and why, and what is still open
+docs/skill-map.html  every skill, mapped to the phase it belongs to — generated
 ```
+
+**[`docs/skill-map.html`](docs/skill-map.html)** is the one-page tour: what each skill does, what it refuses, which phase it belongs to, and the commands and scripts underneath. Open it in a browser. It is **generated** — every count, description and eval number on it is read from the plugin at build time, and `validate.py` fails if it has drifted. The only thing declared by hand is which phase a skill belongs to, and the generator refuses to run until a new skill has been placed.
 
 `validate.py` is not only a linter. It enforces the rules that live in nineteen files at once — the pre-flight and config-first blocks, the usage-log row, and the rule that no optional layer may be used to detect whether an OS exists. Those had all drifted by 0.5.0, which is why they are checked rather than merely documented.
 
