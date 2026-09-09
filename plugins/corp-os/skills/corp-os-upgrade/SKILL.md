@@ -1,6 +1,7 @@
 ---
 name: corp-os-upgrade
 description: Brings an existing Corp-OS up to date with a newer version of the plugin — refreshing the shipped scripts the OS carries its own copies of, recording which version it is now on, and naming the structural migrations the version gap implies. Use when someone updated or reinstalled the plugin, says their OS is on an old version, sees a warning from build_index.py that a newer plugin would explain, gets counts that look wrong after an update, or asks "does my OS need anything now". Not for reshaping an OS to fit the person (use corp-os-configure) and not for creating one (use corp-os-setup).
+model: sonnet
 ---
 
 # Corp-OS upgrade

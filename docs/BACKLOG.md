@@ -6,7 +6,39 @@ Items leave this list by being done or by being declined in §8, never by being 
 
 ---
 
-## 1. Unconditional reference reads — gating done, splitting done
+## Done in 0.19.x
+
+- **Root index split.** Findings moved to `usage/health.md`, uncapped, owned by `corp-os-reality-check`. At 800 claims: INDEX.md 1,440 → 468, pre-flight floor 2,513 → 1,541.
+- **Layer index fires on entries as well as files.** 800 claims in 25 topic files had no entry point; `claims/INDEX.md` now generates.
+- **Filing moved into `scripts/file_raw.py`.** Dedupe, naming, frontmatter, cutoff — one call instead of one turn per item.
+- **Fixture script drift fixed and checked.** All three carried a 414-line `build_index.py` against a shipped 888.
+- **`scripts/corpus_load.py`** and **`scripts/make_fixture.py`** — both free to run.
+- **`model: sonnet` on `corp-os-upgrade`**, the one skill of 23 that is genuinely mechanical.
+- **`docs/COST.md`** — session guidance and what does not save money.
+
+## Open
+
+### 1. Verify `model:` frontmatter is honoured outside Claude Code
+
+`corp-os-upgrade` now declares `model: sonnet`. The documentation for that field is Claude Code's. **Whether Cowork honours it is unverified**, and an ignored field is a change that reaches nobody — the failure this repo is named after by now. One run of that skill in each surface settles it.
+
+### 2. Conformance has not run since any of this
+
+The last run was 69/79 on 0.18.5, and everything since has changed the skills, the scripts, the fixtures and the harness. That number is not a baseline for anything.
+
+`--repeats 5 --case recall-load-bearing-sensitive` first: it is a rate, not a result (§7.2), it costs about eight minutes, and §4.28 records three wording passes made against `corp-os-configure` before anyone established its rate.
+
+### 3. Descriptions: measured, and deliberately not cut
+
+3,655 tokens per session across 23 skills, roughly **two cents** at Opus rates. They are what routes among 23 siblings and a misroute wastes a whole run. The trade is bad in both directions and it stays as-is unless the routing harness says otherwise. Recorded so it is not re-proposed as an obvious win.
+
+### 4. `raw/INDEX.md` is 14,922 tokens at 661 files
+
+Generated because raw crosses the file threshold, and read by anything that touches the source layer. Not yet examined. It may be correct — raw is deliberately never loaded wholesale — but nothing has looked at what reads it or what it costs them.
+
+### 5. Unconditional reference reads — closed
+
+Kept for the rules it produced, not because work remains.
 
 **82,894 unconditional across 23 skills, against 83,478 conditional.** Down from a true starting figure of roughly 92,969 (the 125,289 first reported was measurement error; §4.51).
 
@@ -38,37 +70,11 @@ Every remaining entry is a skill reading a file it needs most of. `configuration
 
 A conformance run. Four skills changed materially — `dashboard`, `setup`, `recall`, `configure` — plus `pull` and `intake` re-pointed at the capture spec, and three cases written in 0.18.2 have never executed.
 
-## 2. Skill descriptions
-
-**3,655 tokens loaded into every session**, whether corp-os is invoked or not. Median 153 per skill against 38 for a comparable public collection. The gap is largely disambiguation across 23 siblings, which is load-bearing, so the target is roughly 2,400 rather than parity.
-
-Verified by the **routing** harness (~15 min), not conformance. Independent of item 1; both can run the same afternoon.
-
-## 3. Conformance
-
-**20/23 skills have a case. 12 ran on 0.18.5: 69/79 checks, ~16 minutes wall clock, 2,946s of compute across 3 workers.** `setup-from-empty` is the long pole at 572s. A full 25-case run is roughly 35 to 45 minutes.
-
-Nothing that run flagged was caused by the reference-read work: `dashboard-missing-layer` fails the identical check in `conformance-v11.json` from before it, and both dashboard cases came back exactly as they were despite that skill going from 12,786 unconditional tokens to zero.
-
-Three real defects surfaced and are fixed in 0.18.6 and 0.18.7 — `corp-os-guide` doing the work instead of routing, `corp-os-jobs` stating its gate below the sections that write, `corp-os-improve` writing a claim. Two harness defects are fixed too: the gate list was hardcoded rather than read from `config.json`, and two assertions tested the answer text rather than the record.
-
-**None of that has been re-run.** The 69/79 predates every fix.
-
-Missing cases: `audit`, `company`, `contribute` — each a fixture problem, see §7.3. `company` is cheapest.
-
-**`recall-load-bearing-sensitive` is a rate, not a result** (§7.2). Its key check has failed, passed and failed again across three runs of the same case against the same fixture. `--repeats 5` on that one case is about eight minutes and is worth more than another wording pass.
-
-## 4. `corp-os-pull`'s bookkeeping belongs in code
-
-The largest remaining lever and deliberately not batched with items 1 and 2. Dedupe, filename construction, frontmatter assembly, recount and cutoff arithmetic are all done by a model, one turn at a time, and every turn re-sends the whole session prefix.
-
-Held back because batching is correct only up to the point where a red run stops telling you which change caused it. Twenty read conversions plus a structural rewrite of the highest-volume skill is past that line. Its own release, after items 1 and 2 are green.
-
-## 5. Cheap and unblocked
+### 6. Cheap and unblocked
 
 - **Lean-session guidance in the docs.** Every connector and plugin loaded contributes tool schemas to the per-turn prefix. A filing run needs the source connector and nothing else. Documentation only.
 - **`model: sonnet` on `corp-os-upgrade`.** The one skill of 23 that survived the 0.18.2 reclassification as genuinely mechanical. Frontmatter supports the field; **whether Cowork honours it is unverified**, and an ignored field is a change that reaches nobody.
 
-## 6. Measurement is unavailable where this actually runs
+### 7. Measurement is unavailable where this actually runs
 
 Cowork exposes no per-session cost or token count. `/usage` exists only in Claude Code. So for anyone running corp-os in Cowork, `usage/log.md` is the only telemetry that exists and `corp-os-improve` is the only thing that reads it. That raises the stakes on the friction field considerably and belongs in the rollout material.

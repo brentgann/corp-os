@@ -192,6 +192,12 @@ The model itself is specified in `reference/data-model.md`. Improvement packets 
 
 ## Version history
 
+**0.19.2** — `corp-os-upgrade` declares `model: sonnet`.
+
+The one skill of twenty-three that survived 0.18.2's reclassification as genuinely mechanical: comparing files and copying the ones that differ, with migrations explicitly excluded. Roughly 60% cheaper per token.
+
+Whether a surface other than Claude Code honours skill frontmatter is unverified, and an ignored field is a change that reaches nobody. It is the first open item in `docs/BACKLOG.md`.
+
 **0.19.1** — filing moves into a script.
 
 `scripts/file_raw.py` takes a whole batch of fetched items and does the deterministic half in one call: dedupe on `external_id` against what is already filed, build the `YYYY-MM-DD--<source>--<slug>.md` name, suffix rather than overwrite a collision, write the frontmatter from the spec, optionally advance the source cutoff. It reports what it filed, what was already there, and what it rejected for missing fields.
