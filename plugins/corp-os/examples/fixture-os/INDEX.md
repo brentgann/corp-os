@@ -43,6 +43,14 @@ Not wrong, and not the same object as one resting on nine. Only the record can t
 
 - AR-0002 — **1 entry / 1 source** · [support-surface](arguments/support-surface.md)
 
+## Resting on evidence that has gone stale
+
+Decay is carried by the entry, and swept by corp-os-reality-check. What is listed here is the join nothing else performs: the things **built from** those entries, which inherit the staleness and say nothing about it. A view published in March off four entries, two of them past their window in June, reads exactly like one refreshed yesterday.
+
+- AR-0002 — **1 of 1** past its window · [support-surface](arguments/support-surface.md)
+
+Re-verify what it rests on, or retire it. An output nobody re-grounds is the same defect as a claim nobody re-checks, one layer up.
+
 ## One call from promotion
 
 **1** entry is a summary whose source still exposes a verbatim fetch. Pulling the original is the cheapest confidence this OS can buy, and a ceiling that looks permanent gets treated as permanent — in the corpus that surfaced this, the number was 599 and nothing showed it.

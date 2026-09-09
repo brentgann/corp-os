@@ -23,6 +23,7 @@ PLUGIN = os.path.join(ROOT, "plugins", "corp-os")
 LOG_ROW_EXEMPT = {"corp-os-audit"}
 
 errors, warnings = [], []
+COVERAGE = None
 
 
 def err(msg):
@@ -261,6 +262,47 @@ def main():
             err(f"{os.path.relpath(path, ROOT)}: says {m2.group(1)} skills, "
                 f"but there are {len(names)} on disk")
 
+    # --- plugin content changed after the last version bump
+    #
+    # A client caches an installed plugin by version string, so commits pushed
+    # without a bump reach nobody: no error, no warning, and nothing the person
+    # running it could inspect. docs/INSTALL.md establishes that and nothing
+    # enforced it, which is the shape this repo converts into code.
+    #
+    # It reads committed history only, so it does not fire while someone is
+    # mid-edit with a dirty tree -- a check that is red during normal work is
+    # one everybody learns to ignore. It fires after the content is committed
+    # and before it is pushed, which is the moment that matters.
+    def git(*args):
+        r = subprocess.run(["git", "-C", ROOT] + list(args),
+                           capture_output=True, text=True, timeout=30)
+        return r.stdout.strip() if r.returncode == 0 else None
+
+    rel_manifest = "plugins/corp-os/.claude-plugin/plugin.json"
+    cur = manifest.get("version")
+    if git("rev-parse", "--git-dir") and cur:
+        shas = (git("log", "--format=%H", "--", rel_manifest) or "").split()
+        bump = None
+        for sha in shas:                     # newest first
+            blob = git("show", f"{sha}:{rel_manifest}")
+            if blob is None:
+                break
+            try:
+                v = json.loads(blob).get("version")
+            except ValueError:
+                break
+            if v != cur:
+                break
+            bump = sha                       # oldest commit still carrying it
+        if bump:
+            after = git("rev-list", f"{bump}..HEAD", "--", "plugins/corp-os/")
+            if after:
+                n = len(after.split())
+                err(f"{n} commit(s) changed the plugin after the last version "
+                    f"bump ({cur}). A client caches by version string, so "
+                    "those changes reach nobody — bump the version in both "
+                    "manifests, or squash them into the bump commit.")
+
     # --- version parity between the plugin and the marketplace manifest
     mkt_path = os.path.join(ROOT, ".claude-plugin", "marketplace.json")
     if os.path.exists(mkt_path):
@@ -366,6 +408,14 @@ def main():
              "unprocessed queue reflects processed: false"),
             ("`usage/` — excluded by config",
              "config-driven scan exclusions are honored"),
+            ("## Resting on evidence that has gone stale",
+             "the join between an entry's decay and the things built from it. "
+             "CL-0003's Verified date in the fixture is deliberately old and "
+             "AR-0002 rests on it, so this case stays true as time moves "
+             "forward rather than ageing out of being a case"),
+            ("AR-0002 — **1 of 1** past its window",
+             "the count is per-entry and says how many of how many, because "
+             "1 of 1 and 2 of 9 are not the same finding"),
         ],
         "examples/fixture-register": [
             ("**Entries**: 4",
@@ -617,6 +667,45 @@ def main():
                 + "\n".join(l for l in r.stdout.split("\n")
                               if "MISSING" in l or "no enabled" in l))
 
+    # --- the pattern kinds the binder accepts are actually exercised
+    #
+    # KINDS lists five. For two releases the fixture carried one pattern and it
+    # was a dashboard, so four accepted values had no fixture, no binding and no
+    # generator behind them -- the binder validating against a list it had never
+    # had to honour. Same class as a check that has never been seen to fail.
+    kinds_seen = set()
+    for pf in sorted(glob.glob("examples/fixture-*/patterns/*.md")):
+        k = re.search(r"^kind:\s*(\S+)", open(pf, encoding="utf-8").read(), re.M)
+        if k:
+            kinds_seen.add(k.group(1))
+    if len(kinds_seen) < 2:
+        err(f"the fixtures exercise only {sorted(kinds_seen) or 'no'} pattern "
+            "kind(s). bind_pattern.py accepts five; a value nothing binds "
+            "against is untested surface, not coverage")
+
+    # --- a pattern's generator is the artifact, so run one
+    #
+    # reference/patterns.md says the script is the artifact and the output is
+    # its product. Asserting a pattern binds proves the frontmatter parses; it
+    # says nothing about whether the thing it points at works.
+    gen = "examples/fixture-os/scripts/build_initiative_evidence.py"
+    if not os.path.exists(gen):
+        err(f"{gen} is missing — the doc pattern names it as its generator, "
+            "and a pattern whose generator is absent is a spec with nothing "
+            "to run it")
+    else:
+        rg = subprocess.run(
+            [sys.executable, os.path.abspath(gen),
+             "--root", os.path.abspath("examples/fixture-os"), "--topic", "pricing"],
+            capture_output=True, text=True, timeout=60)
+        if rg.returncode != 0:
+            err(f"the doc pattern's generator failed: "
+                f"{(rg.stderr or rg.stdout).strip()[:200]}")
+        elif "**Rests on**:" not in rg.stdout:
+            err("the doc pattern's generator emitted no `Rests on` line. That "
+                "line is the whole join: without it the document written from "
+                "this brief stands outside the stale-grounding view")
+
     # --- the 0.12 rules, each checked because each was invisible before.
     dm = open("reference/data-model.md", encoding="utf-8").read()
     if "placement:" not in dm:
@@ -698,7 +787,26 @@ def main():
                         r"\b[A-Z][a-z]+ (?:Inc|LLC|Ltd|Corp)\b", line):
                     warn(f"possible company name in an example: {fp}:{i}")
 
+    global COVERAGE
+    COVERAGE = conformance_coverage(set(names))
     return report(len(names))
+
+
+def conformance_coverage(skill_names):
+    """(covered, total, uncovered) from the case file, not from a run report.
+
+    A run report says which skills a particular run exercised; this says which
+    skills have a case at all, which is the number that should be moving. They
+    have been confused once already.
+    """
+    path = os.path.join(ROOT, "evals", "conformance-cases.json")
+    try:
+        d = json.load(open(path, encoding="utf-8"))
+    except (OSError, ValueError):
+        return None
+    cases = d.get("cases") if isinstance(d, dict) else d
+    have = {c.get("skill") for c in (cases or [])}
+    return len(skill_names & have), len(skill_names), sorted(skill_names - have)
 
 
 def report(skill_count=0):
@@ -710,6 +818,11 @@ def report(skill_count=0):
         print(f"\nFAILED — {len(errors)} error(s), {len(warnings)} warning(s)")
         return 1
     print(f"OK — {skill_count} skills, {len(warnings)} warning(s)")
+    if COVERAGE:
+        n, total, missing = COVERAGE
+        print(f"   conformance: {n}/{total} skills have a case"
+              + (f" — none for {', '.join(s.replace('corp-os-', '') for s in missing)}"
+                 if missing else ""))
     return 0
 
 

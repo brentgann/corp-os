@@ -71,6 +71,10 @@ Publish as an artifact, since a dashboard exists to be returned to and shared. T
 
 On refresh, republish to the same URL and update `last built`. Never create a second artifact for the same dashboard.
 
+**If the dashboard stands on a bounded, nameable set of entries, record them as `Rests on`** — the same field the arguments layer uses, and the reason is the join it enables. A dashboard built from a whole layer has nothing to list and keeps `Source files` alone; listing a folder there is worse than listing nothing, because it renders as breadth nobody measured.
+
+**Then say what the recount says about the grounding.** `build_index.py` renders **Resting on evidence that has gone stale**: anything whose cited entries have gone past their decay window since it was built. If this dashboard is on that list, say so in the same breath as the refresh, with the number — *"republished; it rests on four claims and two of them went past their window in June."* A view that silently keeps rendering stale evidence is the exact failure decay exists to prevent, one layer up, and the person looking at the page has no way to see it from the page.
+
 If the person framed this as a one-off look — "just show me what it'd look like" — write a self-contained HTML file into the OS folder instead and skip the registry. Persisting something nobody returns to is clutter.
 
 ## Step 6 — offer the cadence

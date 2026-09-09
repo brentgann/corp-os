@@ -92,6 +92,17 @@ Skills may write to `raw/`, `INDEX.md`, `meta.json`, and `usage/log.md` autonomo
 
 The gate is not there because any single entry is risky. It is there because without it the derived layer stops being knowledge and becomes just a second, messier copy of raw/.
 
+### The same rules, stated outward
+
+Those three sentences are also the contract for **a skill set built by someone else on top of this one** — a team's own plugin that operates on a Corp-OS. It is written here rather than assumed, because the internal version is enforced by this repo's validator running over this repo's skills, and a companion has nothing checking it.
+
+- **Append to `raw/`, never edit it.** The one sanctioned exception is `processed`, and it is not a companion's to flip unless the companion is what did the processing.
+- **Propose into any layer whose role is `derived`; never write.** Whatever the companion's own gate looks like, entries arriving in the derived layer went past a person or the invariant is gone.
+- **Own your own `record` layers outright.** A companion that needs a place to keep what it produces declares a layer with its own `entry_schema` and `index_line`, and writes there freely. That is the extension point, and it is the whole reason layer roles are explicit.
+- **Do not take the `corp-os-` prefix.** It is what makes this suite guessable, and one exception costs that for every skill in it.
+
+A companion that keeps to those four can be installed alongside without the audit having to ask what it has been doing. One that cannot should say so in its own description, because the failure it produces — a derived layer nobody confirmed — is indistinguishable afterward from a corpus that was curated properly.
+
 **The gate is persisted, not conversational.** Every proposal is written to `proposals/PROPOSAL-YYYY-MM-DD-<slug>.md` before it is presented — headline first, then the specific additions and edits with their provenance, then an explicit recommendation per item (enrich an existing entry, create a new one, flag as a conflict, decline). A proposal that lives only in a chat exchange dies when the session does, leaves no audit trail of what the gate actually saw, and cannot be reviewed by the person the next morning when they have time to think about it. The file is the deliverable of a propose step; the conversation is just how it gets discussed.
 
 A proposal file records what was **recommended**, not what was accepted. Once acted on, append the outcome per item — confirmed, declined, deferred, modified. The declines are the valuable part: they are the only record of what the person deliberately chose not to know.
@@ -241,6 +252,20 @@ These get tracked as claims of kind `identity` and resolved deliberately, never 
 - **When resolved, record the resolution and every place it propagated.** Not just "these two names are one person," but which files were corrected and whether the resolution changed anything else — an alias that turns out to describe someone leaving a *role* rather than the organization may also mean an entry was over-flagged as sensitive.
 
 Where the OS declares a `people` layer, its records carry an `aliases` list for this. An unresolved identity question is a normal state and belongs on a job's evidence list.
+
+### `Rests on` is not the arguments layer's field
+
+It is introduced there because that is where it was first needed, but it belongs to any entry, in any layer, that is **built from a bounded set of other entries** — an argument, a registered dashboard, an authored spec or brief in a layer someone declared. The field is the same, the parser is the same, and the two views that read it (`N entries / M sources`, and the stale-grounding join below) apply wherever it appears.
+
+```markdown
+- **Rests on**: CL-0031, CL-0044, CL-0052
+```
+
+**Bounded is the word that matters.** An output built from a whole layer — a job board reading every job — has nothing to list and should not pretend otherwise; it records `Source files` and there is nothing to check. `Rests on` is for the case where a specific, nameable set of entries is what the thing stands on. Listing a folder there is worse than listing nothing, because it renders as breadth that was never measured.
+
+**What it buys, and why it is worth the field.** Decay is carried by the entry and swept by `corp-os-reality-check`. It is not carried by the things built from entries, and nothing joined the two — so a dashboard registered in March off four claims, two of which went past their window in June, reads exactly like one refreshed yesterday. `build_index.py` performs that join and renders **Resting on evidence that has gone stale**, per entry, as *n of m past its window*. The ratio is the finding: one of one and two of nine are different objects.
+
+An entry that declares no decay window is not the same as one whose window is `none`, and neither is reported as stale. A cited entry that was never verified at all is reported separately in the same line, because an output resting on something nobody ever confirmed is a different weakness from one resting on something that has aged.
 
 ### The arguments layer — optional, and offered rather than scaffolded
 

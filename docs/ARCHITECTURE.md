@@ -557,6 +557,39 @@ So `docs/INSTALL.md` leads with the distinction rather than burying it: **updati
 
 The alternative was to generate the counts the way `docs/skill-map.html` is generated. Rejected for prose: a README whose sentences are assembled reads like a changelog, and the sentence *"a folder of markdown files plus twenty-three skills that operate on it"* is doing rhetorical work that a rendered number would not. Checking a hand-written sentence keeps the prose and removes the drift, which is the right trade wherever the prose is the point.
 
+### 4.40 Decay was modelled on the claim and not on what is built from it
+
+**Decision (0.15.0):** `build_index.py` renders **Resting on evidence that has gone stale**, and `Rests on` is generalized off the arguments layer.
+
+This came from an audit of a second, independently built skill set rather than from this one's own usage, which is what `corp-os-audit`'s tenth dimension exists to produce. The audited system had aimed a whole skill at a related problem — a figure repeated until it feels settled, traced back before it carries weight — and looking for the equivalent here found a different hole next door.
+
+**The hole.** Every claim carries a decay window and `corp-os-reality-check` sweeps them. Nothing carries decay for the *things built from claims*. `dashboards.md` has shipped since 0.10.1 recording a dashboard's URL, owning job and source files; the claims behind it decay underneath it and the registry says nothing. A dashboard registered in March off four claims, two past their window in June, is indistinguishable from one refreshed yesterday. The same exposure appears the moment anyone declares a layer for authored documents that cite the corpus, which is the case that surfaced it.
+
+Every field needed to detect this was already on disk. This is the third time that has been the finding — open evidence across jobs, arguments resting on one source, and now this — and the pattern is worth naming: **the defects that survive longest here are joins nobody performed, not facts nobody recorded.** A view is cheaper than a field, and this repo keeps discovering it needed the view.
+
+**Why `Rests on` rather than a new field.** 0.14.0 introduced it for the arguments layer, and a second citation field for record layers would have been the same concept under two names with two parsers, which is how they drift apart. So it is generalized, one parser reads it, and both views that consume it apply wherever it appears. The constraint that keeps it honest is *bounded*: an output built from a whole layer has nothing to list and keeps `Source files`. Listing a folder in `Rests on` would render as breadth that was never measured, which is precisely the failure §4.31's `N entries / M sources` rendering exists to prevent.
+
+**What is reported, and what deliberately is not.** An entry declaring no decay window is not the same as one whose window is `none`, and neither is stale. A cited entry that was never verified is counted separately in the same line, because *aged* and *never confirmed* are different weaknesses and a single number would hide which one you have.
+
+### 4.41 A binder validating against a list it never had to honour
+
+**Decision (0.15.0):** a second pattern kind in the fixture, with a generator the validator executes.
+
+`bind_pattern.py` has accepted five `kind` values since 0.13.0. The fixture carried one pattern and it was a `dashboard`, so four of those values had no fixture, no binding and no generator behind them. That is the same defect as §4.33's check that could not fail: surface counted as coverage without ever having been exercised.
+
+`doc-initiative-evidence` is the second kind, and it is a real pattern rather than a test double — it renders the evidence brief someone reads before writing a spec, which is what the audit's own comparison kept pointing at. Its generator lives in the fixture, and the validator runs it and asserts it emits the `Rests on` line, because §4.31 already established that a pattern's script is the artifact and asserting the frontmatter parses says nothing about whether the thing it names works.
+
+One check earned its keep immediately. The first negative test of the generator assertion was written with `sed`, the substitution silently failed to match, and the test passed while proving nothing. Re-running it with an assertion that the string was actually found is what turned a green result into a real one.
+
+### 4.42 The version pin, enforced
+
+**Decision (0.15.0):** `validate.py` fails when plugin content has been committed since the last version bump.
+
+0.14.1 documented that a client caches an installed plugin by version string and that commits without a bump reach nobody, silently. Documenting it was the fix for a person reading the docs; it did nothing for the person who does not. This repo's own rule is that a step which has to happen every time and that nothing else catches belongs in code, and this is one — with the aggravating property that its failure is invisible from the inside by construction.
+
+The design decision inside the check is *when* it fires. Reading the working tree would make it red during normal editing, and a check that is red while someone works is one everybody learns to ignore — the same reasoning that removed the `note`-key warning in 0.12.0. So it reads committed history only: find the newest commit still carrying the current version, and fail if anything under `plugins/corp-os/` has been committed after it. That is quiet during the work and loud between committing and pushing, which is the only moment the answer can still change.
+
+
 ## 5. The skills
 
 | Skill | Job |
@@ -674,7 +707,7 @@ Recorded so they do not get re-proposed.
 8. **Negative-test any check you add.** Reintroduce the defect, confirm the check fires, restore. A check that has never been seen to fail is not a check.
 9. **An instruction that touches a source layer means grepping the invariant it sits under.** "Never edited" and "flip `processed: true`" both shipped for four releases and could not both be true. A contradiction like that does not announce itself; it gets read in whichever direction the reader arrives from. See §4.15.
 10. **Adding a skill means placing it on the map.** `scripts/build_skill_map.py` will not render until the new skill is in a phase or on the workbench, and `validate.py` runs it. Everything else on that page regenerates itself.
-11. **Changing a skill's behavior means adding or rerunning its conformance case** — `python3 evals/run_conformance.py --case <id>`. If the skill has no case, that is the moment to write one.
+11. **Changing a skill's behavior means adding or rerunning its conformance case** — `python3 evals/run_conformance.py --case <id>`. If the skill has no case, that is the moment to write one. `validate.py` prints the coverage on every run — the bar is one case per skill, adopted from a smaller suite that already meets it, and the number to move is the one in the case file rather than the one in a run report.
 12. **Adding or rewording a skill description means rerunning `evals/run_routing.py`.** Add coverage queries for the new skill and at least one query that should route *elsewhere* but sits near it. `corp-os-decide` shipped with a description that swallowed two other skills' queries and it took the eval, not review, to see it.
 13. If the change came from real use, write an **improvement packet** per `reference/improvement-packet.md` — and apply its config test first: *if it could have been a config setting, it is not a model change.*
 

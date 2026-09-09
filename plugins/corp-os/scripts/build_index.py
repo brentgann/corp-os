@@ -25,7 +25,7 @@ import json
 import os
 import re
 import sys
-from datetime import date
+from datetime import date, timedelta
 
 FM = re.compile(r"^---\s*\n(.*?)\n---\s*\n", re.S)
 
@@ -326,17 +326,102 @@ def source_map(root, cfg):
     return m
 
 
-def breadth(body, smap):
-    """(n entries, m distinct sources) for one Rests on list."""
+def rests_ids(body):
+    """The entry ids in a Rests on list, or []. One parser, because two
+    readers of the same field is how they drift apart."""
     ids = []
     for line in RESTS_RE.findall(body):
         ids += [x.strip() for x in re.split(r"[,;]", line) if x.strip()]
+    return ids
+
+
+def breadth(body, smap):
+    """(n entries, m distinct sources) for one Rests on list."""
+    ids = rests_ids(body)
     if not ids:
         return None
     srcs = set()
     for i in ids:
         srcs |= smap.get(i, set())
     return len(ids), len(srcs)
+
+
+# ------------------------------------------------ grounding that went stale
+# Decay is modelled on the claim and swept by corp-os-reality-check. It is not
+# modelled on the things BUILT from claims, and nothing joined the two -- so a
+# dashboard registered in March off four claims, two of which went past their
+# window in June, reads exactly like one refreshed yesterday. Same class as the
+# finding that produced "Open evidence": every field was already on disk and no
+# view assembled them.
+DECAY_RE = re.compile(r"^[-*]?\s*\*\*Decay\*\*\s*:\s*(\S+)", re.I | re.M)
+VERIFIED_RE = re.compile(r"^[-*]?\s*\*\*Verified\*\*\s*:\s*(\d{4}-\d{2}-\d{2})",
+                         re.I | re.M)
+
+
+def decay_state(body, today):
+    """'stale' | 'never' | 'fresh' | 'durable' | None.
+
+    None means the entry declares no decay window at all, which is not the same
+    as a durable one and must not be reported as either.
+    """
+    m = DECAY_RE.search(body or "")
+    if not m:
+        return None
+    win = m.group(1).strip().rstrip(".,").lower()
+    if win in ("none", "never", "-", "n/a"):
+        return "durable"
+    d = re.fullmatch(r"(\d+)\s*d", win)
+    if not d:
+        return None                      # an unparseable window is not a claim
+    v = VERIFIED_RE.search(body or "")
+    if not v:
+        return "never"
+    try:
+        y, mo, dy = (int(x) for x in v.group(1).split("-"))
+        due = date(y, mo, dy) + timedelta(days=int(d.group(1)))
+    except ValueError:
+        return None
+    return "stale" if due < today else "fresh"
+
+
+def entry_bodies(root, s, cfg):
+    """entry id -> body, across every enabled layer. The lookup table the
+    Rests on lists are resolved against."""
+    out = {}
+    for name, spec in (cfg.get("layers") or {}).items():
+        if not spec.get("enabled") or not isinstance(s.get(name), list):
+            continue
+        for f in s[name]:
+            for eid, body in entry_blocks(f, spec.get("entry_marker", "### ")):
+                out.setdefault(eid, body)
+    return out
+
+
+def stale_grounding(root, s, cfg, today):
+    """(id, n_stale, n_never, n_cited, relpath) for anything resting on
+    evidence that has gone stale underneath it.
+
+    Deliberately not restricted to one layer role. An argument and a registered
+    dashboard have the same exposure, and the field they declare it with is the
+    same field.
+    """
+    bodies = entry_bodies(root, s, cfg)
+    out = []
+    for name, spec in (cfg.get("layers") or {}).items():
+        if not spec.get("enabled") or not isinstance(s.get(name), list):
+            continue
+        for f in s[name]:
+            for eid, body in entry_blocks(f, spec.get("entry_marker", "### ")):
+                ids = rests_ids(body)
+                if not ids:
+                    continue
+                states = [decay_state(bodies.get(i), today) for i in ids]
+                n_stale = states.count("stale")
+                n_never = states.count("never")
+                if n_stale or n_never:
+                    out.append((eid, n_stale, n_never, len(ids),
+                                os.path.relpath(f, root)))
+    return sorted(out)
 
 
 def retrievable_backlog(root, cfg):
@@ -647,6 +732,28 @@ def render_index(root, s, cfg):
                      f"{m} source{'' if m == 1 else 's'}** · "
                      f"[{os.path.basename(rel)[:-3]}]({rel})")
         L.append("")
+
+    # -- grounding that decayed underneath something built from it.
+    stale = stale_grounding(root, s, cfg, date.today())
+    if stale:
+        L += ["## Resting on evidence that has gone stale", "",
+              "Decay is carried by the entry, and swept by "
+              "corp-os-reality-check. What is listed here is the join nothing "
+              "else performs: the things **built from** those entries, which "
+              "inherit the staleness and say nothing about it. A view "
+              "published in March off four entries, two of them past their "
+              "window in June, reads exactly like one refreshed yesterday.", ""]
+        for eid, n_st, n_nv, n_all, rel in stale:
+            bits = []
+            if n_st:
+                bits.append(f"**{n_st} of {n_all}** past its window")
+            if n_nv:
+                bits.append(f"**{n_nv}** never verified")
+            L.append(f"- {eid} — {' · '.join(bits)} · "
+                     f"[{os.path.basename(rel)[:-3]}]({rel})")
+        L += ["", "Re-verify what it rests on, or retire it. An output nobody "
+              "re-grounds is the same defect as a claim nobody re-checks, one "
+              "layer up.", ""]
 
     back = retrievable_backlog(root, cfg)
     if back:
