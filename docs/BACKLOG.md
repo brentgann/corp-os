@@ -44,15 +44,19 @@ A conformance run. Four skills changed materially — `dashboard`, `setup`, `rec
 
 Verified by the **routing** harness (~15 min), not conformance. Independent of item 1; both can run the same afternoon.
 
-## 3. Conformance coverage: 20/23
+## 3. Conformance
 
-Missing `corp-os-audit`, `corp-os-company`, `corp-os-contribute`. Each is a fixture problem, not a harness problem:
+**20/23 skills have a case. 12 ran on 0.18.5: 69/79 checks, ~16 minutes wall clock, 2,946s of compute across 3 workers.** `setup-from-empty` is the long pole at 572s. A full 25-case run is roughly 35 to 45 minutes.
 
-- **`company`** — no shipped fixture declares a company layer. Cheapest of the three.
-- **`audit`** — needs a fixture representing someone else's non-corp-os system, which is a different artifact from the two that ship.
-- **`contribute`** — its deliverable leaves the OS entirely, so there is nothing in the tree to assert on without plugin source and a prior diagnosis.
+Nothing that run flagged was caused by the reference-read work: `dashboard-missing-layer` fails the identical check in `conformance-v11.json` from before it, and both dashboard cases came back exactly as they were despite that skill going from 12,786 unconditional tokens to zero.
 
-The three cases added in 0.18.2 are **written and never run.** The harness spawns real model runs and costs real money.
+Three real defects surfaced and are fixed in 0.18.6 and 0.18.7 — `corp-os-guide` doing the work instead of routing, `corp-os-jobs` stating its gate below the sections that write, `corp-os-improve` writing a claim. Two harness defects are fixed too: the gate list was hardcoded rather than read from `config.json`, and two assertions tested the answer text rather than the record.
+
+**None of that has been re-run.** The 69/79 predates every fix.
+
+Missing cases: `audit`, `company`, `contribute` — each a fixture problem, see §7.3. `company` is cheapest.
+
+**`recall-load-bearing-sensitive` is a rate, not a result** (§7.2). Its key check has failed, passed and failed again across three runs of the same case against the same fixture. `--repeats 5` on that one case is about eight minutes and is worth more than another wording pass.
 
 ## 4. `corp-os-pull`'s bookkeeping belongs in code
 
