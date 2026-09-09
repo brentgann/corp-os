@@ -7,6 +7,7 @@ dist/
 # rather than stated, because a binary in the tree is the one artifact here
 # nothing could check for staleness.
 docs/skill-map.pdf
+docs/architecture-diagram.pdf
 
 # os / editor
 .DS_Store
