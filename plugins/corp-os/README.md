@@ -156,6 +156,8 @@ The model itself is specified in `reference/data-model.md`. Improvement packets 
 | `scripts/write_export.py` | Redaction's two outputs, written together — refuses one without the other |
 | `scripts/log_run.py` | The usage-log row and the history entry, written together |
 | `scripts/delete_source.py` | The five-step retention deletion — dry-run by default, refuses without an obligation |
+| `scripts/bind_pattern.py` | Resolves a pattern's requirements against an OS, or names exactly what is missing |
+| `scripts/check_shield.py` | The JS-off leak test: proves a screen-share shield is real rather than decorative |
 | `scripts/check_citations.py` | Clusters entries by citation; refuses an export whose members disagree on sensitivity |
 | `scripts/stagger_decay.py` | Spreads a migrated corpus's decay windows so the first sweep is clearable |
 | `scripts/upgrade_os.py` | Refreshes the script copies an OS carries, stamps the version, names the migrations it will not perform |
@@ -164,6 +166,18 @@ The model itself is specified in `reference/data-model.md`. Improvement packets 
 | `evals/` | Two harnesses — does the right skill get reached, and does it do what it says |
 
 ## Version history
+
+**0.13.0** — patterns, which exist because of a problem that only appears with more than one person. One operator keeps their conventions in their head. Five operators produce five dashboards with five palettes and five ideas about what a panel owes the reader, and nothing in the model prevented it.
+
+A pattern is a portable spec for producing one kind of output. The load-bearing rule is that it addresses layers **by role and field, never by name**: a pattern saying `claims/` binds in exactly one OS — the one it was written in — and fails everywhere else by rendering an empty panel, which reads as a state rather than a defect and so never gets investigated. `bind_pattern.py` resolves requirements against the receiving OS and produces three outcomes and no fourth: bound, bound with drops named out loud, or refused with the missing role and field stated. Demonstrated against the register fixture, which renamed `claim` to `entry` and disabled jobs: the claims requirement bound anyway, and the job-board requirement refused precisely.
+
+`corp-os-pattern` is the twenty-third skill, and it authors in both directions — turning something already built into a spec, and adopting a pack from a teammate. `corp-os-dashboard` **got smaller**: it binds a pattern instead of carrying nine composition rules as prose, which is the test of whether patterns earned their place. `corp-os-upgrade` handles pack drift with the same mechanism it already uses for shipped scripts, because teammates carrying copies of files someone else maintains is that problem one layer up.
+
+The screen-share shield is the substantial new material, and it comes from a real build. An OS dashboard gets opened on a shared screen, and `bearing` deliberately keeps sensitive load-bearing material in the scan path, so the moment the thing is genuinely useful is also the moment it is dangerous. The rule is that markup ships **redacted** and script *reveals* — the inverse is visible whenever the script fails, loads late or is disabled, which is exactly when it matters. `check_shield.py` performs that as a mechanical test: strip every script block and every parked attribute, reduce to visible text, grep for known probes. On the build that produced this rule, that test found **three leaks in a shield its author believed worked**.
+
+Four more shield findings are in `reference/patterns.md`, and the last is the one nobody predicts. Sensitivity has to be *declared* and it is not only on claims: decisions inherit from what they rest on (6 of 18 in one OS, none catchable by reading the decision records), and a person record is sensitive only when their role or status is itself the protected fact (2 of 53). Redact the whole identifying row, not only the role. And **every derived summary is computed over the filtered set** — a search view stubbed its sensitive hits correctly and the "who said it" panel counted their speakers anyway, showing three speakers with the shield down and two with it up. The name is the disclosure.
+
+A shield protects a screen; a redacted build protects a file that leaves. Ship both and let neither imply the other — and a redacted build filters once at the data-load boundary, because per-panel filtering is how a view added later arrives without the filter.
 
 **0.12.0** — the first release driven by an audit of a real OS rather than by the eval suite, and the findings were different in kind: correctness and confidentiality rather than close-out discipline.
 

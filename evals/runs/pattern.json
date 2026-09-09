@@ -1,0 +1,84 @@
+{
+  "model": "claude-opus-5",
+  "passed": 6,
+  "total": 6,
+  "runs": [
+    {
+      "id": "pattern-adopt-refusal",
+      "skill": "corp-os-pattern",
+      "error": null,
+      "runs": 2,
+      "tally": {
+        "raw stays append-only": 2,
+        "usage/log.md row appended": 2,
+        "derived-layer writes have a proposal behind them": 2,
+        "the run closed its own books": 2,
+        "the teammate's pattern was not edited to make it bind": 2,
+        "the refusal is reported rather than worked around": 2
+      },
+      "why": {
+        "raw stays append-only": "an edited raw file destroys the only thing a rebuild can restore from; flipping `processed` is the one sanctioned edit, and deletion only under a declared retention obligation",
+        "usage/log.md row appended": "the friction field is the whole improvement flywheel; a skill that skips it under pressure makes corp-os-improve blind",
+        "derived-layer writes have a proposal behind them": "a proposal that lives only in chat dies with the session and leaves no record of what the gate saw -- the declines especially, which are the only trace of what someone chose not to know",
+        "the run closed its own books": "every failing conformance check in this suite has been the last step of a run",
+        "the teammate's pattern was not edited to make it bind": "weakening a requirement to make a refusal go away produces an output that renders an empty panel, which reads as a state rather than a defect. Editing an adopted pattern also forks the pack silently, so the next update reports drift nobody chose",
+        "the refusal is reported rather than worked around": "this OS has jobs disabled, so a job board genuinely cannot be built here. The right outcome is naming that, not rendering a board with an empty panel"
+      },
+      "diff": {
+        "added": [
+          "patterns/INDEX.md"
+        ],
+        "changed": [
+          "INDEX.md",
+          "meta.json",
+          "usage/log.md"
+        ],
+        "removed": []
+      },
+      "results": [
+        {
+          "check": "raw stays append-only",
+          "passed": true,
+          "rate": 1.0,
+          "why": "an edited raw file destroys the only thing a rebuild can restore from; flipping `processed` is the one sanctioned edit, and deletion only under a declared retention obligation",
+          "detail": ""
+        },
+        {
+          "check": "usage/log.md row appended",
+          "passed": true,
+          "rate": 1.0,
+          "why": "the friction field is the whole improvement flywheel; a skill that skips it under pressure makes corp-os-improve blind",
+          "detail": ""
+        },
+        {
+          "check": "derived-layer writes have a proposal behind them",
+          "passed": true,
+          "rate": 1.0,
+          "why": "a proposal that lives only in chat dies with the session and leaves no record of what the gate saw -- the declines especially, which are the only trace of what someone chose not to know",
+          "detail": ""
+        },
+        {
+          "check": "the run closed its own books",
+          "passed": true,
+          "rate": 1.0,
+          "why": "every failing conformance check in this suite has been the last step of a run",
+          "detail": ""
+        },
+        {
+          "check": "the teammate's pattern was not edited to make it bind",
+          "passed": true,
+          "rate": 1.0,
+          "why": "weakening a requirement to make a refusal go away produces an output that renders an empty panel, which reads as a state rather than a defect. Editing an adopted pattern also forks the pack silently, so the next update reports drift nobody chose",
+          "detail": ""
+        },
+        {
+          "check": "the refusal is reported rather than worked around",
+          "passed": true,
+          "rate": 1.0,
+          "why": "this OS has jobs disabled, so a job board genuinely cannot be built here. The right outcome is naming that, not rendering a board with an empty panel",
+          "detail": ""
+        }
+      ]
+    }
+  ]
+}

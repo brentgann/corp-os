@@ -112,7 +112,8 @@ PHASES = [
 # writes to.
 BENCH = ["corp-os-guide", "corp-os-setup", "corp-os-migrate",
          "corp-os-configure", "corp-os-upgrade", "corp-os-rebuild",
-         "corp-os-improve", "corp-os-audit", "corp-os-contribute"]
+         "corp-os-improve", "corp-os-audit", "corp-os-pattern",
+         "corp-os-contribute"]
 
 # How often a person actually reaches for it. Judgment, and the honest kind:
 # nothing measures this yet -- see the open question about which commands get
@@ -139,6 +140,7 @@ RHYTHM = {
     "corp-os-rebuild": "Rarely",
     "corp-os-improve": "After enough real use",
     "corp-os-audit": "On someone else's system",
+    "corp-os-pattern": "Once per output worth repeating",
     "corp-os-contribute": "Maintainer path",
 }
 

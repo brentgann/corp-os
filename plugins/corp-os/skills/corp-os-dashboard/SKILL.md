@@ -27,47 +27,35 @@ Check the registry before building anything. If the requested dashboard already 
 
 ## Step 1 — pick from the person's jobs, not from the catalogue
 
-The patterns reference lists eight views. Do not offer all eight. Read their active jobs and propose the one or two that serve them:
-
-- Jobs blocked on missing information → **evidence gaps**.
-- Jobs running on old claims → **claim health**.
-- Relationship-heavy jobs → **stakeholder map**.
-- Many jobs, unclear priorities → **job board**.
-- Recurring "why did we decide that" → **decision log**.
-- A counterparty-facing job → **company brief**.
-- Uncertainty about what is even feeding the OS → **source coverage**.
+Read `patterns/` and offer from what this OS has adopted, matched to their active jobs — not from a catalogue in this file. Jobs blocked on missing information want an evidence-gaps view; jobs running on old entries want claim health; many jobs and unclear priorities want a job board. `${CLAUDE_PLUGIN_ROOT}/reference/patterns.md` describes the shape; the OS's own `patterns/` says what is actually available here.
 
 Build one well. Two half-built dashboards is worse than one, because neither gets trusted.
 
-**Once a second dashboard already exists**, offer a home/index view linking to all of them, plus the single most consequential thing across the OS right now. That does not compete with "build one well" — it is a thin hub, not another analytical view. Do not offer it before a second real dashboard exists; a homepage linking to one dashboard is not worth the second URL.
+**Once a second dashboard already exists**, offer a home/index view linking to all of them, plus the single most consequential thing across the OS right now. That does not compete with "build one well" — it is a thin hub, not another analytical view.
 
 **If a pattern needs a layer this OS has not declared** — a stakeholder map with no person layer, a decision log with no decisions layer — do not invent one inline to get the dashboard built. Hand off to `corp-os-configure` first; the `relationship` profile in `${CLAUDE_PLUGIN_ROOT}/reference/configuration.md` carries a worked `people` declaration. A layer improvised to serve a rendering is a layer declared without the interrogation that catches shape mistakes, and those are expensive to unpick once entries are in it.
 
-## Step 2 — build each panel from named files
+## Step 2 — bind the pattern before building anything
 
-Every panel declares the files it was built from. If a panel cannot name its sources, it does not ship — that rule is what keeps a dashboard from quietly drifting into decoration.
+```bash
+python3 scripts/bind_pattern.py --root <the OS> --pattern patterns/<file>.md
+```
 
-Composition rules that matter more than they sound:
+The pattern carries the composition rules, what it refuses to do, and its generator. This skill does not carry them: nine rules held as prose are nine things to remember on every build, and they were held as prose right up until a real build broke on four of them.
 
-- **Scannable in fifteen seconds.** If it needs a legend, it is two dashboards.
-- **Counts before charts.** A labelled number beats a donut of four categories. Reach for a chart only when change over time is the actual point.
-- **Freshness on every panel.** A real date, not "recently." Invisible data age is how a dashboard gets trusted long after it should not be.
-- **Empty states say what to do.** "No claims past decay — next sweep due Oct 4" is a working panel. A blank box is a bug.
-- **No decorative data.** No sparklines encoding nothing, no progress rings on things that do not progress, no nested cards inside cards.
+Three outcomes and no fourth:
 
-## Step 3 — surface the uncomfortable numbers
+- **Bound** — run the generator.
+- **Bound with drops** — an optional requirement did not resolve. Say which panel is being dropped. Do not render it empty; a blank panel reads as a state rather than a defect and nobody investigates it.
+- **Refused** — hand off to `corp-os-configure` to declare the missing layer, or build without that pattern. Both are answers.
 
-The temptation is to build a dashboard that looks healthy. Resist it. The panels that change behavior are the ones showing what is wrong:
+If the OS has no pattern for what they want, that is `corp-os-pattern`'s job, not this one's. Build the thing once by hand if you must, then have it authored into a pattern so the second person does not start from nothing.
 
-- Claims past decay, as a count and a share of the total.
-- Evidence items open longest, with which job each blocks.
-- Jobs untouched for a full horizon period.
-- Connectors stale or broken.
-- Assumptions load-bearing on active jobs.
+## Step 3 — run the generator, never write the HTML
 
-A dashboard where every number is green after four months of real use is measuring the wrong things.
+The generator lives in the OS's `scripts/`, so the output is rebuildable when the plugin is not loaded — the same argument that puts `build_index.py` there. Every count, row, ranking and distribution is computed at build time.
 
-Pair each problem panel with the specific instruction that fixes it — "run corp-os-reality-check on the 14 overdue claims." A health panel with no path out of what it found is decoration.
+A hand-written job board had wrong counts within a day. That is the failure `build_index.py` exists to prevent, reproduced one directory over, and it is why the script is the artifact and the HTML is its product.
 
 ## Step 4 — bind the design system
 

@@ -1,0 +1,1009 @@
+{
+  "model": "claude-opus-5",
+  "repeats": 3,
+  "overall": 1.0,
+  "rows": [
+    {
+      "id": "audit-1",
+      "query": "i've got a bad feeling that half of what's in here about the Northwind account is out of date. can you go through and figure out what i shouldn't be trusting anymore",
+      "expect": "corp-os-reality-check",
+      "probes": "pair:reality-check-vs-audit",
+      "picks": [
+        "corp-os-reality-check",
+        "corp-os-reality-check",
+        "corp-os-reality-check"
+      ],
+      "rate": 1.0,
+      "majority": "corp-os-reality-check"
+    },
+    {
+      "id": "audit-2",
+      "query": "my buddy runs his whole consulting practice out of a big obsidian vault, like 400 notes. he asked me to look at it and tell him what he's missing. can you go through it and give him a real assessment",
+      "expect": "corp-os-audit",
+      "probes": "pair:reality-check-vs-audit",
+      "picks": [
+        "corp-os-audit",
+        "corp-os-audit",
+        "corp-os-audit"
+      ],
+      "rate": 1.0,
+      "majority": "corp-os-audit"
+    },
+    {
+      "id": "audit-3",
+      "query": "audit what i know about pricing \u2014 i think some of it is wrong",
+      "expect": "corp-os-reality-check",
+      "probes": "pair:reality-check-vs-audit",
+      "picks": [
+        "corp-os-reality-check",
+        "corp-os-reality-check",
+        "corp-os-reality-check"
+      ],
+      "rate": 1.0,
+      "majority": "corp-os-reality-check"
+    },
+    {
+      "id": "audit-4",
+      "query": "audit my knowledge base and tell me how it stacks up",
+      "expect": "corp-os-audit",
+      "probes": "pair:reality-check-vs-audit",
+      "picks": [
+        "corp-os-audit",
+        "corp-os-audit",
+        "corp-os-audit"
+      ],
+      "rate": 1.0,
+      "majority": "corp-os-audit"
+    },
+    {
+      "id": "shape-1",
+      "query": "this whole thing is set up wrong for how i actually work. i don't have 'jobs', i have matters, and each one has a client and a filing deadline. can we change that",
+      "expect": "corp-os-configure",
+      "probes": "pair:configure-vs-rebuild",
+      "picks": [
+        "corp-os-configure",
+        "corp-os-configure",
+        "corp-os-configure"
+      ],
+      "rate": 1.0,
+      "majority": "corp-os-configure"
+    },
+    {
+      "id": "shape-2",
+      "query": "the topic files have gotten out of hand \u2014 there's like 40 of them and half overlap. i'd rather you just redo the whole derived side from what's in raw and let the categories fall out of the actual material",
+      "expect": "corp-os-rebuild",
+      "probes": "pair:configure-vs-rebuild",
+      "picks": [
+        "corp-os-rebuild",
+        "corp-os-rebuild",
+        "corp-os-rebuild"
+      ],
+      "rate": 1.0,
+      "majority": "corp-os-rebuild"
+    },
+    {
+      "id": "shape-3",
+      "query": "raw/ is at 900 files and it's getting unwieldy, can we put some kind of expiry on it",
+      "expect": "corp-os-configure",
+      "probes": "pair:configure-vs-rebuild",
+      "picks": [
+        "corp-os-configure",
+        "corp-os-configure",
+        "corp-os-configure"
+      ],
+      "rate": 1.0,
+      "majority": "corp-os-configure"
+    },
+    {
+      "id": "shape-4",
+      "query": "my taxonomy doesn't fit anymore, this has drifted, redo it from source",
+      "expect": "corp-os-rebuild",
+      "probes": "pair:configure-vs-rebuild",
+      "picks": [
+        "corp-os-rebuild",
+        "corp-os-rebuild",
+        "corp-os-rebuild"
+      ],
+      "rate": 1.0,
+      "majority": "corp-os-rebuild"
+    },
+    {
+      "id": "add-1",
+      "query": "here's the transcript from this morning's call with the Vertex folks, add it\n\n[Dana] So the integration timeline...\n[Marcus] We'd need the sandbox by October at the latest.",
+      "expect": "corp-os-intake",
+      "probes": "pair:add-this",
+      "picks": [
+        "corp-os-intake",
+        "corp-os-intake",
+        "corp-os-intake"
+      ],
+      "rate": 1.0,
+      "majority": "corp-os-intake"
+    },
+    {
+      "id": "add-2",
+      "query": "i just picked up a new thing at work \u2014 i need to figure out whether we should keep supporting the on-prem customers. add that",
+      "expect": "corp-os-jobs",
+      "probes": "pair:add-this",
+      "picks": [
+        "corp-os-jobs",
+        "corp-os-jobs",
+        "corp-os-jobs"
+      ],
+      "rate": 1.0,
+      "majority": "corp-os-jobs"
+    },
+    {
+      "id": "add-3",
+      "query": "add this term: 'activation rate'. finance and growth define it differently and i keep getting burned in meetings",
+      "expect": "corp-os-glossary",
+      "probes": "pair:add-this",
+      "picks": [
+        "corp-os-glossary",
+        "corp-os-glossary",
+        "corp-os-glossary"
+      ],
+      "rate": 1.0,
+      "majority": "corp-os-glossary"
+    },
+    {
+      "id": "add-4",
+      "query": "quick note before i forget \u2014 ran into Wren at lunch, she said the helpdesk migration is dead for the year. save this",
+      "expect": "corp-os-intake",
+      "probes": "pair:add-this",
+      "picks": [
+        "corp-os-intake",
+        "corp-os-intake",
+        "corp-os-intake"
+      ],
+      "rate": 1.0,
+      "majority": "corp-os-intake"
+    },
+    {
+      "id": "add-5",
+      "query": "what does NRR actually mean here? i keep having to look it up and i'm not sure we all use it the same way",
+      "expect": "corp-os-glossary",
+      "probes": "pair:add-this",
+      "picks": [
+        "corp-os-glossary",
+        "corp-os-glossary",
+        "corp-os-glossary"
+      ],
+      "rate": 1.0,
+      "majority": "corp-os-glossary"
+    },
+    {
+      "id": "update-1",
+      "query": "catch me up, i've been out for a week",
+      "expect": "corp-os-pull",
+      "probes": "pair:update-vs-improve",
+      "picks": [
+        "corp-os-pull",
+        "corp-os-pull",
+        "corp-os-pull"
+      ],
+      "rate": 1.0,
+      "majority": "corp-os-pull"
+    },
+    {
+      "id": "update-2",
+      "query": "honestly this is getting annoying to use. every time i process anything i end up hand-writing the same three fields. what should i change about how it's set up",
+      "expect": "corp-os-improve",
+      "probes": "pair:update-vs-improve",
+      "picks": [
+        "corp-os-improve",
+        "corp-os-improve",
+        "corp-os-improve"
+      ],
+      "rate": 1.0,
+      "majority": "corp-os-improve"
+    },
+    {
+      "id": "update-3",
+      "query": "update my OS please, i think there's a bunch of meeting notes from last week that never got in",
+      "expect": "corp-os-pull",
+      "probes": "pair:update-vs-improve",
+      "picks": [
+        "corp-os-pull",
+        "corp-os-pull",
+        "corp-os-pull"
+      ],
+      "rate": 1.0,
+      "majority": "corp-os-pull"
+    },
+    {
+      "id": "update-4",
+      "query": "is this actually working? i've been using it for four months and i want to know what i'm not using",
+      "expect": "corp-os-improve",
+      "probes": "pair:update-vs-improve",
+      "picks": [
+        "corp-os-improve",
+        "corp-os-improve",
+        "corp-os-improve"
+      ],
+      "rate": 1.0,
+      "majority": "corp-os-improve"
+    },
+    {
+      "id": "decide-1",
+      "query": "i'm stuck between per-seat and usage pricing for the mid-market tier and i keep going back and forth. i need to actually track this instead of re-arguing it every two weeks",
+      "expect": "corp-os-decide",
+      "probes": "new:decide",
+      "picks": [
+        "corp-os-decide",
+        "corp-os-decide",
+        "corp-os-decide"
+      ],
+      "rate": 1.0,
+      "majority": "corp-os-decide"
+    },
+    {
+      "id": "decide-2",
+      "query": "what am i waiting on right now? feels like there are a few things sitting open that i keep not resolving",
+      "expect": "corp-os-decide",
+      "probes": "new:decide",
+      "picks": [
+        "corp-os-decide",
+        "corp-os-decide",
+        "corp-os-decide"
+      ],
+      "rate": 1.0,
+      "majority": "corp-os-decide"
+    },
+    {
+      "id": "decide-3",
+      "query": "we went with postgres in the end, mostly because the team already knew it. get that recorded so nobody re-opens it in six months",
+      "expect": "corp-os-claims",
+      "probes": "new:decide",
+      "picks": [
+        "corp-os-claims",
+        "corp-os-claims",
+        "corp-os-claims"
+      ],
+      "rate": 1.0,
+      "majority": "corp-os-claims"
+    },
+    {
+      "id": "decide-4",
+      "query": "i need to decide how we're going to handle renewals going forward \u2014 that's basically my whole quarter",
+      "expect": "corp-os-jobs",
+      "probes": "new:decide",
+      "picks": [
+        "corp-os-jobs",
+        "corp-os-jobs",
+        "corp-os-jobs"
+      ],
+      "rate": 1.0,
+      "majority": "corp-os-jobs"
+    },
+    {
+      "id": "decide-5",
+      "query": "log a decision: whether to keep the helpdesk through renewal or migrate before Q4. Wren owns it, needs to be settled by september 1, and it's blocking the support triage work",
+      "expect": "corp-os-decide",
+      "probes": "new:decide",
+      "picks": [
+        "corp-os-decide",
+        "corp-os-decide",
+        "corp-os-decide"
+      ],
+      "rate": 1.0,
+      "majority": "corp-os-decide"
+    },
+    {
+      "id": "cover-setup",
+      "query": "i want to build a second brain for my actual work, not another notes app. i'm a principal PM and i lose the same context every quarter. where do i start",
+      "expect": "corp-os-setup",
+      "probes": "coverage",
+      "picks": [
+        "corp-os-setup",
+        "corp-os-setup",
+        "corp-os-setup"
+      ],
+      "rate": 1.0,
+      "majority": "corp-os-setup"
+    },
+    {
+      "id": "cover-guide",
+      "query": "ok i installed this thing. what does it actually do and what should i do first",
+      "expect": "corp-os-guide",
+      "probes": "coverage",
+      "picks": [
+        "corp-os-guide",
+        "corp-os-guide",
+        "corp-os-guide"
+      ],
+      "rate": 1.0,
+      "majority": "corp-os-guide"
+    },
+    {
+      "id": "cover-connect",
+      "query": "i want my granola notes to feed into this automatically. how do i hook that up, and what's it not going to catch",
+      "expect": "corp-os-connect",
+      "probes": "coverage",
+      "picks": [
+        "corp-os-connect",
+        "corp-os-connect",
+        "corp-os-connect"
+      ],
+      "rate": 1.0,
+      "majority": "corp-os-connect"
+    },
+    {
+      "id": "cover-claims",
+      "query": "there's a queue of like 14 unprocessed files sitting in there. work through them and turn them into something i can actually cite",
+      "expect": "corp-os-claims",
+      "probes": "coverage",
+      "picks": [
+        "corp-os-claims",
+        "corp-os-claims",
+        "corp-os-claims"
+      ],
+      "rate": 1.0,
+      "majority": "corp-os-claims"
+    },
+    {
+      "id": "cover-recall",
+      "query": "i've got the Vertex QBR in 20 minutes. what do we know that bears on it, and what have we told them before",
+      "expect": "corp-os-recall",
+      "probes": "coverage",
+      "picks": [
+        "corp-os-recall",
+        "corp-os-recall",
+        "corp-os-recall"
+      ],
+      "rate": 1.0,
+      "majority": "corp-os-recall"
+    },
+    {
+      "id": "cover-recall-2",
+      "query": "i'm drafting the board update \u2014 pull in whatever we actually know about churn drivers so i'm not writing from memory",
+      "expect": "corp-os-recall",
+      "probes": "coverage",
+      "picks": [
+        "corp-os-recall",
+        "corp-os-recall",
+        "corp-os-recall"
+      ],
+      "rate": 1.0,
+      "majority": "corp-os-recall"
+    },
+    {
+      "id": "cover-dashboard",
+      "query": "build me something visual i can pull up on a monday \u2014 jobs, what's blocked, what's gone stale",
+      "expect": "corp-os-dashboard",
+      "probes": "coverage",
+      "picks": [
+        "corp-os-dashboard",
+        "corp-os-dashboard",
+        "corp-os-dashboard"
+      ],
+      "rate": 1.0,
+      "majority": "corp-os-dashboard"
+    },
+    {
+      "id": "cover-brief",
+      "query": "set me up a weekly digest of what changed and what needs my attention",
+      "expect": "corp-os-brief",
+      "probes": "coverage",
+      "picks": [
+        "corp-os-brief",
+        "corp-os-brief",
+        "corp-os-brief"
+      ],
+      "rate": 1.0,
+      "majority": "corp-os-brief"
+    },
+    {
+      "id": "cover-company",
+      "query": "research Vertex for me before thursday \u2014 what they sell, who actually buys it, how they price, and where we lose to them",
+      "expect": "corp-os-company",
+      "probes": "coverage",
+      "picks": [
+        "corp-os-company",
+        "corp-os-company",
+        "corp-os-company"
+      ],
+      "rate": 1.0,
+      "majority": "corp-os-company"
+    },
+    {
+      "id": "cover-redact",
+      "query": "i want to send this brief to the wider org but there's comp stuff and some candid Marcus commentary in it. clean it up first",
+      "expect": "corp-os-redact",
+      "probes": "coverage",
+      "picks": [
+        "corp-os-redact",
+        "corp-os-redact",
+        "corp-os-redact"
+      ],
+      "rate": 1.0,
+      "majority": "corp-os-redact"
+    },
+    {
+      "id": "cover-jobs",
+      "query": "job-004 has gotten enormous, the evidence list is like 15 items and they're not really the same question anymore. split it",
+      "expect": "corp-os-jobs",
+      "probes": "coverage",
+      "picks": [
+        "corp-os-jobs",
+        "corp-os-jobs",
+        "corp-os-jobs"
+      ],
+      "rate": 1.0,
+      "majority": "corp-os-jobs"
+    },
+    {
+      "id": "cover-rebuild",
+      "query": "nobody's confident the claims still reflect what's in raw. regenerate the whole derived layer",
+      "expect": "corp-os-rebuild",
+      "probes": "coverage",
+      "picks": [
+        "corp-os-rebuild",
+        "corp-os-rebuild",
+        "corp-os-rebuild"
+      ],
+      "rate": 1.0,
+      "majority": "corp-os-rebuild"
+    },
+    {
+      "id": "cover-configure",
+      "query": "call them findings instead of claims, that's the word we use here",
+      "expect": "corp-os-configure",
+      "probes": "coverage",
+      "picks": [
+        "corp-os-configure",
+        "corp-os-configure",
+        "corp-os-configure"
+      ],
+      "rate": 1.0,
+      "majority": "corp-os-configure"
+    },
+    {
+      "id": "cover-improve",
+      "query": "read the usage log and tell me what structure i've built that i'm not actually using",
+      "expect": "corp-os-improve",
+      "probes": "coverage",
+      "picks": [
+        "corp-os-improve",
+        "corp-os-improve",
+        "corp-os-improve"
+      ],
+      "rate": 1.0,
+      "majority": "corp-os-improve"
+    },
+    {
+      "id": "neg-1",
+      "query": "what's a reasonable decay window for pricing claims in general? just asking conceptually, not about my setup",
+      "expect": "none",
+      "probes": "negative",
+      "picks": [
+        "none",
+        "none",
+        "none"
+      ],
+      "rate": 1.0,
+      "majority": "none"
+    },
+    {
+      "id": "neg-2",
+      "query": "write me a python script that walks a folder of markdown files and prints any that are missing frontmatter",
+      "expect": "none",
+      "probes": "negative",
+      "picks": [
+        "none",
+        "none",
+        "none"
+      ],
+      "rate": 1.0,
+      "majority": "none"
+    },
+    {
+      "id": "neg-3",
+      "query": "explain jobs-to-be-done to me like i'm new to product management",
+      "expect": "none",
+      "probes": "negative",
+      "picks": [
+        "none",
+        "none",
+        "none"
+      ],
+      "rate": 1.0,
+      "majority": "none"
+    },
+    {
+      "id": "neg-4",
+      "query": "can you summarize this article i'm pasting about knowledge management? not saving it anywhere, i just want the gist",
+      "expect": "none",
+      "probes": "negative",
+      "picks": [
+        "none",
+        "none",
+        "none"
+      ],
+      "rate": 1.0,
+      "majority": "none"
+    },
+    {
+      "id": "neg-5",
+      "query": "i need to redact the SSNs out of this csv before i send it to payroll",
+      "expect": "none",
+      "probes": "negative",
+      "picks": [
+        "none",
+        "none",
+        "none"
+      ],
+      "rate": 1.0,
+      "majority": "none"
+    },
+    {
+      "id": "neg-6",
+      "query": "what's the difference between an assumption and a hypothesis",
+      "expect": "none",
+      "probes": "negative",
+      "picks": [
+        "none",
+        "none",
+        "none"
+      ],
+      "rate": 1.0,
+      "majority": "none"
+    },
+    {
+      "id": "neg-7",
+      "query": "my obsidian vault sync keeps conflicting between my laptop and phone, any idea how to fix that",
+      "expect": "none",
+      "probes": "negative",
+      "picks": [
+        "none",
+        "none",
+        "none"
+      ],
+      "rate": 1.0,
+      "majority": "none"
+    },
+    {
+      "id": "neg-8",
+      "query": "draft the agenda for my 1:1 with Priya tomorrow",
+      "expect": "corp-os-recall",
+      "probes": "coverage",
+      "picks": [
+        "corp-os-recall",
+        "corp-os-recall",
+        "corp-os-recall"
+      ],
+      "rate": 1.0,
+      "majority": "corp-os-recall"
+    },
+    {
+      "id": "vocab-1",
+      "query": "go through the unprocessed stuff and pull out any findings worth keeping \u2014 we call them findings here, not claims",
+      "expect": "corp-os-claims",
+      "probes": "hard:renamed-vocabulary",
+      "picks": [
+        "corp-os-claims",
+        "corp-os-claims",
+        "corp-os-claims"
+      ],
+      "rate": 1.0,
+      "majority": "corp-os-claims"
+    },
+    {
+      "id": "vocab-2",
+      "query": "the Kestrel matter is way too broad, it's really two different questions. split it into two matters",
+      "expect": "corp-os-jobs",
+      "probes": "hard:renamed-vocabulary",
+      "picks": [
+        "corp-os-jobs",
+        "corp-os-jobs",
+        "corp-os-jobs"
+      ],
+      "rate": 1.0,
+      "majority": "corp-os-jobs"
+    },
+    {
+      "id": "vocab-3",
+      "query": "we don't have 'jobs', we have engagements, and each one has a client and a close date. can the system speak our language instead",
+      "expect": "corp-os-configure",
+      "probes": "hard:renamed-vocabulary",
+      "picks": [
+        "corp-os-configure",
+        "corp-os-configure",
+        "corp-os-configure"
+      ],
+      "rate": 1.0,
+      "majority": "corp-os-configure"
+    },
+    {
+      "id": "plain-1",
+      "query": "what do I actually have on the Northwind situation? I know we talked about it a bunch but I can't remember what we concluded",
+      "expect": "corp-os-recall",
+      "probes": "hard:no-vocabulary",
+      "picks": [
+        "corp-os-recall",
+        "corp-os-recall",
+        "corp-os-recall"
+      ],
+      "rate": 1.0,
+      "majority": "corp-os-recall"
+    },
+    {
+      "id": "plain-2",
+      "query": "give me the monday morning rundown from that thing you set up for me",
+      "expect": "corp-os-brief",
+      "probes": "hard:no-vocabulary",
+      "picks": [
+        "corp-os-brief",
+        "corp-os-brief",
+        "corp-os-brief"
+      ],
+      "rate": 1.0,
+      "majority": "corp-os-brief"
+    },
+    {
+      "id": "plain-3",
+      "query": "stick this in my second brain \u2014 Wren says the helpdesk migration is off until volume normalizes",
+      "expect": "corp-os-intake",
+      "probes": "hard:no-vocabulary",
+      "picks": [
+        "corp-os-intake",
+        "corp-os-intake",
+        "corp-os-intake"
+      ],
+      "rate": 1.0,
+      "majority": "corp-os-intake"
+    },
+    {
+      "id": "plain-4",
+      "query": "how much of my notes do you think is just wrong at this point? it's been a few months",
+      "expect": "corp-os-reality-check",
+      "probes": "hard:no-vocabulary",
+      "picks": [
+        "corp-os-reality-check",
+        "corp-os-reality-check",
+        "corp-os-reality-check"
+      ],
+      "rate": 1.0,
+      "majority": "corp-os-reality-check"
+    },
+    {
+      "id": "frag-1",
+      "query": "ok but who actually owns that one, and when does it stop being reversible",
+      "expect": "corp-os-decide",
+      "probes": "hard:fragment",
+      "picks": [
+        "corp-os-decide",
+        "corp-os-decide",
+        "corp-os-decide"
+      ],
+      "rate": 1.0,
+      "majority": "corp-os-decide"
+    },
+    {
+      "id": "frag-2",
+      "query": "yeah that's a real one, write it down properly with the quote",
+      "expect": "corp-os-claims",
+      "probes": "hard:fragment",
+      "picks": [
+        "corp-os-claims",
+        "corp-os-claims",
+        "corp-os-claims"
+      ],
+      "rate": 1.0,
+      "majority": "corp-os-claims"
+    },
+    {
+      "id": "frag-3",
+      "query": "before that goes out, take the comp numbers and the bit about Marcus out of it",
+      "expect": "corp-os-redact",
+      "probes": "hard:fragment",
+      "picks": [
+        "corp-os-redact",
+        "corp-os-redact",
+        "corp-os-redact"
+      ],
+      "rate": 1.0,
+      "majority": "corp-os-redact"
+    },
+    {
+      "id": "seq-1",
+      "query": "here's the Vertex call transcript \u2014 get it in and then tell me what it changes about the integration timeline\n\n[Marcus] Sandbox by October or we slip to Q1.\n[me] Is October firm?\n[Marcus] It's firm on our side.",
+      "expect": "corp-os-intake",
+      "probes": "hard:sequence",
+      "picks": [
+        "corp-os-intake",
+        "corp-os-intake",
+        "corp-os-intake"
+      ],
+      "rate": 1.0,
+      "majority": "corp-os-intake"
+    },
+    {
+      "id": "seq-2",
+      "query": "hook up my meeting notes tool and then pull everything from the last two weeks",
+      "expect": "corp-os-connect",
+      "probes": "hard:sequence",
+      "picks": [
+        "corp-os-connect",
+        "corp-os-connect",
+        "corp-os-connect"
+      ],
+      "rate": 1.0,
+      "majority": "corp-os-connect"
+    },
+    {
+      "id": "seq-3",
+      "query": "a bunch of this looks stale \u2014 check it and then rebuild whatever needs rebuilding",
+      "expect": "corp-os-reality-check",
+      "probes": "hard:sequence",
+      "picks": [
+        "corp-os-reality-check",
+        "corp-os-reality-check",
+        "corp-os-reality-check"
+      ],
+      "rate": 1.0,
+      "majority": "corp-os-reality-check"
+    },
+    {
+      "id": "seq-4",
+      "query": "research Kestrel and then build me a one-pager I can bring into the meeting",
+      "expect": "corp-os-company",
+      "probes": "hard:sequence",
+      "picks": [
+        "corp-os-company",
+        "corp-os-company",
+        "corp-os-company"
+      ],
+      "rate": 1.0,
+      "majority": "corp-os-company"
+    },
+    {
+      "id": "upgrade-1",
+      "query": "i just updated the plugin. does my OS need anything doing to it?",
+      "expect": "corp-os-upgrade",
+      "probes": "coverage:upgrade",
+      "picks": [
+        "corp-os-upgrade",
+        "corp-os-upgrade",
+        "corp-os-upgrade"
+      ],
+      "rate": 1.0,
+      "majority": "corp-os-upgrade"
+    },
+    {
+      "id": "upgrade-2",
+      "query": "my dashboards count says 1 and there are definitely three of them. this started after i reinstalled corp-os",
+      "expect": "corp-os-upgrade",
+      "probes": "coverage:upgrade",
+      "picks": [
+        "corp-os-upgrade",
+        "corp-os-upgrade",
+        "corp-os-upgrade"
+      ],
+      "rate": 1.0,
+      "majority": "corp-os-upgrade"
+    },
+    {
+      "id": "upgrade-3",
+      "query": "this folder was set up back on an old version and i don't think it's ever been brought forward",
+      "expect": "corp-os-upgrade",
+      "probes": "coverage:upgrade",
+      "picks": [
+        "corp-os-upgrade",
+        "corp-os-upgrade",
+        "corp-os-upgrade"
+      ],
+      "rate": 1.0,
+      "majority": "corp-os-upgrade"
+    },
+    {
+      "id": "upgrade-near-1",
+      "query": "i want to move my dashboards registry to a different place and update the config to match",
+      "expect": "corp-os-configure",
+      "probes": "pair:upgrade-vs-configure",
+      "picks": [
+        "corp-os-configure",
+        "corp-os-configure",
+        "corp-os-configure"
+      ],
+      "rate": 1.0,
+      "majority": "corp-os-configure"
+    },
+    {
+      "id": "upgrade-near-2",
+      "query": "the claims in here have drifted a long way from what's actually in raw. regenerate the whole derived layer",
+      "expect": "corp-os-rebuild",
+      "probes": "pair:upgrade-vs-rebuild",
+      "picks": [
+        "corp-os-rebuild",
+        "corp-os-rebuild",
+        "corp-os-rebuild"
+      ],
+      "rate": 1.0,
+      "majority": "corp-os-rebuild"
+    },
+    {
+      "id": "upgrade-near-3",
+      "query": "i installed the plugin, now what \u2014 i don't have one of these folders yet",
+      "expect": "corp-os-setup",
+      "probes": "pair:upgrade-vs-setup",
+      "picks": [
+        "corp-os-setup",
+        "corp-os-setup",
+        "corp-os-setup"
+      ],
+      "rate": 1.0,
+      "majority": "corp-os-setup"
+    },
+    {
+      "id": "migrate-1",
+      "query": "i've got about six months of notes in notion and a wiki. how do i get all that into this thing",
+      "expect": "corp-os-migrate",
+      "probes": "coverage:migrate",
+      "picks": [
+        "corp-os-migrate",
+        "corp-os-migrate",
+        "corp-os-migrate"
+      ],
+      "rate": 1.0,
+      "majority": "corp-os-migrate"
+    },
+    {
+      "id": "migrate-2",
+      "query": "bring my old second brain across",
+      "expect": "corp-os-migrate",
+      "probes": "coverage:migrate",
+      "picks": [
+        "corp-os-migrate",
+        "corp-os-migrate",
+        "corp-os-migrate"
+      ],
+      "rate": 1.0,
+      "majority": "corp-os-migrate"
+    },
+    {
+      "id": "migrate-3",
+      "query": "i exported everything from the old tool, there's like 400 files. what now",
+      "expect": "corp-os-migrate",
+      "probes": "coverage:migrate",
+      "picks": [
+        "corp-os-migrate",
+        "corp-os-migrate",
+        "corp-os-migrate"
+      ],
+      "rate": 1.0,
+      "majority": "corp-os-migrate"
+    },
+    {
+      "id": "migrate-near-1",
+      "query": "i want to build one of these for my role. i don't have anything set up yet",
+      "expect": "corp-os-setup",
+      "probes": "pair:migrate-vs-setup",
+      "picks": [
+        "corp-os-setup",
+        "corp-os-setup",
+        "corp-os-setup"
+      ],
+      "rate": 1.0,
+      "majority": "corp-os-setup"
+    },
+    {
+      "id": "migrate-near-2",
+      "query": "here's the transcript from this morning, add it",
+      "expect": "corp-os-intake",
+      "probes": "pair:migrate-vs-intake",
+      "picks": [
+        "corp-os-intake",
+        "corp-os-intake",
+        "corp-os-intake"
+      ],
+      "rate": 1.0,
+      "majority": "corp-os-intake"
+    },
+    {
+      "id": "migrate-near-3",
+      "query": "grab whatever's new from my meeting notes since last week",
+      "expect": "corp-os-pull",
+      "probes": "pair:migrate-vs-pull",
+      "picks": [
+        "corp-os-pull",
+        "corp-os-pull",
+        "corp-os-pull"
+      ],
+      "rate": 1.0,
+      "majority": "corp-os-pull"
+    },
+    {
+      "id": "migrate-near-4",
+      "query": "take a look at the notes system i've been keeping and tell me what's weak about it",
+      "expect": "corp-os-audit",
+      "probes": "pair:migrate-vs-audit",
+      "picks": [
+        "corp-os-audit",
+        "corp-os-audit",
+        "corp-os-audit"
+      ],
+      "rate": 1.0,
+      "majority": "corp-os-audit"
+    },
+    {
+      "id": "pattern-1",
+      "query": "this dashboard came out well. i want the rest of the team to be able to build the same one",
+      "expect": "corp-os-pattern",
+      "probes": "coverage:pattern",
+      "picks": [
+        "corp-os-pattern",
+        "corp-os-pattern",
+        "corp-os-pattern"
+      ],
+      "rate": 1.0,
+      "majority": "corp-os-pattern"
+    },
+    {
+      "id": "pattern-2",
+      "query": "someone sent me our team's pack, how do i take it",
+      "expect": "corp-os-pattern",
+      "probes": "coverage:pattern",
+      "picks": [
+        "corp-os-pattern",
+        "corp-os-pattern",
+        "corp-os-pattern"
+      ],
+      "rate": 1.0,
+      "majority": "corp-os-pattern"
+    },
+    {
+      "id": "pattern-3",
+      "query": "why does everyone's output look completely different from each other",
+      "expect": "corp-os-pattern",
+      "probes": "coverage:pattern",
+      "picks": [
+        "corp-os-pattern",
+        "corp-os-pattern",
+        "corp-os-pattern"
+      ],
+      "rate": 1.0,
+      "majority": "corp-os-pattern"
+    },
+    {
+      "id": "pattern-near-1",
+      "query": "i need to add a people layer to this thing, with a proper schema",
+      "expect": "corp-os-configure",
+      "probes": "pair:pattern-vs-configure",
+      "picks": [
+        "corp-os-configure",
+        "corp-os-configure",
+        "corp-os-configure"
+      ],
+      "rate": 1.0,
+      "majority": "corp-os-configure"
+    },
+    {
+      "id": "pattern-near-2",
+      "query": "write this up as a diff i can apply to the corp-os repo itself",
+      "expect": "corp-os-contribute",
+      "probes": "pair:pattern-vs-contribute",
+      "picks": [
+        "corp-os-contribute",
+        "corp-os-contribute",
+        "corp-os-contribute"
+      ],
+      "rate": 1.0,
+      "majority": "corp-os-contribute"
+    },
+    {
+      "id": "pattern-near-3",
+      "query": "build me the job board",
+      "expect": "corp-os-dashboard",
+      "probes": "pair:pattern-vs-dashboard",
+      "picks": [
+        "corp-os-dashboard",
+        "corp-os-dashboard",
+        "corp-os-dashboard"
+      ],
+      "rate": 1.0,
+      "majority": "corp-os-dashboard"
+    }
+  ],
+  "confusion": []
+}

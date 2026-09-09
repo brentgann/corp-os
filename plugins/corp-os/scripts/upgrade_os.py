@@ -39,7 +39,8 @@ PLUGIN_ROOT = os.path.dirname(HERE)
 # defect this script exists to clean up after, and it would be absurd to
 # reintroduce it here.
 SHIPPED = ("build_index.py", "write_export.py", "log_run.py",
-           "delete_source.py", "check_citations.py", "stagger_decay.py")
+           "delete_source.py", "check_citations.py", "stagger_decay.py",
+           "bind_pattern.py", "check_shield.py")
 
 
 def plugin_version():

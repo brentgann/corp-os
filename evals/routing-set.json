@@ -427,6 +427,42 @@
       "expect": "corp-os-audit",
       "probes": "pair:migrate-vs-audit",
       "query": "take a look at the notes system i've been keeping and tell me what's weak about it"
+    },
+    {
+      "id": "pattern-1",
+      "expect": "corp-os-pattern",
+      "probes": "coverage:pattern",
+      "query": "this dashboard came out well. i want the rest of the team to be able to build the same one"
+    },
+    {
+      "id": "pattern-2",
+      "expect": "corp-os-pattern",
+      "probes": "coverage:pattern",
+      "query": "someone sent me our team's pack, how do i take it"
+    },
+    {
+      "id": "pattern-3",
+      "expect": "corp-os-pattern",
+      "probes": "coverage:pattern",
+      "query": "why does everyone's output look completely different from each other"
+    },
+    {
+      "id": "pattern-near-1",
+      "expect": "corp-os-configure",
+      "probes": "pair:pattern-vs-configure",
+      "query": "i need to add a people layer to this thing, with a proper schema"
+    },
+    {
+      "id": "pattern-near-2",
+      "expect": "corp-os-contribute",
+      "probes": "pair:pattern-vs-contribute",
+      "query": "write this up as a diff i can apply to the corp-os repo itself"
+    },
+    {
+      "id": "pattern-near-3",
+      "expect": "corp-os-dashboard",
+      "probes": "pair:pattern-vs-dashboard",
+      "query": "build me the job board"
     }
   ]
 }

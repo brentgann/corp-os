@@ -475,6 +475,49 @@ def main():
 
 
 
+
+    # --- patterns: the shipped ones must actually bind, and must be portable.
+    # A pattern that addresses a layer by NAME binds in exactly one OS -- the
+    # one it was written in -- and fails everywhere else by rendering an empty
+    # panel, which reads as a state rather than a defect. Shipping one like
+    # that would teach the shape wrong by example, which is worse than not
+    # shipping patterns at all.
+    for pf in sorted(glob.glob("patterns/*.md")):
+        head = re.match(r"^---\n(.*?)\n---\n",
+                        open(pf, encoding="utf-8").read(), re.S)
+        if not head:
+            err(f"{pf}: no frontmatter, so nothing can bind it")
+            continue
+        fm = head.group(1)
+        for key in ("kind", "requires", "target", "generator"):
+            if not re.search(rf"^{key}\s*:", fm, re.M):
+                err(f"{pf}: no `{key}` in frontmatter")
+        # `role:` is the portable address. A requirement naming a layer
+        # directly is the defect this whole mechanism exists to prevent.
+        if "role:" not in fm:
+            err(f"{pf}: no requirement uses `role:` — a pattern that names "
+                "layers directly is not portable, and this is the exact "
+                "mistake reference/patterns.md is written to prevent")
+        for bad in re.findall(r"^\s*-?\s*layer\s*:\s*(\S+)", fm, re.M):
+            err(f"{pf}: requires a layer by name (`{bad}`). Use role + fields.")
+
+        # os.path.abspath, not os.path.join(ROOT, ...): this loop runs with
+        # cwd at PLUGIN, so joining against the repo root produced a path that
+        # does not exist, bind_pattern exited with an error instead of the word
+        # REFUSED, and the check passed on every input. A check that cannot
+        # fail is worse than no check, because it is counted as coverage.
+        r = subprocess.run(
+            [sys.executable, "scripts/bind_pattern.py",
+             "--root", "examples/fixture-os", "--pattern", os.path.abspath(pf)],
+            capture_output=True, text=True, timeout=60)
+        if r.returncode != 0 and "REFUSED" not in (r.stdout or ""):
+            err(f"{pf}: bind_pattern.py could not read it — "
+                f"{(r.stderr or r.stdout).strip()[:200]}")
+        if "REFUSED" in (r.stdout or ""):
+            err(f"{pf} does not bind against the default fixture:\n"
+                + "\n".join(l for l in r.stdout.split("\n")
+                              if "MISSING" in l or "no enabled" in l))
+
     # --- the 0.12 rules, each checked because each was invisible before.
     dm = open("reference/data-model.md", encoding="utf-8").read()
     if "placement:" not in dm:

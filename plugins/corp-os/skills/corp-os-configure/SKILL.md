@@ -98,6 +98,14 @@ Write `config.json`, update the OS's `README.md` to match, add a dated `meta.jso
 
 Then run `build_index.py` and report any drift the change introduced.
 
+## When a pattern refuses to bind
+
+`bind_pattern.py` refuses when a pattern needs a role or field this OS does not declare, and it names exactly which. That refusal is the reason to be here, and the interrogation in Step 3 is what it is for.
+
+Declare the layer properly or decline it — both are answers. What is not an answer is loosening the pattern until it binds: a requirement weakened to make a refusal go away produces an output that renders an empty panel, which reads as a state rather than a defect and so never gets investigated.
+
+If a layer already exists and the pattern still refuses, the usual cause is a missing `entry_schema`. Declaring one is cheap and it is what makes every future binding checkable rather than hopeful.
+
 ## Every non-regenerable file is a declared layer
 
 If a file holds content that a rebuild could not reproduce from `raw/`, it is a layer and it needs a `role` — even when it is one file rather than a directory, and even when it is deliberately outside the scan path.

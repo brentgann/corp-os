@@ -30,12 +30,34 @@
       "enabled": true,
       "role": "derived",
       "path": "jobs/",
-      "index_line": "{id} — {statement}"
+      "index_line": "{id} — {statement}",
+      "entry_schema": [
+        "id",
+        "statement",
+        "kind",
+        "status",
+        "horizon",
+        "readiness",
+        "last_touched"
+      ]
     },
     "claims": {
       "enabled": true,
       "role": "derived",
-      "path": "claims/"
+      "path": "claims/",
+      "entry_schema": [
+        "id",
+        "statement",
+        "kind",
+        "jobs",
+        "confidence",
+        "source",
+        "citation",
+        "sensitivity",
+        "bearing",
+        "decay",
+        "verified"
+      ]
     },
     "glossary": {
       "enabled": false,
@@ -105,6 +127,22 @@
       "in_scan_path": false,
       "entry_marker": "### ",
       "note": "quarantine for incidental sensitive material; declared as a layer so a rebuild knows it exists"
+    },
+    "patterns": {
+      "enabled": true,
+      "role": "record",
+      "path": "patterns/",
+      "entry_schema": [
+        "name",
+        "kind",
+        "pack",
+        "requires",
+        "target",
+        "shield",
+        "generator"
+      ],
+      "index_line": "{name} — {kind} · {target}",
+      "note": "adopted output specs; portable because they address layers by role and field"
     }
   },
   "decay": {

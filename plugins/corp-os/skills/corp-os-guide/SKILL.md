@@ -55,6 +55,7 @@ Adjust the emphasis to what the person said they wanted. Do not recite it verbat
 | Assess someone else's knowledge system | `corp-os-audit` |
 | Bring an OS in line with a newer plugin version | `corp-os-upgrade` |
 | Bring an existing body of work into a new OS | `corp-os-migrate` |
+| Make an output repeatable, or adopt a team's pack | `corp-os-pattern` |
 | Turn diagnosed friction into an apply-ready diff against the plugin's own source | `corp-os-contribute` |
 
 ## Step 3 — when the ask is ambiguous, resolve it by looking
@@ -66,6 +67,7 @@ Common collisions, and how to settle them:
 - **Anything with "decide" in it** — read the tense. A choice still open is `corp-os-decide`; a choice already made is a `decision` claim via `corp-os-claims`; an outcome they are working toward ("decide how to handle renewals") is a job, so `corp-os-jobs`. Getting this wrong is why forks sit open for months: filed as a job, nothing ever forces the date.
 - **"Update my OS"** — read `usage/log.md` and the unprocessed queue in `INDEX.md`. If raw material is waiting, `corp-os-pull` or `corp-os-claims`. If the structure itself is the complaint, `corp-os-improve`.
 - **"This is a mess"** — one drifted file is a manual fix; stale counts are `build_index.py`; a drifted taxonomy is `corp-os-rebuild`; a shape that never fit is `corp-os-configure`; recurring friction is `corp-os-improve`.
+- **"Everyone's dashboards look different"** — `corp-os-pattern`. One person authors the output as a pattern, the others adopt the pack. A pattern addresses layers by role and field rather than by name, so it binds in a teammate's OS even when they renamed their vocabulary — and when it cannot bind it says which layer is missing instead of rendering an empty panel.
 - **"I already have a load of notes"** — `corp-os-setup` first if there is no OS yet, then `corp-os-migrate`. Not `corp-os-intake`, which takes one thing at a time and will not set the cohort ceiling, spread the decay or record what was left behind — the three things that decide whether a migrated OS is usable a month later.
 - **"Something looks wrong since I updated"** — `corp-os-upgrade` first, before diagnosing anything else. An OS keeps its own copies of the shipped scripts, so a plugin update reaches none of them, and a count that changed or a warning that appeared after an update is usually that gap rather than the content.
 - **"Write this up for the plugin" / "give me a diff"** — `corp-os-improve` studies this OS's own usage and proposes changes to it; `corp-os-contribute` turns something already diagnosed into a diff against the plugin's own source, for someone who maintains it. If nothing has been diagnosed yet, start with `corp-os-improve` or `corp-os-audit` — `corp-os-contribute` does not mine the usage log itself.

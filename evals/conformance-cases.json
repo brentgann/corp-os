@@ -575,6 +575,34 @@
         }
       ],
       "_note": "Second version. The first described the material in the prompt instead of staging it, then asserted raw files would be written — incoherent, because there was nothing on disk to file, and it failed 0/2 for that reason rather than any of the skill's. The material now lives in fixture-os/_incoming/, which the generator ignores because of the leading underscore.\n\nThe first version also checked the answer for the string 'retriev', which is the vocabulary mistake this suite has now made three times — a run can distinguish the two populations perfectly while saying 'fetchable' or 'still have access to'. What replaced it is the calendar log, which has to be declined, named with the material's own word.\n\nThe expect_untouched on claims/ stays as the assertion most likely to be wrong: Step 4 says mint in batches through the gate, so a run that goes on to mint with a proposal is also defensible. If it fails that way, the check changes and the reason gets written here.\n\nThird version, and the flagged assertion was the one that broke. expect_untouched on claims/ encoded 'a first pass files source and stops', which the skill does not say — Step 4 says mint in batches through the gate. Both runs did exactly that: they filed source, then minted with a proposal, and the universal gate check passed on both. The rule I asserted was stricter than the rule that exists, which is the seventh time an assertion in this suite has been wrong about a skill rather than the reverse. Replaced with the property that actually matters at a migration's scale: the batch left a persisted proposal behind."
+    },
+    {
+      "id": "pattern-adopt-refusal",
+      "skill": "corp-os-pattern",
+      "fixture": "examples/fixture-register",
+      "prompt": "A teammate sent me their pattern pack. I copied `dashboard-job-board.md` into patterns/. Can you set it up so I can build that board here?",
+      "expect_output": [
+        {
+          "name": "the refusal is reported rather than worked around",
+          "needle": "job",
+          "why": "this OS has jobs disabled, so a job board genuinely cannot be built here. The right outcome is naming that, not rendering a board with an empty panel"
+        }
+      ],
+      "expect_changed": [
+        {
+          "name": "the run closed its own books",
+          "prefix": "usage/log.md",
+          "why": "every failing conformance check in this suite has been the last step of a run"
+        }
+      ],
+      "_note": "fixture-register is the right target precisely because the pattern cannot bind there: jobs is disabled and the vocabulary is renamed. Two things are being tested at once — that the claims requirement binds anyway despite claim being renamed to entry, which is the portability thesis, and that the jobs requirement refuses out loud rather than degrading into an empty panel.\n\nDeliberately not asserting that config.json is untouched: declaring the missing layer through corp-os-configure is one of the two legitimate answers, and asserting against it would test the frame rather than the skill. That mistake has been made seven times in this suite.\n\nSecond version. The first asserted nothing under patterns/ was touched at all, and it failed at 50% because a run added patterns/pack.json — recording which pack and version the OS is on, which is Step 4 of the skill in as many words. The check forbade what the skill instructs. Eighth time in this suite that an assertion has been wrong about a skill rather than the reverse.\n\nexpect_unmodified on the teammate's file is the right shape: it catches editing theirs to fit, which is the real failure, and permits adding a local file, which is forking visibly rather than silently.",
+      "expect_unmodified": [
+        {
+          "name": "the teammate's pattern was not edited to make it bind",
+          "prefix": "patterns/dashboard-job-board.md",
+          "why": "weakening a requirement to make a refusal go away produces an output that renders an empty panel, which reads as a state rather than a defect. Editing an adopted pattern also forks the pack silently, so the next update reports drift nobody chose"
+        }
+      ]
     }
   ]
 }

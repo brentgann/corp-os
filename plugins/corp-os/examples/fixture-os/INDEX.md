@@ -10,6 +10,7 @@ _Regenerated 2026-09-09 by scripts/build_index.py (counts and listings only — 
 - **Raw files**: 3 (1 unprocessed)
 - **Findings**: 4
 - **Decisions**: 2
+- **Patterns**: 1
 - **Proposals**: 1
 - **Dashboards**: 2
 

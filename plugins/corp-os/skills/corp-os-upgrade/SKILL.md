@@ -53,6 +53,16 @@ cd <the OS> && python3 scripts/build_index.py
 
 A refreshed counter can report different numbers than the old one did. That difference is the entire reason for the upgrade, so say it out loud: *"your dashboards now count 3 rather than 1, which is what was actually there."* A number that silently changes reads as the tool being unreliable. A number that changes with a reason attached reads as the tool being fixed.
 
+## Step 1.5 — the same check for an adopted pack
+
+```bash
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/bind_pattern.py --root <the OS> --all
+```
+
+A pattern pack is this skill's own problem one layer up. Teammates carry copies of files someone else maintains, copies drift, and updating the pack updates nobody's OS — which is exactly why this skill exists for the shipped scripts. Same discipline, no second mechanism: compare by content rather than by date, say which patterns are behind, and refuse to perform anything structural.
+
+Two findings come out of it. A pattern whose **content** differs from the pack's is behind, or was deliberately edited locally — report it either way rather than overwriting, because someone who diverged on purpose should be told they did, not corrected. And a pattern that no longer **binds** means this OS changed underneath it: a layer was disabled or renamed, and the output has been silently missing a panel since. That is a migration, not a refresh, so it goes to `corp-os-configure` with the rest.
+
 ## Step 2 — hand the migrations over
 
 Do not perform them here. Each one moves or restructures the person's own files, which is exactly what `corp-os-configure` Step 1 exists to sort into safe changes and migrations — and a migration gets enumeration, a plan, and a confirmation before anything is written.

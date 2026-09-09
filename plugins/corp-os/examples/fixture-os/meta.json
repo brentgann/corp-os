@@ -32,7 +32,8 @@
     "decisions": 2,
     "unlisted_files": 0,
     "dashboards": 2,
-    "sensitive": 0
+    "sensitive": 0,
+    "patterns": 1
   },
   "generated_at": "2026-09-09"
 }

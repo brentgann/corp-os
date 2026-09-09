@@ -3,7 +3,7 @@
 The working document for this project. It records what Corp-OS is, every consequential decision and the reasoning behind it, what has been tested and how, and what is still open. Written so a session that has never seen this repo can pick it up cold and make correct changes.
 
 **Status:** v0.11.0 · 21 skills · 9 reference specs · 6 shipped scripts · 8 commands · 3 eval harnesses · 3 fixtures
-**Last substantive change:** the first release driven by an audit of a real OS rather than by the eval suite, and the findings were a different kind — correctness and confidentiality, not close-out discipline.
+**Last substantive change:** patterns — the first mechanism in this suite that exists for a problem one operator does not have.
 
 ---
 
@@ -443,6 +443,46 @@ Worth recording because the packet is a good document and these are the parts to
 
 **And one correction that changed what got built.** The packet listed F5 (render `rests_on` as *N claims / M sources*) and S1 (an argument-across-claims layer) as independent deltas. `rests_on` does not exist in the shipped model — not in `data-model.md`, not in any skill, not in any script. It is the reporting operator's own convention. So F5 is not a rendering fix to an existing field; it is part of the schema of a field that has to be introduced first. They are one proposal, deferred together.
 
+### 4.31 Patterns, and the one rule that makes them portable
+
+**Decision (0.13.0):** a pattern layer, `bind_pattern.py`, and `corp-os-pattern`.
+
+Every mechanism in this suite up to now served one operator. Patterns are the first that exists because of a problem that only appears with more than one: five people produce five dashboards with five palettes and five ideas about what a panel owes the reader, and nothing in the model prevented it.
+
+**The load-bearing decision is how a requirement is addressed.** A pattern names the **role** a layer plays and the **fields** it reads, never the layer's name. `claims/` binds in exactly one OS — the one the pattern was written in — and fails everywhere else by rendering an empty panel, which reads as a state rather than a defect and so nobody investigates it. `role: derived, fields: [citation, confidence]` binds in an OS that calls them findings.
+
+That is not an argument, it is a test, and the register fixture is the test: it renamed `claim` to `entry` and disabled `jobs`. The shipped job-board pattern, unmodified, **bound its claims requirement anyway and refused its jobs requirement precisely** — *"no enabled layer with role `derived` looks like `jobs`"*. Portability demonstrated and the limit demonstrated in the same run.
+
+**Three outcomes and no fourth.** Bound; bound with drops, named out loud; or refused with the missing role stated. A refusal hands off to `corp-os-configure`. What a binding never does is degrade quietly, because the failure mode of this whole class of tool is an empty panel that looks like an answer.
+
+**The test of whether it earned its place is that `corp-os-dashboard` got smaller.** It carried nine composition rules as prose that a model had to hold on every build; the dashboard write-up would have added nine more. They are pattern fields and shared composition rules now, checked once at bind time. If the dashboard skill had grown, the design was wrong.
+
+**A pack is `upgrade_os.py`'s problem one layer up,** and it reuses that mechanism rather than inventing a second: teammates carry copies of files someone else maintains, copies drift, and updating the pack updates nobody's OS. Compare by content, record the version, report the drift, refuse to migrate. A local edit shows as drift rather than being overwritten — someone who diverged on purpose should be told they did, not corrected.
+
+### 4.32 The screen-share shield
+
+**Reported from a real build, and it is the sharpest instance of a tension this model creates deliberately.**
+
+`bearing` keeps `sensitive` + `load_bearing` material in the scan path on purpose, because quarantining it produces confidently wrong answers rather than visible gaps (§4.18). A dashboard reads the scan path. **So the moment a dashboard is genuinely useful is also the moment it is dangerous**, and that follows from the model working as designed rather than from anyone's mistake.
+
+**Redact in the markup; let script reveal.** The inverse — render visible, hide with JS — is visible whenever the script fails, loads late, or is disabled, which is exactly the moment it matters. The rule is mechanically checkable and `check_shield.py` checks it: strip every `<script>` block and every parked attribute, reduce to visible text, grep for known probes. **On the build that produced this rule, that test found three leaks in a shield its author believed worked.**
+
+**Default hidden, every load, no persistence.** Forgetting to re-hide before sharing is a disclosure; one extra click is an inconvenience. Not symmetric, so fail toward the recoverable one — the same reasoning that makes `load_bearing` the default. The script greps for `localStorage` for this reason.
+
+**Sensitivity has to be declared, and it is not only on claims.** Decisions inherit from what they rest on — 6 of 18 in one OS, none of which reading the decision records would have caught. A person record is sensitive only when their role or status *is* the protected fact: 2 of 53, and over-applying it hides most of a directory for nothing.
+
+**The aggregation leak is the one nobody predicts.** A search view stubbed its sensitive hits correctly, and the *"who said it"* panel counted their speakers anyway: **three speakers with the shield down, two with it up.** The name is the disclosure. Every derived summary is computed over the filtered set, never the raw one, and this is the easiest thing in the whole design to get wrong because each individual result looks correctly redacted.
+
+**A shield is not a boundary.** The shield protects a screen; a redacted build protects a file that leaves. Both ship and neither implies the other — and a redacted build filters once at the data-load boundary, because per-panel filtering is how a view added later arrives without the filter. One implementation filtered only its search index while three other views rendered the same material in place, disclosed it honestly in three places, and disclosure is not a fix.
+
+### 4.33 A check that could not fail
+
+Worth recording because it nearly shipped.
+
+The validator gained a check that every shipped pattern binds against the default fixture. It passed. It also passed when the pattern was deliberately broken — because the subprocess was handed a path built against the repo root while the loop runs with cwd at the plugin, so `bind_pattern.py` exited with a file-not-found error rather than the word the check greps for.
+
+A check that cannot fail is worse than no check, because it is counted as coverage. The only reason it surfaced is the repo's own rule: negative-test every check you add, by reintroducing the defect and confirming it fires. It did not fire, and that is the entire value of the rule.
+
 ## 5. The skills
 
 | Skill | Job |
@@ -491,6 +531,8 @@ Being explicit, because much of this is unexercised.
 - `build_index.py --check` against a minimal no-config tree, exercising the reduced `DEFAULT_LAYERS` after `people`/`topics` were removed.
 - `scripts/validate.py` passes: frontmatter, name/directory match, cross-references, `${CLAUDE_PLUGIN_ROOT}` targets, step ordering, leakage.
 - **`build_index.py` is now executed by the build**, not merely parsed. `validate.py` copies `examples/fixture-os/` to a temp dir, runs the script against it, and asserts the counts, the custom layer's rendered `index_line`, the unprocessed queue, config-driven exclusions, the omission of the disabled layer, and that a second `--check` run finds no drift. Building the fixture immediately caught a real bug: an unrecognized key under `scan` fell back to defaults silently and rendered a plausible, wrong "not in the scan path" section. It is a warning now.
+- **`corp-os-pattern` at 6/6 across two repeats**, against the register fixture where the pattern deliberately cannot bind. Its first assertion forbade adding anything under `patterns/`, and failed at 50% because a run wrote `patterns/pack.json` — recording which pack the OS is on, which is Step 4 of the skill in as many words. The check forbade what the skill instructs; that is the eighth time in this suite an assertion has been wrong about a skill rather than the reverse.
+- **The routing eval at 23 skills**: 77 queries × 3 repeats, **100%**, including the three-way near-miss set — `pattern` against `configure`, `contribute` and `dashboard` — that the docket named as a risk *before* patterns shipped rather than after. `evals/runs/routing-v6.md`.
 - **`corp-os-migrate` at 10/10 across two repeats**, on the third version of its case. The first staged nothing on disk and then asserted files would be written; the second checked the answer for the string `retriev`, which a run can miss while distinguishing the populations perfectly; the third asserted a first pass files source and stops, which is stricter than the rule the skill states. Three wrong assertions, one working skill, and the corrections are in the case's own note.
 - **The routing eval at 22 skills**: 71 queries × 3 repeats, **100%**, including a four-way near-miss set built to pull `corp-os-migrate` toward `setup`, `intake`, `pull` and `audit` — the neighbourhood a bulk import sits in. `evals/runs/routing-v5.md`.
 - **The routing eval at 20 skills**: 64 queries × 3 repeats, **100%**, including three near-miss pairs written to pull `corp-os-upgrade` toward `configure`, `rebuild` and `setup`. `evals/runs/routing-v4.md`.
