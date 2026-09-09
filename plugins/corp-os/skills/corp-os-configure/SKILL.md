@@ -102,6 +102,8 @@ Then run `build_index.py` and report any drift the change introduced.
 
 ## Offering the arguments layer
 
+If they want one, its record shape and a worked example are in `${CLAUDE_PLUGIN_ROOT}/reference/arguments.md`.
+
 Optional, and offered rather than scaffolded. It holds a conclusion built across entries, with a `timing` field and a `Rests on` list — the thing no shipped layer can express. If they want one, read the `Rests on` spec in `${CLAUDE_PLUGIN_ROOT}/reference/claim-record.md` first, rather than inventing a local shape.
 
 Offer it to a decision-heavy or orientation-shaped role. Do not offer it to a build-heavy or operate-heavy one: they would write two a year and the layer would read as overhead, which is how an unused layer becomes a cost rather than a neutral.

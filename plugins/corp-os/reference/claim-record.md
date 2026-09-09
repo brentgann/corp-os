@@ -94,31 +94,6 @@ It is introduced there because that is where it was first needed, but it belongs
 
 An entry that declares no decay window is not the same as one whose window is `none`, and neither is reported as stale. A cited entry that was never verified at all is reported separately in the same line, because an output resting on something nobody ever confirmed is a different weakness from one resting on something that has aged.
 
-### The arguments layer — optional, and offered rather than scaffolded
-
-A claim is one fact with one citation. A topic file is narrative that asserts nothing on its own. A decision is a fork with an owner and a date. None of them can hold: *here is a conclusion built across eleven entries, here is what to do about it, and here is when doing it stops being useful.*
-
-```markdown
-### AR-0007 — The middle of the funnel is where the drop-off actually is
-- **So what**: Stop instrumenting the top. Move the next two weeks of work to the hand-off.
-- **Timing**: useful until the Q1 plan locks; after that it is a retrospective
-- **Status**: live            # live | spent | stale
-- **Rests on**: CL-0142, CL-0155, CL-0201, CL-0233
-- **Confidence**: needs_review   # inherit the weakest of what it rests on
-```
-
-**`rests_on` is rendered as two numbers, never one.** `4 entries / 3 sources`. The count of supporting entries reads as evidence breadth and does not measure it: entries are minted at whatever granularity a pass chose, so a source that yielded nine contributes nine and a source that yielded one contributes one. Measured, in a real corpus: one argument rested on **nine entries that all traced to a single meeting**. Nine entries from one conversation is one data point, and the number looked like breadth.
-
-`corp-os-reality-check` flags any argument whose distinct-source count is 1. Not wrong, necessarily — an argument resting on one conversation is a different object from one resting on nine, and only the record can tell them apart.
-
-**Inherit the weakest.** An argument's confidence is the lowest confidence among what it rests on. An argument built on eleven `needs_review` entries is `needs_review`, however convincing it reads.
-
-**Why optional.** It is a decision-heavy and orientation-role structure. A build-heavy operator would write two a year and the layer would read as overhead, so `corp-os-setup` offers it rather than scaffolding it.
-
-**Why it earns a place at all.** In the OS that invented it, 23 entries across six months and 220 sources — deliberately rare — and **13 of 23 marked `spent`, 2 `stale`.** The operator retired more than half his own arguments. That is the removal test this model applies to every layer, and this one passed it while the shipped claims layer had retired nothing at all.
-
-One thing it must not have: a hand-set signal-strength rating. The prior system had one and it was dropped as decorative. Its actual function was counting independent witnesses, which `rests_on` derives for free and which cannot go stale.
-
 ### The source record, and what a connector can give back
 
 `connectors.md` carries one block per registered source. Two fields on it decide what the claims drawn from that source can ever become:

@@ -6,34 +6,37 @@ Items leave this list by being done or by being declined in §8, never by being 
 
 ---
 
-## 1. Unconditional reference reads
+## 1. Unconditional reference reads — gating done, splitting done
 
-**84,823 tokens read unconditionally across 23 skills, against 89,458 behind a condition.** An unconditional read costs on every invocation of that skill whether or not the branch needing it fires. Conditional now exceeds unconditional; it did not when this list was written.
+**82,894 unconditional across 23 skills, against 83,478 conditional.** Down from a true starting figure of roughly 92,969 (the 125,289 first reported was measurement error; §4.51).
 
-Re-derive with `python3 scripts/ref_load.py`. Add `--skill <name>` for the sentence-by-sentence view, and **read that before editing anything** — four successive versions of this measurement set the work order wrong, all recorded in §4.51.
+Re-derive with `python3 scripts/ref_load.py`; `--skill <name>` for the sentence view, and **read that before editing** — four versions of this measurement set the work order wrong.
 
-Six skills sit at zero: `brief`, `dashboard`, `guide`, `recall`, `redact`, `glossary`.
+Six skills read nothing unconditionally: `brief`, `dashboard`, `guide`, `recall`, `redact`, `glossary`.
 
-**A file's home is decided by how many skills read it unconditionally, not by subject.** Moving `capture` from `configuration.md` to `records.md` was right on subject and wrong on cost: records has more unconditional readers, so the suite total went up 1,154. Its own file, read by the two skills that use it, was strictly better than either. Check the reader count before re-homing anything.
+### What is left, and why it stays
 
-| skill | unconditional | reads every run |
+| skill | unconditional | why it is legitimate |
 |---|---|---|
-| `corp-os-setup` | 10,463 | configuration, data-model, interrogation |
-| `corp-os-claims` | 8,878 | claim-record, data-model |
-| `corp-os-rebuild` | 8,878 | claim-record, data-model |
-| `corp-os-reality-check` | 5,834 | claim-record |
-| `corp-os-configure` | 5,696 | configuration |
-| `corp-os-migrate` | 5,696 | configuration |
+| `corp-os-setup` | 9,779 | writes a config, scaffolds against the data model, runs the interrogation — three files, three things it does every run |
+| `corp-os-claims` | 8,233 | the skill that writes claims, reading the claim spec |
+| `corp-os-rebuild` | 8,233 | the skill that re-derives them, reading the same |
+| `corp-os-pull` / `corp-os-intake` | 6,146 | data model, raw-file shape, and the capture block that decides their cost |
+| `corp-os-reality-check` | 5,189 | `claim-record.md` |
 
-**`claims` and `rebuild` are next, and they are the same 8,878.** Both read `claim-record.md` and `data-model.md` on every run, and both have a real case for it: claims is the skill that writes claims, rebuild is the skill that re-derives them. Neither is obviously gateable, which makes them the point where this item stops paying and item 1b starts.
+Every remaining entry is a skill reading a file it needs most of. `configuration.md` and `claim-record.md` were both examined section by section against their unconditional readers and neither divides by audience; `data-model.md` is the spine already trimmed in 0.16. **Further splitting would move tokens rather than remove them.**
 
-**1b. Split `configuration.md` and `claim-record.md`.** At 5,725 and 5,857 they are the two largest reference files and between them account for most of what is left above. Six of the seven remaining skills read one of them whole to use part of it. This is the 0.16 split applied one level down, and it is a different piece of work from gating a read.
+### Rules this item produced
 
-**Frequency is not in the table and has to be applied by hand.** `setup` runs once per OS; `claims` runs constantly. The ranking above is per-run cost, not annual.
+- **A file's home is decided by how many skills read it unconditionally, not by subject.** Moving `capture` to `records.md` was right on subject and put the suite total *up* 1,154. Its own file was strictly better. Check the reader count before re-homing.
+- **The pointer has to be gated, not just present.** "`X` is specified in `reference/y.md`" satisfies the reachability check and still pulls the whole file every run. Name the branch instead.
+- **A condition governs what follows it inside its block, never what precedes it.** Both scoping mistakes came from getting this wrong in opposite directions.
+- **Do not convert a read without the reachability check green** (`scripts/validate.py`).
+- **Frequency is not in the table.** `setup` runs once per OS; `claims` runs constantly.
 
-**The pointer has to be gated, not just present.** A pointer phrased as a statement ("`X` is specified in `reference/y.md`") satisfies the reachability check and still pulls the whole file every run. The form that works names the branch.
+### Next
 
-**Do not convert a read without the reachability check green** (`scripts/validate.py`).
+A conformance run. Four skills changed materially — `dashboard`, `setup`, `recall`, `configure` — plus `pull` and `intake` re-pointed at the capture spec, and three cases written in 0.18.2 have never executed.
 
 ## 2. Skill descriptions
 

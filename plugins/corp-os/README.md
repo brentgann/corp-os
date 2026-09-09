@@ -192,6 +192,14 @@ The model itself is specified in `reference/data-model.md`. Improvement packets 
 
 ## Version history
 
+**0.18.5** — the arguments layer gets its own file, and two skills that discussed it could not reach it.
+
+`corp-os-recall` cited `records.md` for the arguments record. `records.md` does not document it — the spec was in `claim-record.md` the whole time. `corp-os-configure` has a section headed *Offering the arguments layer* and reached neither file. Both now point at `reference/arguments.md`.
+
+An optional layer's spec and its 548-token worked example were being read on every run by the three skills that read `claim-record.md` unconditionally and mostly write ordinary claims. Suite unconditional load 84,823 to 82,894.
+
+**This finishes the gating work.** What remains is `configuration.md` for `corp-os-setup`, `claim-record.md` for `claims`, `rebuild` and `reality-check`, and `data-model.md` for six skills. Each of those is a reader that needs most of the file, so the next honest move is a conformance run against what has changed, not another split.
+
 **0.18.4** — `corp-os-dashboard` reads nothing unconditionally, and the capture spec now lives where its readers are.
 
 Dashboard went from 12,786 unconditional reference tokens to zero. Three gates: the pattern catalogue is read only when no adopted pattern fits (Step 1 already said to pick from `patterns/`, "not from a catalogue in this file" — the skill was contradicting itself), the pattern *format* only when a file will not parse, and the scheduling spec only if the person accepts the cadence Step 6 offers.
