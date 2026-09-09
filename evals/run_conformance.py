@@ -32,6 +32,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -245,6 +246,10 @@ def check(case, before, after, work, output=""):
 
 
 def run(case, model, timeout, keep, fixture):
+    # Eleven releases of measuring pass rates and never once measuring what it
+    # costs to ask. "How long does conformance take" had no answer in any of
+    # the four run files.
+    started = time.time()
     tmp = tempfile.mkdtemp(prefix=f"conf-{case['id']}-")
     work = os.path.join(tmp, "os")
     if case.get("fixture") == "empty":
@@ -290,13 +295,16 @@ def run(case, model, timeout, keep, fixture):
     else:
         shutil.rmtree(tmp, ignore_errors=True)
     return {"id": case["id"], "skill": case["skill"], "error": err,
+            "seconds": round(time.time() - started, 1),
             "results": results, "diff": diff, "workdir": tmp if keep else None}
 
 
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--model", default="claude-opus-5")
-    ap.add_argument("--case", default=None)
+    ap.add_argument("--case", default=None,
+                    help="comma-separated substrings; a case runs if any "
+                         "matches its id. Plain substrings, not a regex")
     ap.add_argument("--fixture", default=FIXTURE,
                     help="disposable OS to copy per run; never a real one")
     ap.add_argument("--timeout", type=int, default=600)
@@ -312,7 +320,8 @@ def main():
 
     cases = json.load(open(CASES, encoding="utf-8"))["cases"]
     if a.case:
-        cases = [c for c in cases if a.case in c["id"]]
+        wanted = [s.strip() for s in a.case.split(",") if s.strip()]
+        cases = [c for c in cases if any(w in c["id"] for w in wanted)]
     if not cases:
         print("no cases matched --case")
         return 1
@@ -336,6 +345,7 @@ def main():
             out.append(res)
             n = sum(1 for x in res["results"] if x["passed"])
             print(f"  {res['id']}: {n}/{len(res['results'])}"
+                  f"  {res.get('seconds', 0):.0f}s"
                   + (f"  ERROR {res['error']}" if res["error"] else ""), flush=True)
 
     # Collapse repeats into a rate per check.
