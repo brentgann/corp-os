@@ -8,6 +8,9 @@ What is registered, what it feeds, and what it cannot see.
 - **Verbatim fetch**: yes
 - **Feeds**: raw/, meeting notes
 - **Cadence**: continuous capture, pulled in batches
+- **List call**: `list_meetings(since, limit)` — id, title, date, participants. No bodies.
+- **Fetch call**: `get_transcript(id)` — the body, verbatim
+- **Verbatim fetch**: yes
 - **Blind spots**: attachments are not indexed, so a decision living in a PDF on a thread is invisible to this OS.
 
 ### Hallway

@@ -196,6 +196,7 @@
   "capture": {
     "mode": "triaged",
     "batch": 10,
-    "note": "triaged is safe only where the connector exposes a verbatim fetch; pull captures everything from sources that do not"
+    "note": "excerpt requires Verbatim fetch on the source; pull refuses it otherwise and captures full",
+    "body": "excerpt"
   }
 }

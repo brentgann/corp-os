@@ -192,6 +192,18 @@ The model itself is specified in `reference/data-model.md`. Improvement packets 
 
 ## Version history
 
+**0.18.0** — the other half of the cost problem, for sources a script cannot reach. 0.17 stopped fetching bodies nobody wanted. This stops paying three times for the ones you do.
+
+**When a source is behind MCP, the read is unavoidable and the write is not.** The body enters a context because a model has to call the tool — that cost is real and there is no way around it. What was avoidable was everything after: the model re-emitting the whole body as output to write the file, and then re-opening that file to propose claims from it. The same content, three times, and two of those passes bought nothing.
+
+**`capture.body`** decides how much of a kept item lands: `full` (a complete archive, and a rebuild can find what the first pass missed), `excerpt` (frontmatter, the passages actually cited, and a retrieval pointer — cost proportional to what the material was *used for*), or `stub` (the pointer alone). `excerpt` and `stub` are **refused** on a source with no verbatim fetch, because a pointer at something unretrievable is not a source. Neither mode summarizes: an excerpt is a verbatim span, and a summary is the different object Step 3 has always refused.
+
+Under `excerpt` the order inverts — **propose from the body while it is still in front of you, then write the file carrying what you cited.** And `corp-os-pull` now forbids re-opening a file the same run just wrote, in every mode. It is the same bytes at full price for a file nothing has changed since.
+
+**The connector registry learned the shape of a cheap read.** Almost every source has two: one that enumerates and one that returns a body, differing in cost by two orders of magnitude. The registry recorded `Protocol: MCP` — enough for a skill to know it can reach the source, nothing about reaching it cheaply, so it fetched everything. `List call`, `Fetch call` and their narrowing arguments are now recorded, and `corp-os-connect` asks for them; the list call is the single highest-value fact in the record.
+
+`Fetch command` and `Credential` are there for sources a script can reach, where bytes never enter a context at all. **A credential is named, never written** — `env GRANOLA_TOKEN`, not the token. `connectors.md` gets synced, shared, and handed to audits, and a secret in it is a secret published.
+
 **0.17.0** — the release that came from a bill. A single intake run over two connectors cost **$40**, and none of the sixteen prior releases would have caught it, because nothing in the system could see cost at all.
 
 **The most expensive sentence in the plugin was correct.** `corp-os-pull` said *"Content goes in essentially as retrieved. Do not summarize, condense, or rewrite"* — right for fidelity, and the only way a model can honour it is to re-emit every byte of every transcript as output, at several times the price of reading it. Paired with *"retrieve everything since its cutoff"* and no cap anywhere, one run reads the whole window and types it all back. Forty meetings at ~6k tokens is 240k in and 240k out before anything is proposed.

@@ -60,6 +60,10 @@ One file per source item, named `YYYY-MM-DD--<source>--<slug>.md`, with the full
 
 Content goes in essentially as retrieved. **Do not summarize, condense, or rewrite.**
 
+`capture.body` decides how much of it lands. Under `full`, all of it. Under `excerpt`, the frontmatter plus the passages the proposal actually cited plus a retrieval pointer — which means **the order changes: propose first, from the body while it is still in front of you, then write the file carrying what you cited.** Reading a body, writing it to disk, and reading it back to propose from it pays for the same content three times, and the third pass buys nothing the second did not already have.
+
+Neither mode summarizes. An excerpt is a verbatim span with a pointer to the rest; a summary is a different object and is what Step 3 has always refused. `excerpt` and `stub` are refused outright on a source whose connector records no verbatim fetch — a pointer to something unretrievable is not a source.
+
 Write each file in one operation and **never quote its content back in the run summary** — report the filename, the gist line and the counts. Content that passes through twice costs twice, and the second pass buys nothing a person will read. This skill places and tags material; the derived layer is where interpretation happens, and a summary written at intake time cannot be re-derived later.
 
 For `jobs`: infer from participants, subject, and each job's evidence list. Tag generously — a raw file serving three jobs should list three. When nothing matches, leave it empty rather than forcing a job; unassigned raw material is a normal and useful state.
@@ -76,6 +80,8 @@ Non-negotiable, and independent of any claim decision:
 A run that reports what it found only in chat, without updating `INDEX.md`, has not finished. Waiting on the claims decision before updating the index is a bug, not caution — the index describes what is in `raw/`, and that is already true.
 
 ## Step 5 — propose claims, do not write them
+
+**Propose from what is already in context. Never re-open a file this run just wrote** — it is the same bytes at full price, and nothing has changed between writing and reading it. Under `capture.body: excerpt` this step runs *before* Step 3 for that reason.
 
 Read what was pulled against the open evidence lists in `jobs/`. Lead with what actually moved a job:
 

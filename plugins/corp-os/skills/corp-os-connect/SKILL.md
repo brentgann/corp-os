@@ -37,6 +37,22 @@ Per source, all seven fields. Skipping any of them produces a registry that look
 - **Cadence** — daily, weekly, on demand, or event-driven. Match the person's honest upkeep budget from setup, not their aspirational one.
 - **Blind spots** — what this source structurally cannot see.
 
+## Step 1.5 — find the cheap call, not just the connection
+
+A source almost always has two reads: one that **enumerates** and one that **returns a body**. They differ in cost by roughly two orders of magnitude, and a registry that records only the protocol tells a skill it can reach the source and nothing about how to reach it cheaply — so the skill fetches everything, which is exactly how one intake run cost more than the connector it pulled from.
+
+Ask for both, and record them:
+
+- **List call** — what enumerates. Include the arguments that narrow it: the one that caps results, the one that takes a date, the one that selects fields.
+- **Fetch call** — what returns a body, by id.
+- **Verbatim fetch** — can the original be pulled back later, by id, unchanged? This one field decides whether skipping an item during triage defers it or destroys it, and `corp-os-pull` reads it before it reads the capture mode.
+
+If the source can be reached by a **script** rather than through a model — an export on disk, an API with a token in the environment — record a `Fetch command` instead. Bytes fetched by a script never enter a context, and that is the difference between a capture run costing dollars and costing nothing.
+
+**Name credentials, never write them.** `env GRANOLA_TOKEN`, not the token. This file gets synced, shared, and handed to an audit.
+
+If the person does not know whether a list call exists, that is worth two minutes of looking. It is the single highest-value fact in the record.
+
 ## Step 2 — the blind-spots question, asked properly
 
 Ask it directly for every source: *what would this source never tell you?*

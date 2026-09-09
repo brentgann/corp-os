@@ -129,8 +129,24 @@ processed: false         # flipped true once the derived layer has taken from it
 - **Cadence**: daily
 - **Last pull**: 2026-09-03 — cursor `granola:abc123`
 - **Status**: healthy       # healthy | stale | broken | not-connected | manual-only
+- **List call**: `list_meetings(since, limit)` — id, title, date, participants. No bodies.
+- **Fetch call**: `get_transcript(id)` — the body, verbatim
+- **Verbatim fetch**: yes
 - **Blind spots**: only captures calls I actually joined; nothing from Alex's own calls.
 ```
+
+**`List call` and `Fetch call` are what make triage possible at all.** Almost every source has two shapes of read — one that enumerates and one that returns a body — and they differ in cost by two orders of magnitude. A registry that records only *"Protocol: MCP"* tells a skill it can reach the source and nothing about how to reach it cheaply, so the skill does the only thing it knows how to do and fetches everything.
+
+Record the narrowing arguments too, in the call itself: the parameter that caps results, the one that takes a date, the one that selects fields. An unnarrowed call is the difference between reading a week and reading a year.
+
+Where a source can be reached by a script rather than through a model — an export on disk, an API with a token in the environment — record that instead and the bytes never enter a context at all:
+
+```markdown
+- **Fetch command**: `python3 scripts/fetch_granola.py --since {cursor} --out raw/`
+- **Credential**: env `GRANOLA_TOKEN` — never the value, and never in this file
+```
+
+A credential is named here, never written here. The OS folder gets synced, shared, and handed to an audit; a secret in it is a secret published.
 
 The **blind spots** field earns its keep. A connector registry that only lists what a source provides quietly implies full coverage. Writing down what each source cannot see is what stops the OS from mistaking silence for absence.
 ## Usage log

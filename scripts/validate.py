@@ -317,7 +317,35 @@ def main():
                        "whether skipping an item defers it or destroys it")):
         if term not in cfgdoc:
             err(f"reference/configuration.md does not document {term} — {why}")
+    # The two-call shape is what makes triage possible; without it recorded, a
+    # skill knows it can reach a source and nothing about reaching it cheaply.
+    for term, why in (("List call", "what enumerates a source without bodies"),
+                      ("Fetch call", "what returns one body by id"),
+                      ("Fetch command", "the script path, for a source a model "
+                       "never has to carry bytes for"),
+                      ("Credential", "named by reference — an OS folder gets "
+                       "synced, shared and audited")):
+        if term not in open("reference/records.md", encoding="utf-8").read():
+            err(f"reference/records.md does not document `{term}` — {why}")
+    cn = open("skills/corp-os-connect/SKILL.md", encoding="utf-8").read()
+    if "List call" not in cn:
+        err("corp-os-connect no longer asks for the list call. It is the single "
+            "highest-value fact in a connector record: without it every pull "
+            "fetches bodies it did not need")
+    if "never write them" not in cn.lower() and "never writes them" not in cn.lower():
+        err("corp-os-connect no longer says credentials are named and not "
+            "written. connectors.md is synced, shared and handed to audits")
+    for term, why in (('"body"', "how much of a kept item is written"),
+                      ("excerpt", "the mode that costs what the material was "
+                       "used for rather than how long it is")):
+        if term not in cfgdoc:
+            err(f"reference/configuration.md does not document {term} — {why}")
+
     pl = open("skills/corp-os-pull/SKILL.md", encoding="utf-8").read()
+    if "re-open a file this run just wrote" not in pl:
+        err("corp-os-pull no longer forbids re-reading what it just wrote — "
+            "that is the same bytes at full price, for a file nothing has "
+            "changed since writing")
     if "batch" not in pl or "list first" not in pl:
         err("corp-os-pull no longer caps the pass or lists before fetching. "
             "That is the instruction that made one intake run cost more than "

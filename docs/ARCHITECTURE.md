@@ -636,6 +636,24 @@ Three things changed, and the ordering matters. **Triage before fetch** is the c
 **What is measured, not what is claimed.** `log_run.py` stats the files it is handed rather than accepting a token count, because a model cannot observe its own usage and a number it made up would be exactly the fabrication this model exists to prevent. Bytes written are a proxy, they are honest, and they track the expensive half of the bill.
 
 
+### 4.47 Behind MCP the read is fixed and the write is not
+
+**Decision (0.18.0):** `capture.body`, the two-call connector shape, and a ban on re-reading what a run just wrote.
+
+The obvious fix for §4.46 was to take the bytes out of the model: let a script fetch and write, and the content never enters a context. That works for an export on disk or an API with a token, and it does not work for the two sources that actually cost the money, because both are reached through MCP — a model calls the tool and the result lands in its context by construction.
+
+So the cost splits into a part that cannot be avoided and a part that was never examined. **Input is fixed:** the body arrives because the tool call returns it. **Output was tripled:** the model re-emitted the body to write the raw file, then re-opened that file to propose claims from it. Two of those three passes bought nothing — the second is a copy, and the third reads a file that has not changed since the model wrote it, one step earlier, in the same run.
+
+Removing the third pass is free and was simply never noticed. Removing the second requires deciding **what `raw/` is actually for**, which is a real question with a real trade:
+
+- If it is an archive, the body has to land in full, and a rebuild can find claims the first pass missed.
+- If it is a citable record, it needs the passages that were cited plus a way back to the rest — and a rebuild can re-derive what was cited but **cannot discover what was missed.**
+
+That is not a question this model should answer on anyone's behalf, so it is `capture.body`, with `full` the default wherever the answer is unknowable. The guard is the same field that guarded triage: `excerpt` and `stub` require a verbatim fetch, because the first invariant is the one layer nothing else can rebuild and a pointer at something unretrievable does not satisfy it.
+
+**The registry knew the protocol and not the shape.** Recording `Protocol: MCP` tells a skill it can reach a source. It says nothing about the fact that almost every source has an enumerate call and a fetch call differing by two orders of magnitude in cost — so the skill did the only thing the record described and fetched everything. `List call` and `Fetch call` are now first-class, and this is the third time a missing property of a source turned out to be the cause of an expensive behaviour downstream. The pattern is worth naming: **record what a source is, not just that it is connected.**
+
+
 ## 5. The skills
 
 | Skill | Job |
