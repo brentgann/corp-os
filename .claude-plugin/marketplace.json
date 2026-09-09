@@ -5,7 +5,7 @@
   },
   "metadata": {
     "description": "Skills for building and running a portable personal work OS.",
-    "version": "0.19.0"
+    "version": "0.19.1"
   },
   "plugins": [
     {

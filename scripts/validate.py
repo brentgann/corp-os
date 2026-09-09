@@ -410,6 +410,11 @@ def main():
         err("corp-os-rebuild does not read reference/claim-record.md. It "
             "re-derives claims from raw/ — without the spec for what a claim "
             "is, it is re-deriving against whatever it remembers")
+    if "file_raw.py" not in pl:
+        err("corp-os-pull no longer hands filing to scripts/file_raw.py. "
+            "Naming, deduping and frontmatter are arithmetic; done in the "
+            "model it is one turn per item and every turn re-sends the whole "
+            "session prefix")
     if "batch" not in pl or "list first" not in pl:
         err("corp-os-pull no longer caps the pass or lists before fetching. "
             "That is the instruction that made one intake run cost more than "

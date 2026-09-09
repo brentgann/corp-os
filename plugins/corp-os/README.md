@@ -192,6 +192,14 @@ The model itself is specified in `reference/data-model.md`. Improvement packets 
 
 ## Version history
 
+**0.19.1** — filing moves into a script.
+
+`scripts/file_raw.py` takes a whole batch of fetched items and does the deterministic half in one call: dedupe on `external_id` against what is already filed, build the `YYYY-MM-DD--<source>--<slug>.md` name, suffix rather than overwrite a collision, write the frontmatter from the spec, optionally advance the source cutoff. It reports what it filed, what was already there, and what it rejected for missing fields.
+
+Done in the model this was one turn per item, and every turn re-sends the whole session prefix. That is how a filing run became the most expensive thing in the suite. What stays with the model is the judgment: which items to keep, and what the derived layer should hold.
+
+The cutoff is passed in rather than computed. A batch remainder must not fall behind it, and only the run knows what it did not reach.
+
 **0.19.0** — the index carries what the OS holds; a new `usage/health.md` carries what is wrong with it.
 
 Measured against a generated 800-claim OS, which is the first fixture large enough to show any of this. `INDEX.md` was **1,440 tokens, 1,029 of them findings** — *resting on stale evidence*, *arguments on one source*, *one call from promotion*, *open evidence*. Every skill read all of it on every run and almost none of them act on it.

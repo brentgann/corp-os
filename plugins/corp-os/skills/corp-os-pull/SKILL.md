@@ -56,7 +56,17 @@ Three distinct cases, and they need different handling:
 
 ## Step 3 — write raw files
 
-One file per source item, named `YYYY-MM-DD--<source>--<slug>.md`, with the full frontmatter from the spec: `source`, `person`, `also_present`, `date`, `type`, `jobs`, `tags`, `external_id`, `processed: false`.
+**Do not write these files by hand.** Hand the whole batch to the script in one call:
+
+```bash
+python3 scripts/file_raw.py --root <the OS> --items items.json
+```
+
+`items.json` is one object per kept item: `external_id`, `date`, `source`, `type`, `body`, and optionally `title`/`slug`, `person`, `also_present`, `jobs`, `tags`. The script dedupes on `external_id` against what is already filed, builds the `YYYY-MM-DD--<source>--<slug>.md` name, suffixes rather than overwrites a collision, writes the frontmatter from the spec, and reports what it filed, what was already there, and what it rejected for missing fields.
+
+Filing an item is arithmetic and string formatting. Done in the model it is one turn per item, and every turn re-sends the whole session prefix — which is how a filing run became the most expensive thing in this suite. What stays here is the judgment: which items to keep, and what the derived layer should hold.
+
+Pass `--cutoff` **only when the batch reached everything in the window**, with `--source` naming the connector. If anything went unreached, leave it off: the cutoff must not pass material nobody decided about.
 
 Content goes in essentially as retrieved. **Do not summarize, condense, or rewrite.**
 
