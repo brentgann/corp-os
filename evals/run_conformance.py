@@ -137,8 +137,23 @@ def check(case, before, after, work, output=""):
     # legitimate and a write with no proposal behind it is not. This is the
     # rule as data-model.md actually states it: the proposal is a file, written
     # before anything is presented, and it is what the person confirmed.
-    DERIVED = ("claims/", "jobs/", "decisions/", "glossary", "company/",
-               "connectors.md")
+    # Which layers the gate covers is the OS's decision, not this file's.
+    # Hardcoding it got `connectors` wrong -- it is role: record in both
+    # fixtures, data-model.md says record layers are written freely, and
+    # pull-broken-connector demanded the write in one assertion and failed it
+    # in another. It also silently ignored fixture-register's renamed
+    # vocabulary, checking `claims/` against an OS whose derived layer is
+    # `open-items/`. config.json is the authority; every skill reads it first
+    # and so does this now.
+    FALLBACK = ("claims/", "jobs/", "decisions/", "glossary", "company/")
+    try:
+        cfg = json.load(open(os.path.join(work, "config.json"), encoding="utf-8"))
+        derived = [n for n, L in (cfg.get("layers") or {}).items()
+                   if isinstance(L, dict) and L.get("role") == "derived"
+                   and L.get("enabled") is not False]
+        DERIVED = tuple(x for n in derived for x in (f"{n}/", f"{n}.md")) or FALLBACK
+    except Exception:                                         # noqa: BLE001
+        DERIVED = FALLBACK
     entered = [f for f in added + changed if f.startswith(DERIVED)
                and not f.endswith("INDEX.md")]
     proposed = [f for f in added if f.startswith("proposals/")]
@@ -235,6 +250,20 @@ def check(case, before, after, work, output=""):
             bad = spec["needle"].lower() in txt.lower()
             hit(spec["name"], not bad, spec["why"],
                 f"{spec['needle']!r} survived into {spec['file']}" if bad else "")
+
+    # Every file newly added under a prefix must contain the needle. For a
+    # schema whose required FORM is the thing under test -- a job statement is
+    # "When ..., I want to ..., so I can ..." -- when the filename cannot be
+    # predicted. Asserting the same string against the answer tests narration.
+    for spec in case.get("expect_added_contains", []):
+        files = [f for f in added if f.startswith(spec["prefix"])
+                 and not f.endswith("INDEX.md")]
+        bad = [f for f in files
+               if spec["needle"].lower() not in
+               open(os.path.join(work, f), encoding="utf-8", errors="ignore").read().lower()]
+        hit(spec["name"], bool(files) and not bad, spec["why"],
+            "nothing was added under that prefix" if not files
+            else (f"missing {spec['needle']!r}: {bad}" if bad else ""))
 
     for spec in case.get("expect_contains", []):
         p = os.path.join(work, spec["file"])

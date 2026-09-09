@@ -673,40 +673,45 @@
      "why": "the jobs layer is enabled in this fixture and the person asked for a job; a run that only discusses the shape has filed nothing"
     }
    ],
-   "expect_output": [
-    {
-     "name": "the repaired job carries an outcome clause",
-     "needle": "so I can",
-     "why": "artifact-as-motivation is the most common malformation: 'I want a dashboard' names a thing, not a motivation, and a job with no outcome cannot be closed. The repair is the skill's job"
-    }
-   ],
    "expect_untouched": [
     {
      "name": "the dashboard they asked for was not built",
      "prefix": "dashboards.md",
      "why": "the request names an artifact; this skill converts it into an outcome rather than satisfying it. Building the dashboard here is how the malformation gets baked in instead of repaired"
     }
-   ]
+   ],
+   "expect_added_contains": [
+    {
+     "name": "the job written carries an outcome clause",
+     "prefix": "jobs/",
+     "needle": "so I can",
+     "why": "artifact-as-motivation is the most common malformation: 'I want a dashboard' names a thing, not a motivation, and a job with no outcome cannot be closed. The required form is `When <situation>, I want to <motivation>, so I can <outcome>`, so the clause is schema rather than phrasing — checked in the file the run wrote, not in what it said about it"
+    }
+   ],
+   "_note": "The first version asserted 'so I can' against the answer, which tested narration rather than the record. The cases file already carries one note about dropping an assertion for testing the slug a run happened to choose; this was the same mistake."
   },
   {
    "id": "improve-thin-evidence",
    "skill": "corp-os-improve",
    "prompt": "Take a look at how I've been using this and tell me what to change.",
-   "expect_output": [
-    {
-     "name": "says the evidence is too thin to propose from",
-     "needle": "once",
-     "why": "this fixture's log holds two rows and one friction note. The bar is more than one real occurrence, and a run that proposes changes from a single one is manufacturing findings from noise -- the failure this skill is most prone to, because a person who asked for changes wants changes"
-    }
-   ],
    "expect_untouched": [
     {
      "name": "no improvement packet written from one occurrence",
      "prefix": "usage/improvement-packet",
      "why": "a packet is the model-change deliverable and the most expensive thing to act on; writing one off a single friction row sends someone to edit the plugin over an n of 1"
+    },
+    {
+     "name": "no proposals written from one occurrence",
+     "prefix": "usage/proposals.md",
+     "why": "the bar is more than one real occurrence. Proposing from a single one is manufacturing findings from noise, and this skill is the most prone to it because a person who asked for changes wants changes"
+    },
+    {
+     "name": "improve wrote no claims",
+     "prefix": "claims",
+     "why": "this skill studies how the OS is used and proposes changes to it. Writing a claim means it answered a question nobody asked with material it was reviewing, and it is corp-os-claims that has the rules for doing that properly"
     }
    ],
-   "_note": "Deliberately tests the refusal rather than the proposal. The fixture's log is thin on purpose, and the honest run here says so. An earlier full run showed two skills correctly refusing to proceed and the harness scoring it as failure; this case makes that behaviour the assertion instead of the bug."
+   "_note": "Asserts the refusal structurally. The first version looked for the word 'once' in the answer, which tests narration; the run that failed it had written claims/pricing.md, which is the defect worth catching and which no wording check would have named."
   }
  ]
 }
