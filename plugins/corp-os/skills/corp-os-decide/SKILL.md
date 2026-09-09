@@ -5,6 +5,8 @@ description: Tracks the forks a person has NOT decided yet in a Corp-OS knowledg
 
 # Corp-OS decide
 
+> **Judgment pass** — the reasoning is the product here. Run it on your best model, and do not economise by skipping the questions it asks.
+
 A claim of kind `decision` records a call that was already made. This skill carries the ones that have not been made yet, which is a different object with different fields and a different failure mode: a claim rots by going stale, and an open decision rots by going quiet.
 
 The distinction is the whole reason this layer exists. **A decision nobody is tracking does not feel like a problem — it feels like flexibility**, right up until the option that mattered has expired and the choice was made by default. That is the specific thing this skill is here to prevent, and it is why every open decision carries a date.

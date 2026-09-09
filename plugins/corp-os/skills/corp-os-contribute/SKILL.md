@@ -5,6 +5,8 @@ description: Turns friction already surfaced in a Corp-OS operator's usage — b
 
 # Corp-OS contribute
 
+> **Judgment pass** — the reasoning is the product here. Run it on your best model, and do not economise by skipping the questions it asks.
+
 `corp-os-improve` keeps a packet thin and anonymized because it assumes a stranger maintains the plugin. This skill assumes the opposite: the person running it either maintains corp-os directly or is handing this straight to someone who does. That changes what's worth writing — not a cautious note, an apply-ready diff.
 
 Read `${CLAUDE_PLUGIN_ROOT}/reference/improvement-packet.md` for the config test this skill also uses (Step 1), and for the fallback packet shape in Step 4.

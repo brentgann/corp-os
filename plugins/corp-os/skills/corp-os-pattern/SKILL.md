@@ -5,6 +5,8 @@ description: Turns an output someone has already built — a dashboard, an expor
 
 # Corp-OS pattern
 
+> **Judgment pass** — the reasoning is the product here. Run it on your best model, and do not economise by skipping the questions it asks.
+
 One operator keeps their conventions in their head. Five operators produce five dashboards with five palettes and five ideas about what a panel owes the reader, and nothing about the model prevents it.
 
 A pattern is the fix: a portable spec for producing one kind of output, carrying what it needs from an OS, what it must contain, what it refuses to do, and the generator that builds it.

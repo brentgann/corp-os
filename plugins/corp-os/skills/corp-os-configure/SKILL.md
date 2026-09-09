@@ -5,6 +5,8 @@ description: Changes how a Corp-OS is shaped — renaming its vocabulary, adding
 
 # Corp-OS configure
 
+> **Judgment pass** — the reasoning is the product here. Run it on your best model, and do not economise by skipping the questions it asks.
+
 The shipped model is a default profile, not a schema. This skill changes the profile.
 
 Read `${CLAUDE_PLUGIN_ROOT}/reference/configuration.md` before touching anything.

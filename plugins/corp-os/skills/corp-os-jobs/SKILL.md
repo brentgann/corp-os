@@ -5,6 +5,8 @@ description: Adds, sharpens, splits, re-scopes, or retires the jobs to be done i
 
 # Corp-OS jobs
 
+> **Judgment pass** — the reasoning is the product here. Run it on your best model, and do not economise by skipping the questions it asks.
+
 Jobs are the organizing primitive. Everything else in the OS hangs off them, which means a sloppy job record degrades intake priority, recall relevance, and every dashboard at once. This skill is where that quality is enforced.
 
 Read `${CLAUDE_PLUGIN_ROOT}/reference/jtbd-patterns.md` and the job record section of `${CLAUDE_PLUGIN_ROOT}/reference/records.md` first.

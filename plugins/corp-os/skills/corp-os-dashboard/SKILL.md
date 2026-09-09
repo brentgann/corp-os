@@ -5,6 +5,8 @@ description: Builds and refreshes dashboards from what a Corp-OS knowledge base 
 
 # Corp-OS dashboard
 
+> **Mixed pass** — binding the pattern and running the generator is bookkeeping; choosing which view this OS needs is not. Worth the better model, and worth keeping the mechanical half in scripts so the model is paying for the judgment rather than the typing.
+
 Renders what the OS holds. The governing rule: **never render what the OS does not have.** A panel that would need missing data shows the gap instead of an estimate, because the gap is the information the person needed.
 
 Read `${CLAUDE_PLUGIN_ROOT}/reference/dashboard-patterns.md` before building.

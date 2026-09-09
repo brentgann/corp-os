@@ -5,6 +5,8 @@ description: Audits any existing personal or team knowledge system — one built
 
 # Corp-OS audit
 
+> **Judgment pass** — the reasoning is the product here. Run it on your best model, and do not economise by skipping the questions it asks.
+
 Assesses a knowledge system in place and learns from it. **Two-way by design**, and the second direction matters more: anyone running a real system for months has solved problems the shipped model has not. An audit that only grades is half a skill.
 
 Say that out loud at the start. It changes how the person engages — from defending their system to comparing notes.

@@ -4,6 +4,28 @@ The shipped Corp-OS model is a **default profile, not a schema.** Everything it 
 
 This exists because the parts of the model that are genuinely universal are few: an append-only source layer, provenance on derived entries, a review gate, an index that can be scanned, and something that removes things. Everything else is a reasonable guess about a stranger's work. A controller, a litigator, a field researcher, and a product manager need the same five properties and almost none of the same structure.
 
+## Capture: how much comes in, and what that costs
+
+```json
+"capture": {
+  "mode": "triaged",
+  "batch": 10
+}
+```
+
+The block that decides what a pull or a bulk intake costs, and it exists because nothing did. An uncapped run against a week of meetings fetches every body and writes every one back out; output is the expensive half of a bill, so a mechanical filing run became the most expensive thing in the suite while leaving the same usage-log row as a recall.
+
+**`mode`**
+
+- **`triaged`** (default) — retrieve the list first, propose keep or skip per item with a reason, and fetch bodies only for what a person confirms. `raw/` then holds a complete archive of *what was chosen*, not of the source.
+- **`all`** — fetch everything in the window. Right when the archive itself is the deliverable, and it should be chosen rather than inherited.
+
+**One rule overrides `mode`, and it reads a field the connector registry already carries.** Triage is only safe where the source can be fetched back verbatim: a skipped item is deferred, not lost. So for any source whose `Verbatim fetch` is absent, `corp-os-pull` captures everything regardless of mode. Skipping there is destruction, and raw material is the one layer nothing can rebuild.
+
+**`batch`** caps items per pass, in both pull and intake. The run reports what remains and offers the next. The first run after a holiday is the worst case and the one nobody sizes.
+
+**What this does not do:** it does not summarize, condense or rewrite anything it captures. Fidelity of what lands is untouched; the only question this block answers is how much lands, and how much it costs to decide.
+
 ## Precedence
 
 1. `config.json` in the OS root — the authority.

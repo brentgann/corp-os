@@ -5,6 +5,8 @@ description: Sweeps a Corp-OS knowledge base for knowledge that has drifted from
 
 # Corp-OS reality check
 
+> **Judgment pass** — the reasoning is the product here. Run it on your best model, and do not economise by skipping the questions it asks.
+
 Every personal knowledge system degrades the same way: not by being wrong at the moment of capture, but by staying unchanged while the world moves. This skill is the correction loop, and it works by interrogation — the person is the only available source of ground truth for most of what needs checking.
 
 Read `${CLAUDE_PLUGIN_ROOT}/reference/claim-record.md`.

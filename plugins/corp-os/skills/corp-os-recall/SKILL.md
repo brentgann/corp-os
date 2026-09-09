@@ -5,6 +5,8 @@ description: Answers questions from a Corp-OS knowledge base with citations, and
 
 # Corp-OS recall
 
+> **Mixed pass** — scanning the index and pulling matches is bookkeeping; deciding what the matches mean and what is not known is not. Worth the better model, and worth keeping the mechanical half in scripts so the model is paying for the judgment rather than the typing.
+
 The skill the OS exists for. Everything else is upkeep; this is the payoff — and it is the skill that determines whether the person keeps using the system, so the quality bar is answering honestly rather than answering impressively.
 
 ## Pre-flight

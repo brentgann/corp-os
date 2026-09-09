@@ -5,6 +5,8 @@ description: Turns raw material in a Corp-OS knowledge base into reviewed, citab
 
 # Corp-OS claims
 
+> **Judgment pass** — the reasoning is the product here. Run it on your best model, and do not economise by skipping the questions it asks.
+
 The claims layer is what separates a Corp-OS from a tagged archive. A claim is a short statement that has been looked at by a person and carries enough provenance that a future reader — including a future version of the person who wrote it — can tell how much to trust it and when to re-check it.
 
 Read `${CLAUDE_PLUGIN_ROOT}/reference/claim-record.md` before writing anything. The layer rules and the scan contract are in `${CLAUDE_PLUGIN_ROOT}/reference/data-model.md`; you do not need them to mint a claim.

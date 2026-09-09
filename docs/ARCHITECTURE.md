@@ -619,6 +619,23 @@ Against a fixture holding two open decisions it reported **"0 open decisions"**.
 The general form is worth naming: **a reader that silently halves its input is worse than one that crashes**, because the output is well-formed and the omission is invisible. It is the same class as the harness that never ran a script (§4.27) and the dashboards registry that counted 1 for five releases (§4.24) — correct-looking output produced by a component that was never exercised against the case it got wrong. The validator now asserts a match from each encoding, which is the cheapest possible guard and would have caught it on the day.
 
 
+### 4.46 The system could not see its own cost
+
+**Decision (0.17.0):** `capture` in config, a pass declaration on every skill, and measured volume in the usage log.
+
+A single intake run over two connectors cost **$40**. Sixteen releases of eval harnesses, a validator and an improvement loop would not have caught it, and the reason is structural: **`usage/log.md` recorded friction and nothing else**, so a run that moved forty transcripts through the model left the same row as one that answered a question. `corp-os-improve` could rank skills by friction and by no other dimension, because no other dimension was recorded.
+
+The cost itself came from an instruction that is correct. `corp-os-pull` says content goes in as retrieved, do not summarize or rewrite — right for fidelity, and honourable only by re-emitting every byte as output, which is priced several times input. Add *"retrieve everything since its cutoff"* with no cap and the worst case is unbounded by design.
+
+**This is §4.21's rule broken in the largest case in the suite.** A step that has to happen every time, that nothing else catches, belongs in code — and nine of them were moved there. Copying bytes from a connector into a file is that step at the highest volume in the system, and it stayed with the model because it does not present as a step. It presents as content.
+
+Three things changed, and the ordering matters. **Triage before fetch** is the cut that costs no fidelity for what is kept: retrieve the list, decide, fetch what survives. **A batch cap** bounds the worst case, which is always the first run after a holiday. **A recorded model and a measured byte count** make the next instance visible in the log rather than in an invoice.
+
+**The safety rule fell out of a field that already existed.** Triage is only safe where the material is retrievable, and `connectors.md` has recorded `Verbatim fetch` since 0.14 for a different reason — the promotion backlog. So a source without one captures everything regardless of mode. That is the second time a field added for one purpose answered a question nobody had asked yet, and it is an argument for recording properties of sources rather than conclusions about them.
+
+**What is measured, not what is claimed.** `log_run.py` stats the files it is handed rather than accepting a token count, because a model cannot observe its own usage and a number it made up would be exactly the fabrication this model exists to prevent. Bytes written are a proxy, they are honest, and they track the expensive half of the bill.
+
+
 ## 5. The skills
 
 | Skill | Job |

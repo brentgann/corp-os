@@ -5,6 +5,8 @@ description: Explains what Corp-OS is and routes to the right Corp-OS skill for 
 
 # Corp-OS guide
 
+> **Mechanical pass** — reading what exists and naming the next skill. Little here is a judgment call, so run it on a cheaper model; the expensive one buys nothing and this is the kind of run that moves the most bytes.
+
 Orient the person, then hand off. This skill never does the work itself.
 
 ## Pre-flight

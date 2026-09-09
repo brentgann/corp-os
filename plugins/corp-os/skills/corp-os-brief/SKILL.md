@@ -5,6 +5,8 @@ description: Produces the recurring operating brief for a Corp-OS knowledge base
 
 # Corp-OS brief
 
+> **Mixed pass** — assembling what moved is bookkeeping; choosing the single action is not. Worth the better model, and worth keeping the mechanical half in scripts so the model is paying for the judgment rather than the typing.
+
 The operating rhythm. The specific fix for the person whose last knowledge system died of neglect: a recurring moment where the OS is read rather than only written to.
 
 A brief is short. If it runs past a screen, it has become a report and will stop being read.

@@ -5,6 +5,8 @@ description: Produces a shareable version of anything leaving a Corp-OS knowledg
 
 # Corp-OS redact
 
+> **Judgment pass** — the reasoning is the product here. Run it on your best model, and do not economise by skipping the questions it asks.
+
 Produces two outputs, always: a cleaned copy safe to share, and a private log of every removal with its reason. The log is what makes this reviewable rather than a black box, and it is the difference between redaction and quiet deletion.
 
 Never modify the original in place. `raw/` in particular is append-only and must survive this untouched.

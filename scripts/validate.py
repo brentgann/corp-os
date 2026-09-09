@@ -303,6 +303,42 @@ def main():
                     "those changes reach nobody — bump the version in both "
                     "manifests, or squash them into the bump commit.")
 
+    # --- every skill declares what kind of pass it is
+    #
+    # A real intake run cost $40 because a mechanical pass -- fetching forty
+    # transcripts and writing them back out -- ran on the most expensive model
+    # available, and nothing in twenty-three skills said which ones are filing
+    # and which are reasoning. The declaration is for the person choosing, and
+    # for corp-os-guide when it routes.
+    # capture is what decides a run's cost, so it is documented and honoured
+    cfgdoc = open("reference/configuration.md", encoding="utf-8").read()
+    for term, why in (("\"capture\"", "the block that caps what a run fetches"),
+                      ("Verbatim fetch", "the connector field that decides "
+                       "whether skipping an item defers it or destroys it")):
+        if term not in cfgdoc:
+            err(f"reference/configuration.md does not document {term} — {why}")
+    pl = open("skills/corp-os-pull/SKILL.md", encoding="utf-8").read()
+    if "batch" not in pl or "list first" not in pl:
+        err("corp-os-pull no longer caps the pass or lists before fetching. "
+            "That is the instruction that made one intake run cost more than "
+            "the connector it pulled from")
+
+    PASSES = ("Mechanical pass", "Mixed pass", "Judgment pass")
+    for d in sorted(names):
+        path = f"skills/{d}/SKILL.md"
+        if not os.path.exists(path):
+            continue
+        body = open(path, encoding="utf-8").read()
+        found = [k for k in PASSES if f"> **{k}" in body]
+        if not found:
+            err(f"{d}: declares no pass type. One of {', '.join(PASSES)} as a "
+                "blockquote under the title — a skill that does not say whether "
+                "it is filing or reasoning gets run on whatever model is loaded, "
+                "and the mechanical ones are the ones that move real bytes")
+        elif len(found) > 1:
+            err(f"{d}: declares {len(found)} pass types ({', '.join(found)}). "
+                "It is one of the three.")
+
     # --- version parity between the plugin and the marketplace manifest
     mkt_path = os.path.join(ROOT, ".claude-plugin", "marketplace.json")
     if os.path.exists(mkt_path):

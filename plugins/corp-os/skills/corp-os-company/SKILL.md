@@ -5,6 +5,8 @@ description: Researches and maintains company context in a Corp-OS knowledge bas
 
 # Corp-OS company
 
+> **Judgment pass** — the reasoning is the product here. Run it on your best model, and do not economise by skipping the questions it asks.
+
 Company context is the material people re-explain and re-look-up more than anything else, and it is also the category where recalled knowledge is most confidently wrong. Funding rounds close, pricing pages get rewritten, leadership turns over, strategies reverse.
 
 Read `${CLAUDE_PLUGIN_ROOT}/reference/company-research.md` before starting.

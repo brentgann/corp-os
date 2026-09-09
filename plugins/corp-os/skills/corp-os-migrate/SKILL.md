@@ -5,6 +5,8 @@ description: Brings an existing body of work into a Corp-OS — a previous knowl
 
 # Corp-OS migrate
 
+> **Judgment pass** — the reasoning is the product here. Run it on your best model, and do not economise by skipping the questions it asks.
+
 Setup builds an empty OS. This fills one from work that already exists, which is a different act with different failure modes — and it is what almost every real first day looks like, because someone who wants a knowledge system usually has six months of notes and a wiki they are tired of.
 
 Read `${CLAUDE_PLUGIN_ROOT}/reference/claim-record.md` and `${CLAUDE_PLUGIN_ROOT}/reference/data-model.md` before starting, and the OS's own `README.md` if it has one.

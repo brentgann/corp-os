@@ -5,6 +5,8 @@ description: Brings an existing Corp-OS up to date with a newer version of the p
 
 # Corp-OS upgrade
 
+> **Mechanical pass** — comparing files and copying the ones that differ. Little here is a judgment call, so run it on a cheaper model; the expensive one buys nothing and this is the kind of run that moves the most bytes.
+
 Updating the plugin does not update anyone's OS.
 
 Every Corp-OS carries its own copies of the shipped scripts, because an OS should keep working when the plugin is not loaded, and because sixteen skills call them at the OS path rather than the plugin path. The cost of that is this skill. When `build_index.py` was fixed in 0.10.1 to count a single-file layer correctly, every OS created before it kept the copy that counts wrong, and nothing would ever have said so.

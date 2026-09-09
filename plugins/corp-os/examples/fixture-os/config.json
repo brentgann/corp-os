@@ -192,5 +192,10 @@
       "usage/",
       "sensitive.md"
     ]
+  },
+  "capture": {
+    "mode": "triaged",
+    "batch": 10,
+    "note": "triaged is safe only where the connector exposes a verbatim fetch; pull captures everything from sources that do not"
   }
 }

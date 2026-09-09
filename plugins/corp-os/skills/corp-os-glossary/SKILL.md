@@ -5,6 +5,8 @@ description: Builds and maintains the glossary in a Corp-OS knowledge base — i
 
 # Corp-OS glossary
 
+> **Judgment pass** — the reasoning is the product here. Run it on your best model, and do not economise by skipping the questions it asks.
+
 The fastest-paying part of a work OS, and the most neglected. Every organization runs on vocabulary that is nowhere written down: an acronym three teams define differently, a metric whose formula lives in one analyst's head, a role name that means something specific here and something else everywhere else.
 
 The glossary is also what makes the rest of the OS portable across roles. This suite ships no domain vocabulary on purpose — the terms come entirely from the person's own captured material.

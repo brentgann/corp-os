@@ -5,6 +5,8 @@ description: Analyzes how a Corp-OS knowledge base is actually being used — fr
 
 # Corp-OS improve
 
+> **Judgment pass** — the reasoning is the product here. Run it on your best model, and do not economise by skipping the questions it asks.
+
 The OS watches how it gets used and reshapes itself from evidence. This is what stops a personal knowledge system from being frozen at whatever its owner guessed on day one.
 
 The discipline that makes this skill worth running: **every proposal carries a count.** A hunch about what would be nicer is worth less than one line of the usage log, because a hunch is how the previous system got over-built.

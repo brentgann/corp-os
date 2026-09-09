@@ -26,12 +26,24 @@ input to corp-os-improve.
 
 import argparse
 import json
+import re
 import os
 import sys
 from datetime import date
 
-HEADER = ("| date | skill | scope | friction |\n"
-          "|---|---|---|---|\n")
+HEADER = ("| date | skill | model | volume | scope | friction |\n"
+          "|---|---|---|---|---|---|\n")
+
+# Cost was invisible for sixteen releases: a run that moved forty transcripts
+# through the model and one that answered a question left identical rows, so
+# corp-os-improve could rank skills by friction and by nothing else. A real
+# intake run cost $40 and the log recorded it the same as a $0.40 recall.
+#
+# What is recorded is what can be MEASURED, not what can be claimed. A model
+# cannot observe its own token count, so writing one here would be the exact
+# fabrication this suite refuses everywhere else. Bytes written are measurable,
+# they are the output half of the bill, and output is priced several times
+# input -- so raw/ bytes track the dominant cost closely enough to rank by.
 
 
 def main():
@@ -47,6 +59,17 @@ def main():
     ap.add_argument("--event", default=None,
                     help="dated meta.json history entry. Omit only when the "
                          "run changed nothing on disk")
+    ap.add_argument("--model", default=None,
+                    help="the model this run used. Recorded, never inferred — "
+                         "it is how a mechanical pass running on an expensive "
+                         "model becomes visible in the log rather than in a bill")
+    ap.add_argument("--wrote", nargs="*", default=[],
+                    help="files this run created or rewrote, relative to the OS "
+                         "root. Their size is measured here rather than "
+                         "estimated: bytes written are the output half of the "
+                         "cost, and output is the expensive half")
+    ap.add_argument("--items", type=int, default=None,
+                    help="how many source items the run processed")
     ap.add_argument("--os-root", default=".")
     a = ap.parse_args()
 
@@ -65,10 +88,45 @@ def main():
     existing = ""
     if os.path.exists(log):
         existing = open(log, encoding="utf-8").read()
+    if "| date | skill | scope |" in existing:
+        # A log written before 0.17 has four columns. Widen the old rows rather
+        # than starting a second table: corp-os-improve reads the whole file,
+        # and two tables under one heading is a parsing problem it should never
+        # have to have.
+        out = []
+        for ln in existing.split("\n"):
+            if ln.startswith("| date | skill | scope |"):
+                out.append(HEADER.split("\n")[0])
+            elif re.match(r"^\|\s*-+\s*\|", ln):
+                out.append(HEADER.split("\n")[1])
+            elif re.match(r"^\|\s*\d{4}-\d{2}-\d{2}\s*\|", ln):
+                c = ln.split("|")
+                out.append("|".join(c[:3] + [" - ", " - "] + c[3:]))
+            else:
+                out.append(ln)
+        existing = "\n".join(out)
     if "| date |" not in existing:
         existing = (existing.rstrip() + "\n\n" if existing.strip() else
                     "# Usage log\n\n") + HEADER
-    row = (f"| {today} | {a.skill} | {a.scope.replace('|', '/')} "
+    # Volume: measured from disk, so it cannot be wrong in the flattering
+    # direction. A run that names no files and no items records "-", which is
+    # honest and still distinguishes it from one that moved a megabyte.
+    written = 0
+    for rel in a.wrote:
+        try:
+            written += os.path.getsize(os.path.join(root, rel))
+        except OSError:
+            pass
+    bits = []
+    if a.items is not None:
+        bits.append(f"{a.items} item{'' if a.items == 1 else 's'}")
+    if written:
+        bits.append(f"{written / 1024:.0f}KB written" if written >= 1024
+                    else f"{written}B written")
+    volume = " · ".join(bits) or "-"
+
+    row = (f"| {today} | {a.skill} | {a.model or '-'} | {volume} "
+           f"| {a.scope.replace('|', '/')} "
            f"| {a.friction.replace('|', '/')} |\n")
     with open(log, "w", encoding="utf-8") as f:
         f.write(existing.rstrip("\n") + "\n" + row)

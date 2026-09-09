@@ -5,6 +5,8 @@ description: Takes material a person pastes, uploads, or hands over directly —
 
 # Corp-OS intake
 
+> **Mechanical pass** — filing what it is handed: name it, tag it, write it, recount. Little here is a judgment call, so run it on a cheaper model; the expensive one buys nothing and this is the kind of run that moves the most bytes.
+
 Most real context does not arrive through an API. Someone pastes a thread, forwards a doc, or types a note after a hallway conversation. That material deserves the same discipline as a connector pull: filed as-is, typed correctly, job-tagged, and never treated as reviewed knowledge until a person says so.
 
 Read `${CLAUDE_PLUGIN_ROOT}/reference/records.md` for the raw file shape and `${CLAUDE_PLUGIN_ROOT}/reference/data-model.md` for the two-layer rule.
@@ -47,6 +49,12 @@ Two cases worth distinguishing:
 
 - **Accidental re-paste.** Ask; do not write a second file.
 - **A second person's capture of the same event.** Write one file and note the second capture explicitly in the source line. Two captures of one conversation are not two pieces of evidence, and treating them as such is how confidence gets quietly inflated.
+
+## Step 2.5 — if it is more than a handful, cap the pass
+
+`capture.batch` in `config.json` applies here too. Someone handing over a folder of forty documents is the same run as an uncapped pull, and it costs the same. File up to `batch`, report what remains, and offer the next pass.
+
+Where the material is a bundle rather than one item, list it first — names, dates, kinds — and confirm what is in scope before reading any of it in full.
 
 ## Step 3 — file it
 

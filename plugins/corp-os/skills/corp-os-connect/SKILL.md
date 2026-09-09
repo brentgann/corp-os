@@ -5,6 +5,8 @@ description: Registers a data source in a Corp-OS knowledge base — establishin
 
 # Corp-OS connect
 
+> **Mixed pass** — recording the protocol and cadence is bookkeeping; the blind-spots question is not. Worth the better model, and worth keeping the mechanical half in scripts so the model is paying for the judgment rather than the typing.
+
 Configures and audits what feeds the OS. This skill establishes the contract; `corp-os-pull` executes against it.
 
 Read the connector registry section of `${CLAUDE_PLUGIN_ROOT}/reference/records.md` and the plugin's `CONNECTORS.md` for how tool categories work.

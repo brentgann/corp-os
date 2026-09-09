@@ -5,6 +5,8 @@ description: Regenerates the entire derived layer of a Corp-OS knowledge base â€
 
 # Corp-OS rebuild
 
+> **Mixed pass** â€” re-deriving from raw is bookkeeping; splitting, merging and retiring is not. Worth the better model, and worth keeping the mechanical half in scripts so the model is paying for the judgment rather than the typing.
+
 The one operation permitted to restructure the derived layer, because none of it is destructive: `raw/` is untouched and the derived layer was always meant to be regenerable.
 
 Read `${CLAUDE_PLUGIN_ROOT}/reference/data-model.md` and the OS's own `README.md` (its conventions win over the shipped spec).

@@ -5,6 +5,8 @@ description: Retrieves new material from the sources registered in a Corp-OS kno
 
 # Corp-OS pull
 
+> **Mechanical pass** — fetch, dedupe, write, recount. Little here is a judgment call, so run it on a cheaper model; the expensive one buys nothing and this is the kind of run that moves the most bytes.
+
 Executes against the connector registry. Writing to `raw/` is autonomous; everything downstream of that is proposed.
 
 Read `${CLAUDE_PLUGIN_ROOT}/reference/records.md` for the raw file shape and `${CLAUDE_PLUGIN_ROOT}/reference/data-model.md` for the two-layer rule.
@@ -25,9 +27,22 @@ Then decide scope with the person if it is not obvious: all sources, or one? Sin
 
 If nothing is registered, stop and point at `corp-os-connect`.
 
-## Step 1 — pull, source by source
+## Step 1 — list before you fetch
 
-For each in-scope source, retrieve everything since its cutoff. Handle each source's failure honestly: if a connector is missing, unauthorized, or erroring, mark it `broken` in `connectors.md` with the specific failure and **carry on with the other sources**. One dead connector must not abort the run.
+Read `capture` in `config.json`: `mode` is `triaged` (the default) or `all`, and `batch` caps how many items one pass writes.
+
+**Retrieve the list first, never the contents.** Titles, dates, participants, `external_id` — tens of tokens per item instead of thousands. That list is enough to dedupe, enough to see what the window actually held, and enough to decide what is worth capturing. Fetching forty bodies to discover that six mattered is the single most expensive thing this suite can do, and it was the default for sixteen releases.
+
+- **`triaged`** — present the list with a proposed keep or skip and a one-line reason each, and fetch nothing until a person confirms. Most weeks a minority of items carry anything the derived layer will ever cite; the rest are standing meetings that produced no decision and threads that resolved themselves.
+- **`all`** — fetch every body. Legitimate when the archive itself is the point, and it should be a decision somebody made rather than a default they inherited.
+
+**One rule overrides the mode, and it uses a field the connector already carries.** Triage is safe when the source can be fetched back verbatim, because a skipped item is still retrievable — that is exactly what `Verbatim fetch` in `connectors.md` records. **For a source whose connector says no verbatim fetch, capture everything regardless of mode.** Skipping there is not deferring, it is losing it, and this model's whole position is that raw material is the one thing nothing else can rebuild.
+
+Say the consequence out loud the first time triage runs on a source: under `triaged`, `raw/` stops being a complete archive of the source and becomes a complete archive of what was chosen. That is a real trade and the person should make it knowingly.
+
+**Never exceed `batch` in one pass.** Report what remains and offer the next. The first run after a holiday is the worst case and the one nobody sizes.
+
+For each in-scope source, retrieve what triage kept, since its cutoff. Handle each source's failure honestly: if a connector is missing, unauthorized, or erroring, mark it `broken` in `connectors.md` with the specific failure and **carry on with the other sources**. One dead connector must not abort the run.
 
 Never work around a blocked or unavailable source by other means. Record it as broken and move on.
 
@@ -43,7 +58,9 @@ Three distinct cases, and they need different handling:
 
 One file per source item, named `YYYY-MM-DD--<source>--<slug>.md`, with the full frontmatter from the spec: `source`, `person`, `also_present`, `date`, `type`, `jobs`, `tags`, `external_id`, `processed: false`.
 
-Content goes in essentially as retrieved. **Do not summarize, condense, or rewrite.** This skill places and tags material; the derived layer is where interpretation happens, and a summary written at intake time cannot be re-derived later.
+Content goes in essentially as retrieved. **Do not summarize, condense, or rewrite.**
+
+Write each file in one operation and **never quote its content back in the run summary** — report the filename, the gist line and the counts. Content that passes through twice costs twice, and the second pass buys nothing a person will read. This skill places and tags material; the derived layer is where interpretation happens, and a summary written at intake time cannot be re-derived later.
 
 For `jobs`: infer from participants, subject, and each job's evidence list. Tag generously — a raw file serving three jobs should list three. When nothing matches, leave it empty rather than forcing a job; unassigned raw material is a normal and useful state.
 

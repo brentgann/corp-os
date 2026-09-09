@@ -5,6 +5,8 @@ description: Interrogates someone about their role, mandate, jobs to be done, va
 
 # Corp-OS setup
 
+> **Judgment pass** — the reasoning is the product here. Run it on your best model, and do not economise by skipping the questions it asks.
+
 Interrogate first, scaffold second. The interrogation is the deliverable as much as the folder is — a scaffold built without it produces a generic notebook that gets abandoned in a month.
 
 Read `${CLAUDE_PLUGIN_ROOT}/reference/data-model.md` and `${CLAUDE_PLUGIN_ROOT}/reference/interrogation.md` before starting. Read `${CLAUDE_PLUGIN_ROOT}/reference/jtbd-patterns.md` when working on jobs in area 3.

@@ -192,6 +192,22 @@ The model itself is specified in `reference/data-model.md`. Improvement packets 
 
 ## Version history
 
+**0.17.0** — the release that came from a bill. A single intake run over two connectors cost **$40**, and none of the sixteen prior releases would have caught it, because nothing in the system could see cost at all.
+
+**The most expensive sentence in the plugin was correct.** `corp-os-pull` said *"Content goes in essentially as retrieved. Do not summarize, condense, or rewrite"* — right for fidelity, and the only way a model can honour it is to re-emit every byte of every transcript as output, at several times the price of reading it. Paired with *"retrieve everything since its cutoff"* and no cap anywhere, one run reads the whole window and types it all back. Forty meetings at ~6k tokens is 240k in and 240k out before anything is proposed.
+
+It is also this repo's own rule broken in the largest case it has: **moving bytes from a connector into a file is bookkeeping, not judgment.** Nine other always-required mechanical steps were moved into scripts. This one never was, because it does not look like a step — it looks like content.
+
+**Capture is now a config block.** `capture.mode` is `triaged` (default) or `all`, and `capture.batch` caps items per pass in both pull and intake. Triaged retrieves the **list** first — titles, dates, participants, ids, tens of tokens per item instead of thousands — proposes keep or skip with a reason, and fetches bodies only for what a person confirms.
+
+**One rule overrides the mode and it reads a field the connector registry already carried.** Triage is safe only where the source can be fetched back verbatim, because a skipped item is deferred rather than lost — which is exactly what `Verbatim fetch` records. For a source without one, pull captures everything regardless of mode. The registry was built for this in 0.9 and nobody finished the thought.
+
+**Every skill now declares what kind of pass it is** — mechanical, mixed, or judgment — because twenty-three skills said nothing about it and the filing ones were running on the most expensive model available. Four are mechanical, five mixed, fourteen judgment; the validator fails a skill that declares none or more than one.
+
+**And the usage log records cost.** `log_run.py` takes `--model`, `--items` and `--wrote`, and **measures** the bytes of the files it is given rather than accepting a claimed number — a model cannot observe its own token count, and writing one would be the fabrication this suite refuses everywhere else. Bytes written are the output half of the bill, which is the expensive half. A four-column log from an earlier release is widened in place rather than restarted, because `corp-os-improve` reads the whole file.
+
+Deferred deliberately: getting the bytes out of the model entirely, by declaring a runnable `fetch` on the connector and dispatching it from a script. That is the one that takes capture cost to roughly zero, and it needs a credential contract and a per-source fetcher, which belongs in a pack rather than in a content-agnostic plugin.
+
 **0.16.0** — a cost release. Nothing about what the model decides changed; what it has to read to decide it did.
 
 **`data-model.md` was one 6,857-word file that seventeen of twenty-three skills loaded in full.** Most of them for one section: `corp-os-connect` needed the connector registry, 118 words, and paid for all 6,857. The claim record alone was 3,737 words, 55% of the file. It is now three — a spine (layer rules, directory shape, the scan contract), `claim-record.md`, and `records.md` for the job, decision, raw file, connector, usage log and `meta.json` shapes. Measured per skill: `connect` 6,857 → 1,279 reference words, `decide` and `recall` the same, `jobs` 7,915 → 2,337, `rebuild` and `redact` 6,857 → 1,962. Roughly **6,000 tokens off a typical run**, with no behavior change at all. The validator now names which file each schema field belongs in, rather than accepting it anywhere: a field that drifts into the spine is invisible to the skills that need it, which is the failure the split exists to fix.
