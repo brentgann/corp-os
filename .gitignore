@@ -2,6 +2,12 @@
 dist/
 *.plugin
 
+# the printed skill map -- a render of a file that regenerates itself. The
+# README says it is deliberately not committed; this is that rule enforced
+# rather than stated, because a binary in the tree is the one artifact here
+# nothing could check for staleness.
+docs/skill-map.pdf
+
 # os / editor
 .DS_Store
 Thumbs.db

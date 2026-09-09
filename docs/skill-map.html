@@ -546,6 +546,19 @@ footer{margin-top:40px; padding-top:18px; border-top:1px solid var(--line-soft);
   </div>
 </section>
 
+<section class="layer">
+  <div class="eyebrow">Getting it</div>
+  <h2>Two things are called &ldquo;update&rdquo; and they are not the same</h2>
+  <p>Updating the plugin replaces the skills. Updating your OS brings the folder those skills operate on in line with them &mdash; its copies of the shipped scripts above, the version it records, and any shape change the release implies. <strong>Doing the first does nothing to the second</strong>, because an OS carries its own copies so that it still works when the plugin is not loaded. That is the whole reason <span class="mono">corp-os-upgrade</span> exists.</p>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Do this</th><th>To</th></tr></thead>
+      <tbody><tr><td class="mono">/plugin marketplace add brentgann/corp-os</td><td class="dim">Point your client at this repository&rsquo;s marketplace manifest</td></tr><tr><td class="mono">/plugin install corp-os@brentgann</td><td class="dim">Install the plugin. In the desktop app, use the plugin browser rather than the slash command</td></tr><tr><td class="mono">/plugin marketplace update brentgann</td><td class="dim">Refetch. This is the update that replaces <em>the skills</em></td></tr><tr><td class="mono">ask for corp-os-upgrade</td><td class="dim">The other update: refresh the script copies inside your OS, stamp the version, and name the migrations it refuses to perform for you</td></tr></tbody>
+    </table>
+  </div>
+  <p>One thing that catches maintainers as often as users: a client caches an installed plugin <strong>by version string</strong>, so commits pushed without a bump in <span class="mono">plugin.json</span> reach nobody &mdash; no error, no warning, nothing to inspect from the inside. The full procedure is in <span class="mono">docs/INSTALL.md</span>.</p>
+</section>
+
 <section class="notes">
   <div class="eyebrow">Maintainer notes &mdash; skip if you are here to use it</div>
   <h2>What is measured, and what is not</h2>

@@ -229,6 +229,28 @@ def eval_numbers():
     return out
 
 
+def install_ids():
+    """The three strings an install command needs, read rather than typed.
+
+    A page that hard-codes `/plugin install corp-os@brentgann` is a fourth
+    copy of two names that already exist in two manifests, and the whole
+    argument of this generator is that a fourth copy goes stale.
+    """
+    manifest = json.load(open(os.path.join(
+        PLUGIN, ".claude-plugin", "plugin.json"), encoding="utf-8"))
+    mkt = json.load(open(os.path.join(
+        ROOT, ".claude-plugin", "marketplace.json"), encoding="utf-8"))
+    repo = (manifest.get("repository") or "").rstrip("/")
+    slug = repo.split("github.com/")[-1]
+    if slug.endswith(".git"):
+        slug = slug[:-4]
+    if not slug or "/" not in slug:
+        die("plugin.json has no usable `repository` — the install command on "
+            "the page is built from it rather than typed, so a missing one "
+            "would ship an install line that does not work")
+    return {"plugin": manifest["name"], "market": mkt["name"], "slug": slug}
+
+
 def gather():
     d = {}
     d["version"] = json.load(open(os.path.join(
@@ -290,6 +312,7 @@ def gather():
                            glob.glob(os.path.join(PLUGIN, "examples", "fixture-*")))
     d["invariants"] = invariants()
     d["evals"] = eval_numbers()
+    d["install"] = install_ids()
     return d
 
 
@@ -365,6 +388,23 @@ def render(d, fragment=False):
     scr_rows = "".join(
         f'<tr><td class="mono">{E(s["name"])}</td><td class="dim">{E(s["doc"])}</td>'
         f'<td class="dim">{E(s["where"])}</td></tr>' for s in d["scripts"])
+
+    ins = d["install"]
+    ins_rows = "".join(
+        f'<tr><td class="mono">{E(cmd)}</td><td class="dim">{why}</td></tr>'
+        for cmd, why in (
+            (f"/plugin marketplace add {ins['slug']}",
+             "Point your client at this repository&rsquo;s marketplace manifest"),
+            (f"/plugin install {ins['plugin']}@{ins['market']}",
+             "Install the plugin. In the desktop app, use the plugin browser "
+             "rather than the slash command"),
+            (f"/plugin marketplace update {ins['market']}",
+             "Refetch. This is the update that replaces <em>the skills</em>"),
+            ("ask for corp-os-upgrade",
+             "The other update: refresh the script copies inside your OS, "
+             "stamp the version, and name the migrations it refuses to "
+             "perform for you"),
+        ))
 
     inv = " &middot; ".join(E(x) for x in d["invariants"])
 
@@ -450,6 +490,19 @@ def render(d, fragment=False):
       <tbody>{scr_rows}</tbody>
     </table>
   </div>
+</section>
+
+<section class="layer">
+  <div class="eyebrow">Getting it</div>
+  <h2>Two things are called &ldquo;update&rdquo; and they are not the same</h2>
+  <p>Updating the plugin replaces the skills. Updating your OS brings the folder those skills operate on in line with them &mdash; its copies of the shipped scripts above, the version it records, and any shape change the release implies. <strong>Doing the first does nothing to the second</strong>, because an OS carries its own copies so that it still works when the plugin is not loaded. That is the whole reason <span class="mono">corp-os-upgrade</span> exists.</p>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Do this</th><th>To</th></tr></thead>
+      <tbody>{ins_rows}</tbody>
+    </table>
+  </div>
+  <p>One thing that catches maintainers as often as users: a client caches an installed plugin <strong>by version string</strong>, so commits pushed without a bump in <span class="mono">plugin.json</span> reach nobody &mdash; no error, no warning, nothing to inspect from the inside. The full procedure is in <span class="mono">docs/INSTALL.md</span>.</p>
 </section>
 
 <section class="notes">
