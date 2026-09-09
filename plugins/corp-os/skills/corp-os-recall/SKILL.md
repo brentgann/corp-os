@@ -31,6 +31,18 @@ Never load `raw/`. Open a raw file only to check a specific citation the person 
 
 Most questions resolve from the indexes alone. If they routinely do not, the indexes have drifted — note that as friction in the usage log, because it is a structural problem `corp-os-improve` should see.
 
+**When step 4 would mean opening a whole file to find part of it, narrow first.**
+
+```bash
+python3 scripts/find.py --topic <term> --digest     # one line per match
+python3 scripts/find.py --job job-004               # the matches, in full
+python3 scripts/find.py --id CL-0042 --id CL-0044
+```
+
+A topic file holding forty entries costs all forty to answer a question about one, and the index grows with the corpus while the answer does not. `find.py` returns the matches instead of the files containing them, and `--digest` gives one line each — enough to decide which of them you actually need in full. It reads both entry encodings, refuses an unscoped search, and never returns from `proposals/`, so nothing unreviewed arrives wearing the same shape as something confirmed.
+
+Selecting by id, job, topic, confidence or decay state is bookkeeping. What the matches mean is not, and that stays here.
+
 ## Step 1 — read the question for its job
 
 Ask which job this serves, or infer it. This is the relevance filter that makes recall better than search: "what do we know about pricing" is unanswerable in the abstract, but "what do we know about pricing that bears on the Acme renewal" has a real answer.
@@ -93,7 +105,7 @@ One line. The most useful next action given what the answer exposed — a specif
 
 Sometimes the answer you just assembled is not a lookup — it is a **conclusion built across several entries**, with something to do about it and a moment after which doing it stops helping. No shipped layer holds that: an entry is one fact with one citation, a topic file asserts nothing on its own, and a decision is a fork with an owner and a date.
 
-If this OS declares an arguments layer, offer to keep it, per `${CLAUDE_PLUGIN_ROOT}/reference/data-model.md`: the conclusion, the so-what, the timing, and `Rests on` naming the entries it depends on. **Inherit the weakest confidence** of what it rests on — an argument built on eleven `needs_review` entries is `needs_review` however convincing it reads.
+If this OS declares an arguments layer, offer to keep it, per `${CLAUDE_PLUGIN_ROOT}/reference/records.md`: the conclusion, the so-what, the timing, and `Rests on` naming the entries it depends on. **Inherit the weakest confidence** of what it rests on — an argument built on eleven `needs_review` entries is `needs_review` however convincing it reads.
 
 Offer it rarely. In the OS this came from, 23 across six months and 220 sources — and 13 of those 23 were later marked `spent`, which is the reason the layer is worth having at all. A layer that accumulates and never retires is a layer nobody trusts.
 

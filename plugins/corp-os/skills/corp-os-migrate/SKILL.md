@@ -7,7 +7,7 @@ description: Brings an existing body of work into a Corp-OS — a previous knowl
 
 Setup builds an empty OS. This fills one from work that already exists, which is a different act with different failure modes — and it is what almost every real first day looks like, because someone who wants a knowledge system usually has six months of notes and a wiki they are tired of.
 
-Read `${CLAUDE_PLUGIN_ROOT}/reference/data-model.md` before starting, and the OS's own `README.md` if it has one.
+Read `${CLAUDE_PLUGIN_ROOT}/reference/claim-record.md` and `${CLAUDE_PLUGIN_ROOT}/reference/data-model.md` before starting, and the OS's own `README.md` if it has one.
 
 ## Pre-flight
 
@@ -47,7 +47,7 @@ Each item becomes a file in `raw/` under the shipped naming shape, with frontmat
 
 **Use the original date, never today's.** The date is what makes elapsed time recoverable, and elapsed time is the primary ranking signal for everything about what has not been settled. One audited migration stamped every item with its migration date and lost six months of age in a single pass, with nothing recording that it had happened.
 
-Where an item carries an instruction that overrides where its derived content should live — *"this stays out of her person record"* — write `placement:` into that raw file's frontmatter now, per `${CLAUDE_PLUGIN_ROOT}/reference/data-model.md`. An instruction that lives only in a derived file is an instruction a rebuild will not read.
+Where an item carries an instruction that overrides where its derived content should live — *"this stays out of her person record"* — write `placement:` into that raw file's frontmatter now, per `${CLAUDE_PLUGIN_ROOT}/reference/claim-record.md`. An instruction that lives only in a derived file is an instruction a rebuild will not read.
 
 ## Step 3 — set the cohort ceiling before minting a single claim
 

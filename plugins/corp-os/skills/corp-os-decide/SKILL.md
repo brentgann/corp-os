@@ -9,7 +9,7 @@ A claim of kind `decision` records a call that was already made. This skill carr
 
 The distinction is the whole reason this layer exists. **A decision nobody is tracking does not feel like a problem — it feels like flexibility**, right up until the option that mattered has expired and the choice was made by default. That is the specific thing this skill is here to prevent, and it is why every open decision carries a date.
 
-Read the decision record section of `${CLAUDE_PLUGIN_ROOT}/reference/data-model.md`.
+Read the decision record section of `${CLAUDE_PLUGIN_ROOT}/reference/records.md`.
 
 ## Pre-flight
 

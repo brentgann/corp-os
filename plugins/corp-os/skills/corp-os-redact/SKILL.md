@@ -72,7 +72,7 @@ When generalizing would make a claim meaningless, remove it and say in the log t
 
 Redacting on the way out is necessary and not sufficient. A `sensitive` entry sitting inline in a topic file still loads on every scan, still gets read over a shoulder, and still travels the next time that file is shared by someone who did not run this skill.
 
-When the sweep finds sensitive content living inline in the derived layer, ask first whether it is `incidental` or `load_bearing` — see the two-axis model in `${CLAUDE_PLUGIN_ROOT}/reference/data-model.md`. Only `incidental` material gets quarantined. Moving a `load_bearing` entry out of the scan path does not protect anything (redaction already does that) and it makes every later answer wrong in a way nobody can see, which is the failure this model exists to prevent.
+When the sweep finds sensitive content living inline in the derived layer, ask first whether it is `incidental` or `load_bearing` — see the two-axis model in `${CLAUDE_PLUGIN_ROOT}/reference/claim-record.md`. Only `incidental` material gets quarantined. Moving a `load_bearing` entry out of the scan path does not protect anything (redaction already does that) and it makes every later answer wrong in a way nobody can see, which is the failure this model exists to prevent.
 
 For `incidental` material, propose moving it to `sensitive.md` — the quarantine file deliberately outside the scan path — leaving a one-line pointer behind so continuity is not lost:
 

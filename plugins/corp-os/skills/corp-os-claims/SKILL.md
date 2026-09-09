@@ -7,7 +7,7 @@ description: Turns raw material in a Corp-OS knowledge base into reviewed, citab
 
 The claims layer is what separates a Corp-OS from a tagged archive. A claim is a short statement that has been looked at by a person and carries enough provenance that a future reader — including a future version of the person who wrote it — can tell how much to trust it and when to re-check it.
 
-Read the claim record section of `${CLAUDE_PLUGIN_ROOT}/reference/data-model.md` before writing anything.
+Read `${CLAUDE_PLUGIN_ROOT}/reference/claim-record.md` before writing anything. The layer rules and the scan contract are in `${CLAUDE_PLUGIN_ROOT}/reference/data-model.md`; you do not need them to mint a claim.
 
 ## Pre-flight
 
@@ -62,7 +62,7 @@ Filing an assumption as a fact is the single most damaging error available here,
 
 **Sensitivity and bearing.** Two fields, not one, and they answer different questions. `sensitivity` is the export class — what must not leave. `bearing` is whether the OS can reason correctly without it: `incidental` if removing it makes an answer thinner, `load_bearing` if removing it makes an answer *wrong*.
 
-Set both at proposal time. **When bearing is genuinely unclear, write `load_bearing`** — a wrongly quarantined fact produces confidently wrong answers with nothing to signal the omission, while a wrongly retained one just gives `corp-os-redact` more to strip. Full reasoning in `${CLAUDE_PLUGIN_ROOT}/reference/data-model.md`; the short version is that sensitivity governs what leaves, not what the person is allowed to know.
+Set both at proposal time. **When bearing is genuinely unclear, write `load_bearing`** — a wrongly quarantined fact produces confidently wrong answers with nothing to signal the omission, while a wrongly retained one just gives `corp-os-redact` more to strip. Full reasoning in `${CLAUDE_PLUGIN_ROOT}/reference/claim-record.md`; the short version is that sensitivity governs what leaves, not what the person is allowed to know.
 
 **Decay.** Ask "when would this need re-checking?" and write the interval. Pricing, headcount, org structure, roadmap, competitive positioning: 30 to 90 days. Someone's role or a customer's architecture: a year. A stated principle, a contract term, a fiscal calendar: `none`.
 

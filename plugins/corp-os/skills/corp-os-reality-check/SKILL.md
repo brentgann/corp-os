@@ -7,7 +7,7 @@ description: Sweeps a Corp-OS knowledge base for knowledge that has drifted from
 
 Every personal knowledge system degrades the same way: not by being wrong at the moment of capture, but by staying unchanged while the world moves. This skill is the correction loop, and it works by interrogation — the person is the only available source of ground truth for most of what needs checking.
 
-Read the claim record section of `${CLAUDE_PLUGIN_ROOT}/reference/data-model.md`.
+Read `${CLAUDE_PLUGIN_ROOT}/reference/claim-record.md`.
 
 ## Pre-flight
 

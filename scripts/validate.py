@@ -581,16 +581,29 @@ def main():
 
 
     # --- the 0.14 schema rules.
-    dm = open("reference/data-model.md", encoding="utf-8").read()
-    for term, why in (
-            ("Source fidelity", "the medium split out of confidence"),
-            ("Retrievable", "the derived flag that makes the promotion "
+    #
+    # Named per file, not searched across all three. 0.16 split the data model
+    # into a spine plus two record specs so a skill reads only what it needs,
+    # and a check that accepts a field anywhere would not notice one drifting
+    # into the file whose readers never open it -- which is the whole failure
+    # the split was performed to fix.
+    SPEC = {f: open("reference/" + f, encoding="utf-8").read()
+            for f in ("data-model.md", "claim-record.md", "records.md")}
+    for term, where, why in (
+            ("Source fidelity", "claim-record.md", "the medium split out of confidence"),
+            ("Retrievable", "claim-record.md", "the derived flag that makes the promotion "
                             "backlog visible"),
-            ("Confidence reason", "the sibling field that replaced the "
+            ("Confidence reason", "claim-record.md", "the sibling field that replaced the "
                                   "rejected suffix"),
-            ("Rests on", "the dependency field the arguments layer needs")):
-        if term not in dm:
-            err(f"reference/data-model.md does not document `{term}` — {why}")
+            ("Rests on", "claim-record.md", "the dependency field the arguments layer needs"),
+            ("append-only", "data-model.md", "the first invariant, stated where every "
+                            "skill's pre-flight can reach it"),
+            ("external_id", "records.md", "the raw-file field dedupe reads")):
+        if term not in SPEC[where]:
+            elsewhere = [f for f, tx in SPEC.items() if f != where and term in tx]
+            err(f"reference/{where} does not document `{term}` — {why}"
+                + (f" (it is in {elsewhere[0]}, whose readers are a different set "
+                   "of skills)" if elsewhere else ""))
 
     # A reason must never be written INTO an enum value. Everything downstream
     # equality-tests confidence, so `needs_review — because x` breaks the
@@ -688,6 +701,41 @@ def main():
     # reference/patterns.md says the script is the artifact and the output is
     # its product. Asserting a pattern binds proves the frontmatter parses; it
     # says nothing about whether the thing it points at works.
+    # --- find.py returns matches, not files, and reads BOTH entry encodings
+    #
+    # A corpus stores entries two ways -- many per file as `### ID` blocks with
+    # bold-label fields, and one per file with YAML frontmatter -- and both are
+    # legitimate. A reader that handles only the first returns a confident,
+    # quiet zero for every layer using the second, which is exactly how the
+    # 0.15.0 evidence generator shipped reporting "0 open decisions" against a
+    # fixture holding two. So the check asserts a match from each encoding.
+    fp = "examples/fixture-os/scripts/find.py"
+    if not os.path.exists(fp):
+        err(f"{fp} is missing — it is in SHIPPED, so an OS is supposed to carry it")
+    else:
+        rf = subprocess.run(
+            [sys.executable, os.path.abspath(fp), "--root",
+             os.path.abspath("examples/fixture-os"), "--topic", "pricing", "--digest"],
+            capture_output=True, text=True, timeout=60)
+        out = rf.stdout or ""
+        if rf.returncode != 0:
+            err(f"find.py failed on the fixture: {(rf.stderr or out).strip()[:200]}")
+        if "CL-0001" not in out:
+            err("find.py found no `### ID` block entry for a topic the fixture "
+                "plainly holds — the many-entries-per-file encoding is not read")
+        if "dec-001" not in out:
+            err("find.py found no frontmatter entry (dec-001 is a mid-market "
+                "pricing decision). A reader that handles one encoding answers "
+                "zero for every layer using the other, and says nothing about it")
+        rs = subprocess.run(
+            [sys.executable, os.path.abspath(fp), "--root",
+             os.path.abspath("examples/fixture-os")],
+            capture_output=True, text=True, timeout=60)
+        if rs.returncode == 0:
+            err("find.py accepted an unscoped search. Returning the whole corpus "
+                "is what INDEX.md is for, and doing it here costs the caller "
+                "every entry to answer a question about one")
+
     gen = "examples/fixture-os/scripts/build_initiative_evidence.py"
     if not os.path.exists(gen):
         err(f"{gen} is missing — the doc pattern names it as its generator, "
@@ -707,7 +755,7 @@ def main():
                 "this brief stands outside the stale-grounding view")
 
     # --- the 0.12 rules, each checked because each was invisible before.
-    dm = open("reference/data-model.md", encoding="utf-8").read()
+    dm = SPEC["claim-record.md"]
     if "placement:" not in dm:
         err("reference/data-model.md does not document `placement:` — the "
             "override that a rebuild reads instead of destroying a commitment")

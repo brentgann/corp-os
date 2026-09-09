@@ -7,7 +7,7 @@ description: Retrieves new material from the sources registered in a Corp-OS kno
 
 Executes against the connector registry. Writing to `raw/` is autonomous; everything downstream of that is proposed.
 
-Read `${CLAUDE_PLUGIN_ROOT}/reference/data-model.md` for the raw file shape and the two-layer rule.
+Read `${CLAUDE_PLUGIN_ROOT}/reference/records.md` for the raw file shape and `${CLAUDE_PLUGIN_ROOT}/reference/data-model.md` for the two-layer rule.
 
 ## Pre-flight
 

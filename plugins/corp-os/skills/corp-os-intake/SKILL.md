@@ -7,7 +7,7 @@ description: Takes material a person pastes, uploads, or hands over directly —
 
 Most real context does not arrive through an API. Someone pastes a thread, forwards a doc, or types a note after a hallway conversation. That material deserves the same discipline as a connector pull: filed as-is, typed correctly, job-tagged, and never treated as reviewed knowledge until a person says so.
 
-Read `${CLAUDE_PLUGIN_ROOT}/reference/data-model.md` for the raw file shape and the two-layer rule.
+Read `${CLAUDE_PLUGIN_ROOT}/reference/records.md` for the raw file shape and `${CLAUDE_PLUGIN_ROOT}/reference/data-model.md` for the two-layer rule.
 
 ## Pre-flight
 
@@ -76,7 +76,7 @@ Read the material against the open evidence lists and say plainly whether it mov
 
 Then write the proposal to `proposals/PROPOSAL-<date>-<slug>.md` and present it — each claim with full provenance and an explicit recommendation (enrich an existing claim, create a new one, flag a conflict, decline). Hand the writing to `corp-os-claims`.
 
-**If the person gives an instruction about where derived content may live** — *"this stays out of her person record"*, *"file it but leave no pointer"* — write it into the raw file's frontmatter as `placement:`, per `${CLAUDE_PLUGIN_ROOT}/reference/data-model.md`. An instruction recorded only in a derived file, or only in the conversation, is one a rebuild will not read: regeneration is schema-driven, so it faithfully re-derives the content the person asked you not to produce. That is the one failure in this suite that destroys a commitment rather than degrading an answer, and the override has to live with the source it governs.
+**If the person gives an instruction about where derived content may live** — *"this stays out of her person record"*, *"file it but leave no pointer"* — write it into the raw file's frontmatter as `placement:`, per `${CLAUDE_PLUGIN_ROOT}/reference/claim-record.md`. An instruction recorded only in a derived file, or only in the conversation, is one a rebuild will not read: regeneration is schema-driven, so it faithfully re-derives the content the person asked you not to produce. That is the one failure in this suite that destroys a commitment rather than degrading an answer, and the override has to live with the source it governs.
 
 **If the material's natural shape does not fit any layer that exists**, do not force it into a claim just because `claims/` is what is there. A directory of people, a set of live decisions, a register of obligations — each has its own shape, and a claim distorts it. Hand off to `corp-os-configure` to declare the layer properly first, then come back and propose entries into it.
 

@@ -1,6 +1,6 @@
 {
   "name": "corp-os",
-  "version": "0.15.0",
+  "version": "0.16.0",
   "description": "A portable, configurable personal work OS. Interrogates you at setup, ingests meetings, transcripts and documents, builds citable claims you can refine against reality, answers recall queries with provenance, and renders dashboards. Layer names, vocabulary, decay windows, retention policy and review-gate strictness are all configurable, and you can declare layers the model never imagined.",
   "author": {
     "name": "Brent Gann"

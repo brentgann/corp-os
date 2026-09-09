@@ -24,14 +24,34 @@ import sys
 F = "^[-*]?\\s*\\*\\*{f}\\*\\*\\s*:\\s*(.+?)\\s*$"
 
 
+# Two entry encodings, both legitimate: `### ID` blocks with bold-label fields,
+# and one-entry-per-file with YAML frontmatter. This generator shipped reading
+# only the first, so every decisions layer answered a confident zero.
+FM = re.compile(r"^---\s*\n(.*?)\n---\s*\n", re.S)
+
+
 def field(body, name):
     m = re.search(F.format(f=name), body, re.I | re.M)
-    return m.group(1).strip() if m else ""
+    if m:
+        return m.group(1).strip()
+    fm = FM.match(body)
+    if fm:
+        key = name.strip().lower().replace(" ", "_")
+        for ln in fm.group(1).split("\n"):
+            if ":" not in ln or ln.startswith((" ", "\t", "#")):
+                continue
+            k, v = ln.split(":", 1)
+            if k.strip().lower() == key:
+                return v.strip().strip('"').strip("'").strip("[]")
+    return ""
 
 
 def blocks(path, marker="### "):
+    text = open(path, encoding="utf-8", errors="replace").read()
+    if FM.match(text):
+        return [(field(text, "id") or os.path.basename(path)[:-3], text)]
     out, cur, buf = [], None, []
-    for ln in open(path, encoding="utf-8", errors="replace").read().split("\n"):
+    for ln in text.split("\n"):
         if ln.startswith(marker):
             if cur:
                 out.append((cur, "\n".join(buf)))

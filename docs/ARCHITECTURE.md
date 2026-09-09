@@ -590,6 +590,35 @@ One check earned its keep immediately. The first negative test of the generator 
 The design decision inside the check is *when* it fires. Reading the working tree would make it red during normal editing, and a check that is red while someone works is one everybody learns to ignore — the same reasoning that removed the `note`-key warning in 0.12.0. So it reads committed history only: find the newest commit still carrying the current version, and fail if anything under `plugins/corp-os/` has been committed after it. That is quiet during the work and loud between committing and pushing, which is the only moment the answer can still change.
 
 
+### 4.43 Seventeen skills read one file for one section of it
+
+**Decision (0.16.0):** `data-model.md` splits into a spine, `claim-record.md` and `records.md`.
+
+The house style says a skill states the reason for every non-obvious instruction, and that is right for a skill: it is read once, under pressure, by something that will otherwise rationalize the rule away. A **reference spec re-read on every run has different economics**, and nobody had priced it. `data-model.md` reached 6,857 words carrying the reasoning for every field it defines, and seventeen skills named it. `corp-os-connect` needs 118 words of connector registry.
+
+The split is mechanical and the enforcement is not. A check that accepted a schema field *anywhere* in the three files would not notice one drifting into the spine, whose readers are a different set of skills — so the check names the file each field belongs to and, when it misses, says which file it found it in instead. That is the difference between a check that guards the split and one that merely counts words.
+
+The trim is deliberately not done here. Moving the *why* out of the reference and into this file is a further cut of roughly 2,500 words from the claim record, and it is a judgment about what a maintainer needs at runtime versus what belongs in the record. Worth doing; worth doing separately from a refactor that changed nothing.
+
+### 4.44 The scan contract is correct and does not scale
+
+**Decision (0.16.0):** `find.py`, the eleventh shipped script.
+
+`INDEX.md` → layer index → detail file is the right order to *look*. It is the wrong unit to *read*. A question about one entry costs the file that contains it — 156 tokens per claim on a real shape, so a forty-entry topic file costs all forty — and the index is read on every run while growing linearly with the corpus. Neither cost is visible until the corpus is large, at which point it is the dominant per-run expense and structural.
+
+`find.py` applies the rule this repo has applied nine times already: **selecting by id, job, topic, confidence or decay state is bookkeeping; what the matches mean is judgment.** It returns matches rather than files, and `--digest` renders one line per entry at about a fifth the cost — usually enough to decide which ones are needed in full.
+
+Two refusals are load-bearing. It rejects an unscoped search, because returning the corpus is what the index is for. And it never returns from `proposals/`: unreviewed material arriving in the same shape as reviewed material is the exact failure the gate exists to prevent, and a search tool is the easiest place to reintroduce it by accident.
+
+### 4.45 Two entry encodings, and a reader that silently saw half
+
+**Found while building §4.44.** A corpus stores entries two ways, both legitimate and both in the shipped fixture: many per file as `### ID — statement` blocks with bold-label fields, and one per file with its fields in YAML frontmatter. `build_index.py` has always handled both. The evidence generator shipped in 0.15.0 handled one.
+
+Against a fixture holding two open decisions it reported **"0 open decisions"**. No error, no warning, and the number looked plausible enough that it passed review — including mine, in the release notes. It surfaced only because a second tool was written over the same corpus and disagreed.
+
+The general form is worth naming: **a reader that silently halves its input is worse than one that crashes**, because the output is well-formed and the omission is invisible. It is the same class as the harness that never ran a script (§4.27) and the dashboards registry that counted 1 for five releases (§4.24) — correct-looking output produced by a component that was never exercised against the case it got wrong. The validator now asserts a match from each encoding, which is the cheapest possible guard and would have caught it on the day.
+
+
 ## 5. The skills
 
 | Skill | Job |

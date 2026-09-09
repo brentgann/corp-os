@@ -7,7 +7,7 @@ description: Registers a data source in a Corp-OS knowledge base — establishin
 
 Configures and audits what feeds the OS. This skill establishes the contract; `corp-os-pull` executes against it.
 
-Read the connector registry section of `${CLAUDE_PLUGIN_ROOT}/reference/data-model.md` and the plugin's `CONNECTORS.md` for how tool categories work.
+Read the connector registry section of `${CLAUDE_PLUGIN_ROOT}/reference/records.md` and the plugin's `CONNECTORS.md` for how tool categories work.
 
 ## Pre-flight
 
