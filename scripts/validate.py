@@ -191,8 +191,10 @@ def main():
                         "OS — every layer but the source archive is optional")
 
     # --- stated counts match the headings that follow them
-    WORDNUM = {"three": 3, "four": 4, "five": 5, "six": 6, "seven": 7,
-               "eight": 8, "nine": 9, "ten": 10, "eleven": 11, "twelve": 12}
+    WORDNUM = {"one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6,
+               "seven": 7, "eight": 8, "nine": 9, "ten": 10, "eleven": 11,
+               "twelve": 12, "thirteen": 13, "fourteen": 14, "fifteen": 15,
+               "sixteen": 16, "seventeen": 17, "eighteen": 18, "nineteen": 19}
     for path, pattern, counter in (
         ("skills/corp-os-reality-check/SKILL.md",
          r"worklist in (\w+) buckets", lambda tx: len(re.findall(r"^\d+\. \*\*", tx, re.M))),
@@ -207,6 +209,57 @@ def main():
             stated, actual = WORDNUM[m2.group(1).lower()], counter(tx)
             if stated != actual:
                 err(f"{path}: says {m2.group(1)} but there are {actual}")
+
+    # --- the roster count, wherever a README states it in words
+    #
+    # Both READMEs said a number of skills and both were wrong: nineteen three
+    # releases after there were twenty-three, and twenty-one two after. It is
+    # the same defect as the hard-coded version, the prose list of shipped
+    # scripts, and the hand-kept skill map -- a fact that is already true on
+    # disk, retyped somewhere that nothing recounts.
+    #
+    # Scoped to the live prose, never the version history: "corp-os-pattern is
+    # the twenty-third skill" is a claim about the past and stays true.
+    TENS = {"twenty": 20, "thirty": 30, "forty": 40, "fifty": 50}
+
+    def wordnum(w):
+        """Written out, because that is how the prose says it. A count in
+        digits would be easier to check and would read like a changelog."""
+        w = w.lower()
+        if w in WORDNUM:
+            return WORDNUM[w]
+        if w in TENS:
+            return TENS[w]
+        if "-" in w:
+            a, b = w.split("-", 1)
+            if a in TENS and b in WORDNUM and WORDNUM[b] < 10:
+                return TENS[a] + WORDNUM[b]
+        return None
+
+    for path, pattern in (
+        (os.path.join(ROOT, "README.md"), r"the ([a-z]+(?:-[a-z]+)?) skills that operate on it"),
+        (os.path.join(ROOT, "README.md"), r"live in ([a-z]+(?:-[a-z]+)?) skill files"),
+        ("README.md", r"plus ([a-z]+(?:-[a-z]+)?) skills that operate on it"),
+    ):
+        if not os.path.exists(path):
+            err(f"{path}: gone — the roster count was stated here and nothing "
+                "else checks it")
+            continue
+        tx = open(path, encoding="utf-8").read().split("## Version history")[0]
+        m2 = re.search(pattern, tx)
+        if not m2:
+            err(f"{os.path.relpath(path, ROOT)}: the sentence stating how many "
+                f"skills there are no longer matches /{pattern}/ — either fix "
+                "the sentence or drop this check, but do not leave a count "
+                "nothing recounts")
+            continue
+        stated = wordnum(m2.group(1))
+        if stated is None:
+            err(f"{os.path.relpath(path, ROOT)}: cannot read {m2.group(1)!r} "
+                "as a number")
+        elif stated != len(names):
+            err(f"{os.path.relpath(path, ROOT)}: says {m2.group(1)} skills, "
+                f"but there are {len(names)} on disk")
 
     # --- version parity between the plugin and the marketplace manifest
     mkt_path = os.path.join(ROOT, ".claude-plugin", "marketplace.json")

@@ -44,22 +44,26 @@ corp-os/
 │   ├── README.md                     # user-facing; the "what and why"
 │   ├── CONNECTORS.md                 # tool-category conventions
 │   ├── commands/*.md                 # 8 slash commands over the daily path
-│   ├── skills/<name>/SKILL.md        # 21 skills
-│   ├── reference/*.md                # 9 shared specs, referenced via ${CLAUDE_PLUGIN_ROOT}
-│   ├── scripts/build_index.py        # shipped into each user's OS
-│   ├── scripts/write_export.py       # ditto -- redaction's two outputs, together
-│   ├── scripts/log_run.py            # ditto -- the log row and history entry, together
-│   ├── scripts/delete_source.py      # ditto -- the five-step retention deletion
+│   ├── skills/<name>/SKILL.md        # 23 skills
+│   ├── reference/*.md                # 10 shared specs, referenced via ${CLAUDE_PLUGIN_ROOT}
+│   ├── scripts/*.py                  # 11 -- 9 of them copied into each user's OS
+│   │                                 #   scaffold.py and upgrade_os.py are the two that
+│   │                                 #   are not: a stale upgrader cannot report itself stale
 │   └── examples/
 │       ├── config-worked-example.json  # a real config, anonymized
-│       └── fixture-os/                 # a synthetic OS the build runs the script against
-├── evals/                            # two harnesses -- routing and conformance -- and every run
+│       ├── fixture-os/                 # a synthetic OS the build runs the script against
+│       ├── fixture-register/           # jobs off, renamed vocabulary, a rebuild trap
+│       └── fixture-stale/              # two releases behind, asserted to STAY broken
+├── evals/                            # three harnesses -- commands, routing, conformance -- and every run
 ├── scripts/validate.py               # pre-package checks
+├── scripts/build_skill_map.py        # regenerates docs/skill-map.html from the plugin
 ├── build.sh                          # validate + package to dist/corp-os.plugin
+├── docs/INSTALL.md                   # installing, both kinds of update, and releasing
+├── docs/skill-map.html               # generated; validate.py fails if it has drifted
 └── docs/ARCHITECTURE.md              # this file
 ```
 
-**Conventions.** `Corp-OS` is the product name in prose; `corp-os-*` is the identifier form for skills and never gets title-cased. **All twenty-one skills carry the prefix** — `improve-corp-os` was renamed to `corp-os-improve` in 0.6.0, because the prefix is what lets someone guess a skill name instead of consulting the guide, and one exception costs that for the whole suite. Reference files are shared across skills and addressed as `${CLAUDE_PLUGIN_ROOT}/reference/<file>.md` — never a relative path, which breaks once the plugin is installed elsewhere.
+**Conventions.** `Corp-OS` is the product name in prose; `corp-os-*` is the identifier form for skills and never gets title-cased. **All twenty-three skills carry the prefix** — `improve-corp-os` was renamed to `corp-os-improve` in 0.6.0, because the prefix is what lets someone guess a skill name instead of consulting the guide, and one exception costs that for the whole suite. Reference files are shared across skills and addressed as `${CLAUDE_PLUGIN_ROOT}/reference/<file>.md` — never a relative path, which breaks once the plugin is installed elsewhere.
 
 **`build.sh` gotcha, already handled:** it zips to a temp dir and copies in with `cat >` rather than `mv`. Synced and mounted filesystems commonly permit writes but refuse deletes, and `mv -f` needs an unlink.
 
@@ -537,6 +541,22 @@ Step 1.5 was added and the check went to **2/2**. Nothing about this was visible
 
 What is left unmeasured, said plainly rather than papered over: whether the backlog is *framed* as actionable. That is a quality judgment about an answer and this harness cannot see it. The safety-critical half — nothing promoted without an actual fetch — is checkable, and has held on every run.
 
+### 4.39 The version pin, and the two things called "update"
+
+**Decision (0.14.1):** `docs/INSTALL.md`, and a version bump for a documentation-only change.
+
+Two failures sit in the same place and neither announces itself.
+
+**The first is the pin.** A client caches an installed plugin by **version string**, at `~/.claude/plugins/cache/<marketplace>/<plugin>/<version>/`, and a cache hit never touches the network. So a release that ships new commits without bumping `plugin.json` reaches nobody: no error, no warning, and nothing the person running it could inspect to find out. It is the worst shape of failure this project keeps meeting — correct on the maintainer's disk, wrong everywhere else, and silent in both directions. The rule it produces is one line: **the version is bumped on every release, or the release did not happen.** That is also why this documentation change has a version. `plugins/corp-os/README.md` ships *inside* the plugin, so correcting it without a bump would have corrected it for nobody, which would have been a joke at the expense of the file being added.
+
+**The second is the ambiguity in the word.** §4.26 established that updating the plugin updates nothing inside anyone's OS, and shipped `corp-os-upgrade` to close it. What it did not do was say so anywhere a person looks *before* they have a problem. The install instructions were four lines pointing at a `.plugin` file — which, checked against the client's actual documented surface, is not an install path at all. `dist/corp-os.plugin` is a zip of the plugin directory: useful for proving the package is well-formed and for attaching an exact copy to a release, and not something any client installs. Telling people to install it was telling them to do something that does not work.
+
+So `docs/INSTALL.md` leads with the distinction rather than burying it: **updating the plugin replaces the skills; updating your OS brings the folder in line with them; doing the first does nothing to the second.** Both READMEs now carry the short form and link to it.
+
+**And two stated counts had gone stale, which is this project's oldest defect showing up again.** The repository README said nineteen skills three releases after there were twenty-three; the plugin README said twenty-one. The list is now long enough to be its own argument: *"both shipped scripts"* three releases after there were four, a hard-coded version stale within one release, `corpos_version` in six files with six values, a registry that counted 1 for five releases, a skill map that §4.28 caught before it shipped, and now two README sentences that were not caught at all. Every one is a fact that was already true on disk, retyped somewhere nothing recounts. `validate.py` counts the skill directories and reads the number out of the prose, and it fails on drift in either direction — including when the sentence is reworded so the pattern stops matching, because a check that silently stops checking is the same defect one level up. Two skills were also missing from the plugin README's own tables: shipped, described in the version history, and absent from the list somebody actually reads.
+
+The alternative was to generate the counts the way `docs/skill-map.html` is generated. Rejected for prose: a README whose sentences are assembled reads like a changelog, and the sentence *"a folder of markdown files plus twenty-three skills that operate on it"* is doing rhetorical work that a rendered number would not. Checking a hand-written sentence keeps the prose and removes the drift, which is the right trade wherever the prose is the point.
+
 ## 5. The skills
 
 | Skill | Job |
@@ -648,14 +668,15 @@ Recorded so they do not get re-proposed.
 2. Update **every skill that touches the changed behavior.** Cross-cutting rules live in many files by design; grep before assuming one edit covers it.
 3. **If the change makes something optional, grep for everywhere that assumed it.** §4.10 is what happens when this step is skipped.
 4. Update the plugin **`README.md` version history** with what changed and why. `validate.py` fails without an entry for the shipped version.
-5. Run `python3 scripts/validate.py`, then `./build.sh`.
-6. **A wording change means `evals/run_commands.py`** — a minute, and it is the only loop short enough to actually use while writing.
-7. **Negative-test any check you add.** Reintroduce the defect, confirm the check fires, restore. A check that has never been seen to fail is not a check.
-8. **An instruction that touches a source layer means grepping the invariant it sits under.** "Never edited" and "flip `processed: true`" both shipped for four releases and could not both be true. A contradiction like that does not announce itself; it gets read in whichever direction the reader arrives from. See §4.15.
-9. **Adding a skill means placing it on the map.** `scripts/build_skill_map.py` will not render until the new skill is in a phase or on the workbench, and `validate.py` runs it. Everything else on that page regenerates itself.
-10. **Changing a skill's behavior means adding or rerunning its conformance case** — `python3 evals/run_conformance.py --case <id>`. If the skill has no case, that is the moment to write one.
-11. **Adding or rewording a skill description means rerunning `evals/run_routing.py`.** Add coverage queries for the new skill and at least one query that should route *elsewhere* but sits near it. `corp-os-decide` shipped with a description that swallowed two other skills' queries and it took the eval, not review, to see it.
-12. If the change came from real use, write an **improvement packet** per `reference/improvement-packet.md` — and apply its config test first: *if it could have been a config setting, it is not a model change.*
+5. **Bump the version in both manifests, even for a documentation change to the plugin.** The client caches an installed plugin by version string, so new commits without a bump reach nobody, silently. `validate.py` fails if the two version fields disagree; nothing anywhere fails if you forget to move them together. `docs/INSTALL.md` is the full procedure and the file to hand somebody who asks how to install or update this.
+6. Run `python3 scripts/validate.py`, then `./build.sh`.
+7. **A wording change means `evals/run_commands.py`** — a minute, and it is the only loop short enough to actually use while writing.
+8. **Negative-test any check you add.** Reintroduce the defect, confirm the check fires, restore. A check that has never been seen to fail is not a check.
+9. **An instruction that touches a source layer means grepping the invariant it sits under.** "Never edited" and "flip `processed: true`" both shipped for four releases and could not both be true. A contradiction like that does not announce itself; it gets read in whichever direction the reader arrives from. See §4.15.
+10. **Adding a skill means placing it on the map.** `scripts/build_skill_map.py` will not render until the new skill is in a phase or on the workbench, and `validate.py` runs it. Everything else on that page regenerates itself.
+11. **Changing a skill's behavior means adding or rerunning its conformance case** — `python3 evals/run_conformance.py --case <id>`. If the skill has no case, that is the moment to write one.
+12. **Adding or rewording a skill description means rerunning `evals/run_routing.py`.** Add coverage queries for the new skill and at least one query that should route *elsewhere* but sits near it. `corp-os-decide` shipped with a description that swallowed two other skills' queries and it took the eval, not review, to see it.
+13. If the change came from real use, write an **improvement packet** per `reference/improvement-packet.md` — and apply its config test first: *if it could have been a config setting, it is not a model change.*
 
 ---
 

@@ -2,7 +2,7 @@
 
 A portable, configurable personal work OS.
 
-Most personal knowledge systems are organized by subject: a folder per topic, a note per person. They only ever grow, nothing in them ever expires, and after a few months nobody trusts them enough to look. Corp-OS is a folder of markdown files plus twenty-one skills that operate on it, and its shape is declared rather than assumed — layer names, label vocabulary, decay windows, retention and gate strictness all live in a `config.json` that every skill reads first.
+Most personal knowledge systems are organized by subject: a folder per topic, a note per person. They only ever grow, nothing in them ever expires, and after a few months nobody trusts them enough to look. Corp-OS is a folder of markdown files plus twenty-three skills that operate on it, and its shape is declared rather than assumed — layer names, label vocabulary, decay windows, retention and gate strictness all live in a `config.json` that every skill reads first.
 
 Its default organizing primitive is the **job** — the concrete outcome someone is trying to reach — with subjects hanging off jobs. That default is worth understanding before adopting it, and worth turning off when it does not fit; see "It is a default profile, not a schema" below.
 
@@ -44,6 +44,7 @@ That last field is what makes drift correctable on a schedule instead of by acci
 | `corp-os-guide` | Explains the system and routes to the right skill |
 | `corp-os-setup` | Interrogates you across nine areas, then scaffolds an OS shaped to the answers |
 | `corp-os-configure` | Reshape it later — rename vocabulary, add a custom layer, set decay or retention, tune the gate |
+| `corp-os-migrate` | Bring an existing body of work across — cohort ceiling, original dates, staggered decay, a record of what was left behind |
 
 **Define the work**
 
@@ -76,6 +77,7 @@ That last field is what makes drift correctable on a schedule instead of by acci
 | `corp-os-recall` | Answer with citations, and enrich whatever you are working on |
 | `corp-os-dashboard` | Publish views of what the OS actually holds |
 | `corp-os-brief` | The recurring operating brief; schedulable |
+| `corp-os-pattern` | Turn an output you built into a portable spec, or adopt a teammate's pack, so five people's dashboards stop being five dashboards |
 
 **Keep it honest**
 
@@ -114,6 +116,26 @@ Or just ask for Corp-OS setup. The interrogation takes fifteen to twenty minutes
 
 The interrogation is the deliverable as much as the folder is. A scaffold built without it produces a generic notebook that gets abandoned in a month.
 
+## Installing, and the two things called "update"
+
+```
+/plugin marketplace add brentgann/corp-os
+/plugin install corp-os@brentgann
+```
+
+Then ask for Corp-OS setup. In the desktop app, use the plugin browser rather than the slash command.
+
+Updating has two halves and doing the first does nothing to the second:
+
+```
+/plugin marketplace update brentgann     # replaces the skills
+ask for corp-os-upgrade                  # brings your OS in line with them
+```
+
+Every Corp-OS carries its own copies of the shipped scripts, so that it keeps working when the plugin is not loaded and because sixteen skills call them at the OS path. That is why updating the plugin has never updated anyone's OS, and why `corp-os-upgrade` exists: it refreshes those copies by comparing content rather than dates, records the version, and names the structural migrations it deliberately refuses to perform.
+
+One thing that surprises people, including maintainers: the client caches an installed plugin **by version string**. New commits without a bump in `plugin.json` reach nobody, with no error and no way to tell from the inside. Full detail, including the release procedure, is in the repository's `docs/INSTALL.md`.
+
 ## Design principles
 
 **The model argues against itself where the evidence says so.** `corp-os-audit` refuses to score outcome-orientation from the absence of a jobs layer without running the clustering test, and refuses to recommend decay without first checking whether entries can be re-verified at all. A model that only ever confirms itself is not measuring anything.
@@ -148,6 +170,7 @@ The model itself is specified in `reference/data-model.md`. Improvement packets 
 | `reference/interrogation.md` | The nine-area setup question bank |
 | `reference/jtbd-patterns.md` | Job statement forms, malformed shapes and their repairs |
 | `reference/dashboard-patterns.md` | Which views are worth building, and what makes them go stale |
+| `reference/patterns.md` | The pattern shape, the binding contract, the screen-share shield, and the composition rules every rendering pattern inherits |
 | `reference/company-research.md` | What to establish about a company, and how to source it |
 | `reference/improvement-packet.md` | The interchange format for improving the model |
 | `reference/os-audit-rubric.md` | The ten audit dimensions |
@@ -162,11 +185,18 @@ The model itself is specified in `reference/data-model.md`. Improvement packets 
 | `scripts/check_citations.py` | Clusters entries by citation; refuses an export whose members disagree on sensitivity |
 | `scripts/stagger_decay.py` | Spreads a migrated corpus's decay windows so the first sweep is clearable |
 | `scripts/upgrade_os.py` | Refreshes the script copies an OS carries, stamps the version, names the migrations it will not perform |
+| `scripts/scaffold.py` | Builds an OS from the interrogation's answers, and copies the nine scripts an OS carries |
 | `examples/fixture-os/` | A synthetic OS the build actually runs `build_index.py` against |
 | `commands/` | Eight slash commands over the daily path — see below |
-| `evals/` | Two harnesses — does the right skill get reached, and does it do what it says |
+| `evals/` | Three harnesses — do the commands read distinctly, does the right skill get reached, and does it do what it says |
 
 ## Version history
+
+**0.14.1** — documentation, and it gets a version number for the reason the documentation is about. The client caches an installed plugin **by version string**: same version, different content, and every existing install keeps the old copy with no error and no way to tell from the inside. This README ships inside the plugin, so correcting it without a bump would have corrected it for nobody — which is the exact failure `docs/INSTALL.md` was written to name.
+
+Two counts had gone stale in the way this project keeps catching: the repository README said nineteen skills three releases after there were twenty-three, and this one said twenty-one. Both are now checked by `validate.py` against the directories on disk rather than trusted, because a number typed by hand next to a number that changes is a defect with a delay on it. `corp-os-migrate` and `corp-os-pattern` were also missing from the skill tables here — shipped, documented in the version history, and absent from the list somebody actually reads.
+
+`docs/INSTALL.md` is the new file, and its first sentence is the thing that keeps costing people a session: **there are two updates and they are not the same operation.** Updating the plugin replaces the skills; updating your OS brings the folder in line with them, and nothing about doing the first does the second. It covers the install paths that are actually supported (the marketplace; `--plugin-dir` for working on it) and says plainly that installing the packaged bundle directly is not one of them — `dist/corp-os.plugin` is a build artifact, not a distribution channel.
 
 **0.14.0** — the schema work, and the first release where an existing OS has to change shape. Which is why the mechanism for it was built three releases ago: `corp-os-upgrade` has always named migrations and refused to perform them, and 0.14 is the first time it has any to name.
 
