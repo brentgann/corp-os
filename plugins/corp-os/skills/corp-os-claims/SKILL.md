@@ -111,6 +111,16 @@ Statements can be sharpened, citations added, decay adjusted, jobs re-linked. Tw
 - **Never edit a citation.** It is a quotation. If it was wrong, the claim was wrong — retire and replace.
 - **Log any confidence change** in the claim's `Verified` field with the date and what changed it. A claim that quietly became `confirmed` is indistinguishable from one that was always guessed at.
 
+## Source fidelity is read, not judged
+
+Set `Source fidelity` — `verbatim | summary | reconstructed | absent` — from the **source's** record in `connectors.md`, not from an assessment of the entry. It is a property of the medium, which is why it can be read rather than decided, and why deciding it per entry would be wrong.
+
+`absent` when the citation is the sanctioned `no source` literal. Nothing can ever re-confirm those, so they are a one-time disposition pass rather than decay candidates, and `corp-os-reality-check` handles them as their own bucket.
+
+This is not confidence. Confidence is evidentiary standing; fidelity is how faithful the recording is. Keeping them separate is what makes *"summary, and the transcript is still fetchable"* expressible — and that sentence is the difference between a ceiling people work through and one they treat as permanent.
+
+Where a confidence value needs a reason, write `Confidence reason` as its own field. Never inside the value: everything downstream equality-tests that string.
+
 ## Stamp the proposal with its outcome
 
 After review, write the result back into the proposal file as a header — what was accepted, what was declined, what changed during the conversation, and the date. Then say plainly in the file that it is a record rather than a live list.

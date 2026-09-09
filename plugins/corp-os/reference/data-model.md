@@ -174,6 +174,7 @@ Claims live grouped by topic in `claims/<topic-slug>.md`, one block each:
 - **Kind**: fact          # fact | decision | theme | assumption | constraint | metric | preference
 - **Jobs**: job-004
 - **Confidence**: confirmed   # confirmed | needs_review | reconstructed | disputed | retired
+- **Source fidelity**: verbatim   # verbatim | summary | reconstructed | absent
 - **Sensitivity**: internal   # public | internal | sensitive
 - **Source**: raw/2026-09-02--granola--acme-qbr.md — Dana Chen (Acme), 2026-09-02
 - **Citation**: "Honestly the seat math is the only thing my CFO is going to push back on."
@@ -186,6 +187,16 @@ Field notes that matter:
 
 - **Kind** separates what is observed from what is chosen from what is guessed. Conflating a `fact` with an `assumption` is the single most common way one of these systems starts lying to its owner.
 - **Confidence** is about evidentiary standing, not importance. `confirmed` means verbatim or corroborated. `needs_review` means inferred, single-mention, or ambiguous. `reconstructed` means backfilled from a summary rather than a real source. `disputed` means live evidence points both ways — keep both sides visible rather than picking a winner. `retired` means no longer true; kept, not deleted, so the record of having believed it survives.
+- **Source fidelity** is a property of the claim's relationship to its source, and it is not confidence. One enum was carrying three independent questions: how faithful is the *medium* (was this a quote, a paraphrase, a reconstruction, or is the original gone), how many independent sources exist, and is the claim contested. Two of those are about evidence and one is about the recording, and collapsing them makes a specific thing invisible.
+
+  Measured, in a real corpus: **599 of 836 claims** were single-source summaries parked one step below the top confidence value, and the config documented two routes upward — a second independent recording, or pulling the verbatim transcript through the same connector that produced the summary. The second is one API call. **Zero claims had taken it.** Meanwhile 60 claims sat lower still because their source genuinely no longer exists, and nothing in the record distinguished the two populations. A ceiling that is *elective* looked exactly like a ceiling that is *permanent*, so it got treated as permanent.
+
+  Separating the medium out fixes that: `summary` plus a source whose connector exposes a verbatim fetch is a **visible, sortable backlog of claims one call from promotion**. `absent` is a claim nothing can ever re-confirm, which belongs in a one-time disposition pass rather than a decay window.
+
+- **Retrievable** is derived, never written. A claim is retrievable when its source's record in `connectors.md` says that connector exposes a verbatim fetch. Deriving it means it cannot go stale the way a hand-set flag would, and it means disconnecting a source correctly changes the promotion backlog rather than leaving a field lying.
+
+- **Confidence reason** and **Sensitivity reason** are optional free-text siblings, never suffixes on the value. `needs_review` covers three situations — the source is thin, two readings genuinely compete, and a paraphrase cannot satisfy a verbatim requirement — and a sweep cannot triage them apart. Writing the reason *inside* the value (`needs_review — explicitly an open unknown`) was proposed and rejected: everything that reads confidence equality-tests that string, including `build_index.py`, the export emitter, every ceiling rule and every eval assertion. A sibling field carries the same information at no migration cost.
+
 - **Decay** is what makes "refine data that has drifted from reality" mechanical instead of a vibe. A pricing claim rots in a quarter; a claim about a person's job title rots in a year; "our fiscal year starts in February" is `none`. `corp-os-reality-check` works this field.
 - **Citation** is a verbatim excerpt, always. A paraphrase in the citation field defeats the purpose, because the next reader cannot tell how much of the claim is the source and how much is the summarizer.
 
@@ -230,6 +241,64 @@ These get tracked as claims of kind `identity` and resolved deliberately, never 
 - **When resolved, record the resolution and every place it propagated.** Not just "these two names are one person," but which files were corrected and whether the resolution changed anything else — an alias that turns out to describe someone leaving a *role* rather than the organization may also mean an entry was over-flagged as sensitive.
 
 Where the OS declares a `people` layer, its records carry an `aliases` list for this. An unresolved identity question is a normal state and belongs on a job's evidence list.
+
+### The arguments layer — optional, and offered rather than scaffolded
+
+A claim is one fact with one citation. A topic file is narrative that asserts nothing on its own. A decision is a fork with an owner and a date. None of them can hold: *here is a conclusion built across eleven entries, here is what to do about it, and here is when doing it stops being useful.*
+
+```markdown
+### AR-0007 — The middle of the funnel is where the drop-off actually is
+- **So what**: Stop instrumenting the top. Move the next two weeks of work to the hand-off.
+- **Timing**: useful until the Q1 plan locks; after that it is a retrospective
+- **Status**: live            # live | spent | stale
+- **Rests on**: CL-0142, CL-0155, CL-0201, CL-0233
+- **Confidence**: needs_review   # inherit the weakest of what it rests on
+```
+
+**`rests_on` is rendered as two numbers, never one.** `4 entries / 3 sources`. The count of supporting entries reads as evidence breadth and does not measure it: entries are minted at whatever granularity a pass chose, so a source that yielded nine contributes nine and a source that yielded one contributes one. Measured, in a real corpus: one argument rested on **nine entries that all traced to a single meeting**. Nine entries from one conversation is one data point, and the number looked like breadth.
+
+`corp-os-reality-check` flags any argument whose distinct-source count is 1. Not wrong, necessarily — an argument resting on one conversation is a different object from one resting on nine, and only the record can tell them apart.
+
+**Inherit the weakest.** An argument's confidence is the lowest confidence among what it rests on. An argument built on eleven `needs_review` entries is `needs_review`, however convincing it reads.
+
+**Why optional.** It is a decision-heavy and orientation-role structure. A build-heavy operator would write two a year and the layer would read as overhead, so `corp-os-setup` offers it rather than scaffolding it.
+
+**Why it earns a place at all.** In the OS that invented it, 23 entries across six months and 220 sources — deliberately rare — and **13 of 23 marked `spent`, 2 `stale`.** The operator retired more than half his own arguments. That is the removal test this model applies to every layer, and this one passed it while the shipped claims layer had retired nothing at all.
+
+One thing it must not have: a hand-set signal-strength rating. The prior system had one and it was dropped as decorative. Its actual function was counting independent witnesses, which `rests_on` derives for free and which cannot go stale.
+
+### The source record, and what a connector can give back
+
+`connectors.md` carries one block per registered source. Two fields on it decide what the claims drawn from that source can ever become:
+
+```markdown
+### Granola
+- **Protocol**: MCP connector
+- **Medium**: summary          # verbatim | summary | mixed
+- **Verbatim fetch**: yes      # can the original text be pulled back on demand
+- **Feeds**: raw/, meeting notes
+- **Blind spots**: attachments are not indexed, so a decision living in a PDF is invisible
+```
+
+**Medium** is what the connector produces by default. **Verbatim fetch** is whether the original can be retrieved later. They are different questions and the second is the one that matters: a notetaker that writes summaries but keeps transcripts is a source whose claims are one call from promotion, and a notetaker that discards them is not. Without the distinction, both look identical in the record and neither gets acted on.
+
+`corp-os-connect` asks both when a source is registered. `corp-os-claims` reads them to set `source_fidelity` without asking, because the answer is a property of the source rather than a judgment about the claim.
+
+### Alias provenance
+
+A person record's `aliases` decide whether two renderings are one entity, and that field is what deduplication reads. An **assumed** merge must not be able to look identical to a **confirmed** one.
+
+```yaml
+aliases:
+  - alias: Rosh
+    resolved_by: Dana Okafor
+    resolved_on: 2026-08-14
+  - alias: Arosh              # a bare string still parses: unresolved, and says so
+```
+
+Both shapes are read. A bare string is an alias nobody has confirmed, which is a legitimate state and should render as one — not silently as a confirmation. Requiring the object form would break every existing person record, and the point is to make the distinction visible rather than to force a migration.
+
+The measured cost of not having this: in one corpus, three claims minted from a single quote reached three different conclusions about one name resolution — one asserting it settled, one stating it was never confirmed, one saying "likely" — none cross-referencing the others, while the person record carried **both renderings in `aliases`**. The unconfirmed resolution had been promoted into the exact field that decides whether two entities are one. That is how a corpus quietly merges two people or splits one.
 
 ### Corpus-level confidence ceilings
 

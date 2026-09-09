@@ -9,15 +9,22 @@ _Regenerated 2026-09-09 by scripts/build_index.py (counts and listings only — 
 - **Jobs**: 2
 - **Raw files**: 3 (1 unprocessed)
 - **Findings**: 4
+- **Arguments**: 2
 - **Decisions**: 2
 - **Patterns**: 1
 - **Proposals**: 1
+- **Connectors**: 2
 - **Dashboards**: 2
 
 ## Jobs
 
 - **[job-001](jobs/renewal-risk.md)** — When a renewal comes up, I want to know which churn risks are real, so I can decide what to concede.
 - **[job-002](jobs/support-load.md)** — When support volume spikes, I want to know which product surface caused it, so I can decide what to fix first.
+
+## Arguments
+
+- **[renewal math](arguments/renewal-math.md)**
+- **[support surface](arguments/support-surface.md)**
 
 ## Decisions
 
@@ -29,6 +36,16 @@ _Regenerated 2026-09-09 by scripts/build_index.py (counts and listings only — 
 Raw material not yet folded into the derived layer.
 
 - [2026-08-21--note--hallway](raw/2026-08-21--note--hallway.md) — note
+
+## Arguments resting on one source
+
+Not wrong, and not the same object as one resting on nine. Only the record can tell them apart, so it says so.
+
+- AR-0002 — **1 entry / 1 source** · [support-surface](arguments/support-surface.md)
+
+## One call from promotion
+
+**1** entry is a summary whose source still exposes a verbatim fetch. Pulling the original is the cheapest confidence this OS can buy, and a ceiling that looks permanent gets treated as permanent — in the corpus that surfaced this, the number was 599 and nothing showed it.
 
 ## Open evidence
 

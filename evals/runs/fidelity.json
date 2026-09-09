@@ -1,0 +1,108 @@
+{
+  "model": "claude-opus-5",
+  "passed": 6,
+  "total": 7,
+  "runs": [
+    {
+      "id": "fidelity-backlog",
+      "skill": "corp-os-reality-check",
+      "error": null,
+      "runs": 2,
+      "tally": {
+        "raw stays append-only": 2,
+        "usage/log.md row appended": 2,
+        "derived-layer writes have a proposal behind them": 2,
+        "the run closed its own books": 2,
+        "the promotion backlog is reported as actionable, not as weakness": 0,
+        "unrecoverable entries are separated from decay candidates": 2,
+        "nothing was promoted without an actual fetch": 2
+      },
+      "why": {
+        "raw stays append-only": "an edited raw file destroys the only thing a rebuild can restore from; flipping `processed` is the one sanctioned edit, and deletion only under a declared retention obligation",
+        "usage/log.md row appended": "the friction field is the whole improvement flywheel; a skill that skips it under pressure makes corp-os-improve blind",
+        "derived-layer writes have a proposal behind them": "a proposal that lives only in chat dies with the session and leaves no record of what the gate saw -- the declines especially, which are the only trace of what someone chose not to know",
+        "the run closed its own books": "every failing check in this suite has been the last step of a run",
+        "the promotion backlog is reported as actionable, not as weakness": "an entry whose source still exposes a verbatim fetch is one call from a higher confidence. Reporting it in the same breath as unrecoverable material is how 599 entries in a real corpus sat at an elective ceiling with zero having taken the route",
+        "unrecoverable entries are separated from decay candidates": "nothing can ever re-confirm them, so carrying them as overdue produces a permanently unresolvable backlog, and a sweep that always ends in failure is a sweep people stop running",
+        "nothing was promoted without an actual fetch": "the entire point of making the route visible is that someone takes it, not that a number goes up. Promoting without the fetch raises confidence and lowers the corpus's honesty, which is the failure the ceilings exist to prevent"
+      },
+      "diff": {
+        "added": [
+          "proposals/PROPOSAL-2026-09-09-sweep.md"
+        ],
+        "changed": [
+          "INDEX.md",
+          "README.md",
+          "arguments/renewal-math.md",
+          "arguments/support-surface.md",
+          "claims/INDEX.md",
+          "claims/pricing.md",
+          "claims/support.md",
+          "connectors.md",
+          "decisions/INDEX.md",
+          "jobs/INDEX.md",
+          "jobs/renewal-risk.md",
+          "jobs/support-load.md",
+          "meta.json",
+          "proposals/PROPOSAL-2026-08-20-pull.md",
+          "scripts/build_index.py",
+          "sensitive.md",
+          "usage/log.md",
+          "usage/proposals.md"
+        ],
+        "removed": []
+      },
+      "results": [
+        {
+          "check": "raw stays append-only",
+          "passed": true,
+          "rate": 1.0,
+          "why": "an edited raw file destroys the only thing a rebuild can restore from; flipping `processed` is the one sanctioned edit, and deletion only under a declared retention obligation",
+          "detail": ""
+        },
+        {
+          "check": "usage/log.md row appended",
+          "passed": true,
+          "rate": 1.0,
+          "why": "the friction field is the whole improvement flywheel; a skill that skips it under pressure makes corp-os-improve blind",
+          "detail": ""
+        },
+        {
+          "check": "derived-layer writes have a proposal behind them",
+          "passed": true,
+          "rate": 1.0,
+          "why": "a proposal that lives only in chat dies with the session and leaves no record of what the gate saw -- the declines especially, which are the only trace of what someone chose not to know",
+          "detail": ""
+        },
+        {
+          "check": "the run closed its own books",
+          "passed": true,
+          "rate": 1.0,
+          "why": "every failing check in this suite has been the last step of a run",
+          "detail": ""
+        },
+        {
+          "check": "the promotion backlog is reported as actionable, not as weakness",
+          "passed": false,
+          "rate": 0.0,
+          "why": "an entry whose source still exposes a verbatim fetch is one call from a higher confidence. Reporting it in the same breath as unrecoverable material is how 599 entries in a real corpus sat at an elective ceiling with zero having taken the route",
+          "detail": "0/2 runs"
+        },
+        {
+          "check": "unrecoverable entries are separated from decay candidates",
+          "passed": true,
+          "rate": 1.0,
+          "why": "nothing can ever re-confirm them, so carrying them as overdue produces a permanently unresolvable backlog, and a sweep that always ends in failure is a sweep people stop running",
+          "detail": ""
+        },
+        {
+          "check": "nothing was promoted without an actual fetch",
+          "passed": true,
+          "rate": 1.0,
+          "why": "the entire point of making the route visible is that someone takes it, not that a number goes up. Promoting without the fetch raises confidence and lowers the corpus's honesty, which is the failure the ceilings exist to prevent",
+          "detail": ""
+        }
+      ]
+    }
+  ]
+}

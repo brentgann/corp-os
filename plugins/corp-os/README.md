@@ -156,6 +156,7 @@ The model itself is specified in `reference/data-model.md`. Improvement packets 
 | `scripts/write_export.py` | Redaction's two outputs, written together — refuses one without the other |
 | `scripts/log_run.py` | The usage-log row and the history entry, written together |
 | `scripts/delete_source.py` | The five-step retention deletion — dry-run by default, refuses without an obligation |
+| `scripts/migrate_schema.py` | Adds a schema field, filling only what can be derived and counting what cannot |
 | `scripts/bind_pattern.py` | Resolves a pattern's requirements against an OS, or names exactly what is missing |
 | `scripts/check_shield.py` | The JS-off leak test: proves a screen-share shield is real rather than decorative |
 | `scripts/check_citations.py` | Clusters entries by citation; refuses an export whose members disagree on sensitivity |
@@ -166,6 +167,20 @@ The model itself is specified in `reference/data-model.md`. Improvement packets 
 | `evals/` | Two harnesses — does the right skill get reached, and does it do what it says |
 
 ## Version history
+
+**0.14.0** — the schema work, and the first release where an existing OS has to change shape. Which is why the mechanism for it was built three releases ago: `corp-os-upgrade` has always named migrations and refused to perform them, and 0.14 is the first time it has any to name.
+
+**`Source fidelity`** splits the medium out of confidence. One enum was carrying three independent questions — how faithful is the recording, how many sources exist, is the claim contested — and collapsing them made a specific thing invisible. Measured in a real corpus: **599 of 836 entries** were single-source summaries whose transcripts were still fetchable through the same connector that produced them, one API call from a higher confidence, and **zero had taken that route**, because a ceiling that is elective looked exactly like one that is permanent. `corp-os-connect` now records each source's `Medium` and `Verbatim fetch`; `corp-os-claims` reads them rather than judging; `build_index.py` renders **One call from promotion** as a count. Not a list of what is weak, a list of what is one call from being stronger.
+
+**The arguments layer** ships optional, and it is one proposal rather than two: `rests_on` had to be introduced before anything could render it. A supporting-entry count reads as evidence breadth and does not measure it, because entries are minted at whatever granularity a pass chose — one argument in a real corpus rested on **nine entries that all traced to a single meeting**. So it renders as `N entries / M sources`, always both, and the index lists any argument whose distinct-source count is 1. No hand-set strength rating: the prior system had one, it was dropped as decorative, and its actual function was counting independent witnesses, which is derived for free and cannot go stale.
+
+**`aliases` carry resolution provenance**, and read in both shapes. A bare string is an alias nobody confirmed, which is a legitimate state that should render as one. Requiring the object form would break every existing person record, and the goal is to make the distinction visible rather than to force a migration — in the corpus that reported it, an unconfirmed name resolution had already been promoted into the exact field deduplication reads.
+
+**Reasons are sibling fields, never suffixes.** `needs_review` covers three situations a sweep cannot triage apart, so the reason is worth capturing — but writing it inside the value was proposed and declined, because everything downstream equality-tests that string. `Confidence reason` and `Sensitivity reason` carry it at no migration cost, and the validator now fails if a doc example puts a reason back inside a value.
+
+**`migrate_schema.py`** is the tenth shipped script and draws the line this suite keeps drawing: a field whose value is derivable is bookkeeping, one whose value is judgment is not. It fills what the connector records already answer, **leaves the rest blank on purpose**, and reports both counts — because a blank field someone can see is honest, and a plausible wrong value is the failure this model exists to prevent.
+
+One bug found by building it: `order_by` assumed `entry_schema` was a dict. A list of field names is equally legitimate and equally in the wild, and the first config to use both crashed the whole index.
 
 **0.13.0** — patterns, which exist because of a problem that only appears with more than one person. One operator keeps their conventions in their head. Five operators produce five dashboards with five palettes and five ideas about what a panel owes the reader, and nothing in the model prevented it.
 

@@ -98,6 +98,14 @@ Write `config.json`, update the OS's `README.md` to match, add a dated `meta.jso
 
 Then run `build_index.py` and report any drift the change introduced.
 
+## Offering the arguments layer
+
+Optional, and offered rather than scaffolded. It holds a conclusion built across entries, with a `timing` field and a `Rests on` list — the thing no shipped layer can express.
+
+Offer it to a decision-heavy or orientation-shaped role. Do not offer it to a build-heavy or operate-heavy one: they would write two a year and the layer would read as overhead, which is how an unused layer becomes a cost rather than a neutral.
+
+Two things to get right at declaration time, because both are expensive later. Ship **one** dependency field, not two — the OS this came from declared both `connections` and `rests_on`, populated both on all 23 entries, and stated the difference nowhere. And do **not** add a hand-set strength rating: the prior system had one, it was dropped as decorative, and its real function was counting independent witnesses, which `rests_on` derives for free and which cannot go stale.
+
 ## When a pattern refuses to bind
 
 `bind_pattern.py` refuses when a pattern needs a role or field this OS does not declare, and it names exactly which. That refusal is the reason to be here, and the interrogation in Step 3 is what it is for.

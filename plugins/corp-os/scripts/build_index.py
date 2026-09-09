@@ -272,6 +272,111 @@ def survey(root, cfg):
     return s
 
 
+# ------------------------------------------------ rests_on breadth (F5 + S1)
+# A list of supporting entry ids reads as evidence breadth and does not measure
+# it. Entries are minted at whatever granularity a pass chose, so one
+# conversation that yielded nine contributes nine. Measured in a real corpus:
+# an argument resting on nine entries that all traced to a single meeting. The
+# number looked like breadth and was one data point.
+#
+# So it renders as two numbers, always, and the ratio is the signal.
+RESTS_RE = re.compile(r"^[-*]?\s*\*\*Rests on\*\*\s*:\s*(.+?)\s*$", re.I | re.M)
+SRC_RE = re.compile(r"^[-*]?\s*\*\*Source\*\*\s*:\s*(.+?)\s*$", re.I | re.M)
+FID_RE = re.compile(r"^[-*]?\s*\*\*Source fidelity\*\*\s*:\s*(\w+)", re.I | re.M)
+
+
+def entry_blocks(path, marker="### "):
+    """(id, body) per entry. Shared by everything that reads entry fields."""
+    out, cur, buf = [], None, []
+    try:
+        lines = open(path, encoding="utf-8", errors="replace").read().split("\n")
+    except OSError:
+        return out
+    for ln in lines:
+        if ln.startswith(marker):
+            if cur:
+                out.append((cur, "\n".join(buf)))
+            cur, buf = ln[len(marker):].split("—")[0].strip(), [ln]
+        elif cur:
+            buf.append(ln)
+    if cur:
+        out.append((cur, "\n".join(buf)))
+    return out
+
+
+def source_map(root, cfg):
+    """entry id -> set of raw paths it cites, across every derived layer."""
+    m = {}
+    for name, spec in (cfg.get("layers") or {}).items():
+        if not spec.get("enabled") or spec.get("role") != "derived":
+            continue
+        path = (spec.get("path") or name).rstrip("/")
+        full = os.path.join(root, path)
+        files = ([full] if path.endswith(".md")
+                 else [f for f in md_files(root, path)])
+        for f in files:
+            for eid, body in entry_blocks(f, spec.get("entry_marker", "### ")):
+                srcs = set()
+                for s in SRC_RE.findall(body):
+                    for tok in re.split(r"[,;]| and ", s):
+                        tok = tok.strip().split(" — ")[0].strip()
+                        if tok.startswith("raw/"):
+                            srcs.add(tok)
+                m[eid] = srcs
+    return m
+
+
+def breadth(body, smap):
+    """(n entries, m distinct sources) for one Rests on list."""
+    ids = []
+    for line in RESTS_RE.findall(body):
+        ids += [x.strip() for x in re.split(r"[,;]", line) if x.strip()]
+    if not ids:
+        return None
+    srcs = set()
+    for i in ids:
+        srcs |= smap.get(i, set())
+    return len(ids), len(srcs)
+
+
+def retrievable_backlog(root, cfg):
+    """Entries whose medium is a summary and whose source can still be fetched.
+
+    Not a count of what is weak -- a count of what is one call from being
+    stronger, which is a different and actionable thing. In the corpus that
+    produced this, that number was 599 and nobody could see it.
+    """
+    conn = os.path.join(root, "connectors.md")
+    fetchable = set()
+    if os.path.exists(conn):
+        cur = None
+        for ln in open(conn, encoding="utf-8", errors="replace"):
+            if ln.startswith("### "):
+                cur = ln[4:].strip().lower()
+            m = re.match(r"^[-*]?\s*\*\*Verbatim fetch\*\*\s*:\s*(\w+)", ln, re.I)
+            if m and cur and m.group(1).lower() in ("yes", "true"):
+                fetchable.add(cur)
+    if not fetchable:
+        return 0
+    n = 0
+    for name, spec in (cfg.get("layers") or {}).items():
+        if not spec.get("enabled") or spec.get("role") != "derived":
+            continue
+        path = (spec.get("path") or name).rstrip("/")
+        files = ([os.path.join(root, path)] if path.endswith(".md")
+                 else md_files(root, path))
+        for f in files:
+            for _eid, body in entry_blocks(f, spec.get("entry_marker", "### ")):
+                fid = FID_RE.search(body)
+                if not fid or fid.group(1).lower() != "summary":
+                    continue
+                src = SRC_RE.search(body)
+                blob = (src.group(1).lower() if src else "")
+                if any(c in blob for c in fetchable):
+                    n += 1
+    return n
+
+
 # --------------------------------------------------------- open evidence (F4)
 # A job's evidence list is where "what do I still not know" lives, and it was
 # the one structure with no declared shape: in the corpus that reported it, 33
@@ -461,8 +566,18 @@ def render_index(root, s, cfg):
         # already said.
         order_by = spec.get("order_by")
         if order_by:
-            values = (spec.get("entry_schema", {}).get(order_by, {})
-                      .get("values") or [])
+            # entry_schema is a dict in some OSes and a list of field names in
+            # others. Both are legitimate and both are in the wild; assuming
+            # the dict form crashed the whole index the first time a config
+            # used the list form with order_by. A list declares names without
+            # values, so there is no ordering to read -- fall back to
+            # alphabetical rather than failing.
+            es = spec.get("entry_schema")
+            values = []
+            if isinstance(es, dict):
+                spec_field = es.get(order_by)
+                if isinstance(spec_field, dict):
+                    values = spec_field.get("values") or []
             rank = {v: i for i, v in enumerate(values)}
             files = sorted(
                 files,
@@ -511,6 +626,37 @@ def render_index(root, s, cfg):
             L.append(f"- [{os.path.basename(f)[:-3]}]({rel})" +
                      (f" — {gist}" if gist else ""))
         L.append("")
+
+    # -- rests_on breadth, wherever it appears.
+    smap = source_map(root, cfg)
+    thin = []
+    for name, spec in cfg["layers"].items():
+        if not spec.get("enabled") or not isinstance(s.get(name), list):
+            continue
+        for f in s[name]:
+            for eid, body in entry_blocks(f, spec.get("entry_marker", "### ")):
+                b = breadth(body, smap)
+                if b and b[1] <= 1:
+                    thin.append((eid, b[0], b[1], os.path.relpath(f, root)))
+    if thin:
+        L += ["## Arguments resting on one source", "",
+              "Not wrong, and not the same object as one resting on nine. "
+              "Only the record can tell them apart, so it says so.", ""]
+        for eid, n, m, rel in sorted(thin):
+            L.append(f"- {eid} — **{n} entr{'y' if n == 1 else 'ies'} / "
+                     f"{m} source{'' if m == 1 else 's'}** · "
+                     f"[{os.path.basename(rel)[:-3]}]({rel})")
+        L.append("")
+
+    back = retrievable_backlog(root, cfg)
+    if back:
+        L += ["## One call from promotion", "",
+              f"**{back}** entr{'y is a summary' if back == 1 else 'ies are summaries'} "
+              "whose source still exposes a verbatim fetch. Pulling the "
+              "original is the cheapest confidence this OS can buy, and a "
+              "ceiling that looks permanent gets treated as permanent — in "
+              "the corpus that surfaced this, the number was 599 and nothing "
+              "showed it.", ""]
 
     ev = open_evidence(root, s, cfg)
     if ev:

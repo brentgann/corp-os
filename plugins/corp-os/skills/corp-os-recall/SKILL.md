@@ -89,6 +89,16 @@ All proposals, not writes.
 
 One line. The most useful next action given what the answer exposed — a specific source to pull, a person to ask, a claim to verify. Not a menu.
 
+## When an answer is worth keeping
+
+Sometimes the answer you just assembled is not a lookup — it is a **conclusion built across several entries**, with something to do about it and a moment after which doing it stops helping. No shipped layer holds that: an entry is one fact with one citation, a topic file asserts nothing on its own, and a decision is a fork with an owner and a date.
+
+If this OS declares an arguments layer, offer to keep it, per `${CLAUDE_PLUGIN_ROOT}/reference/data-model.md`: the conclusion, the so-what, the timing, and `Rests on` naming the entries it depends on. **Inherit the weakest confidence** of what it rests on — an argument built on eleven `needs_review` entries is `needs_review` however convincing it reads.
+
+Offer it rarely. In the OS this came from, 23 across six months and 220 sources — and 13 of those 23 were later marked `spent`, which is the reason the layer is worth having at all. A layer that accumulates and never retires is a layer nobody trusts.
+
+If the OS has no arguments layer, do not create one here. That is `corp-os-configure`'s interrogation, and a layer improvised to hold one good answer is a layer declared without the checks that catch shape mistakes.
+
 ## Every run ends with
 
 Close the run with `scripts/log_run.py` in the OS rather than editing the files by hand — it writes the `usage/log.md` row and the dated `meta.json` history entry in one call, and refuses a blank friction field:

@@ -6,8 +6,10 @@
 - **Statement**: Northwind's finance lead said per-seat pricing is the primary obstacle to renewing at current volume.
 - **Kind**: fact
 - **Jobs**: job-001
-- **Confidence**: confirmed
-- **Source**: raw/2026-08-12--meeting--northwind-qbr.md
+- **Confidence**: needs_review
+- **Source fidelity**: summary
+- **Confidence reason**: single Granola summary; the transcript is still fetchable
+- **Source**: raw/2026-08-12--granola--northwind-qbr.md
 - **Citation**: "At this seat count the math stops working for us." — Dana Okafor, 2026-08-12
 - **Decay**: 90d
 - **Verified**: 2026-08-12

@@ -603,6 +603,33 @@
           "why": "weakening a requirement to make a refusal go away produces an output that renders an empty panel, which reads as a state rather than a defect. Editing an adopted pattern also forks the pack silently, so the next update reports drift nobody chose"
         }
       ]
+    },
+    {
+      "id": "fidelity-backlog",
+      "skill": "corp-os-reality-check",
+      "prompt": "Run the sweep. I want to know what's actually weak in here and what I can do about it.",
+      "expect_output": [
+        {
+          "name": "unrecoverable entries are separated from decay candidates",
+          "needle": "no source",
+          "why": "nothing can ever re-confirm them, so carrying them as overdue produces a permanently unresolvable backlog, and a sweep that always ends in failure is a sweep people stop running"
+        }
+      ],
+      "expect_changed": [
+        {
+          "name": "the run closed its own books",
+          "prefix": "usage/log.md",
+          "why": "every failing check in this suite has been the last step of a run"
+        }
+      ],
+      "forbid_output": [
+        {
+          "name": "nothing was promoted without an actual fetch",
+          "needle": "promoted to confirmed",
+          "why": "the entire point of making the route visible is that someone takes it, not that a number goes up. Promoting without the fetch raises confidence and lowers the corpus's honesty, which is the failure the ceilings exist to prevent"
+        }
+      ],
+      "_note": "fixture-os carries a Granola connector with `Verbatim fetch: yes` and one summary-fidelity entry sourced from it, plus entries whose citation is the sanctioned `no source` literal. The two populations are the whole test: one is one call from stronger, the other can never be re-confirmed, and collapsing them is the failure this release exists to fix.\n\nThe needle is `fetch` rather than a phrase I chose, because it is the word the connector record itself uses — the vocabulary mistake this suite has made three times is checking for language the run had no reason to pick.\n\nTwo things came out of running this, and they went opposite ways.\n\n**A real defect, found and fixed.** The cross-cutting check that every derived-layer write has a proposal behind it failed on three of the first four runs — one of them rewriting fourteen files and filing nothing. corp-os-reality-check had no gate step at all, which is a serious gap in the one skill whose whole job is removing things: the declines are the valuable part of the record, and a retirement that happened in conversation and nowhere else is indistinguishable six months later from something that was never there. Step 1.5 was added, and the check went to 2/2.\n\n**A needle that measured nothing, removed.** `fetch` in the answer scored 1/2, then 2/2, then 0/2 across three batches. That spread is a coin flip on a word choice, not a skill behaving inconsistently — a run can treat the promotion backlog as entirely actionable while writing 'pull the transcript' or 'the original is still available'. It is the fourth time this suite has checked for vocabulary and called it behaviour. The safety-critical half of the same property is kept as a forbid_output, because 'nothing was promoted without an actual fetch' is checkable and has held every run.\n\nWhat is left unmeasured, and stated rather than papered over: whether the backlog is *framed* as actionable. That is a quality judgment about an answer, and this harness cannot see it."
     }
   ]
 }

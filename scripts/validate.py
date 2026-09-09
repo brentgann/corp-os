@@ -476,6 +476,52 @@ def main():
 
 
 
+
+    # --- the 0.14 schema rules.
+    dm = open("reference/data-model.md", encoding="utf-8").read()
+    for term, why in (
+            ("Source fidelity", "the medium split out of confidence"),
+            ("Retrievable", "the derived flag that makes the promotion "
+                            "backlog visible"),
+            ("Confidence reason", "the sibling field that replaced the "
+                                  "rejected suffix"),
+            ("Rests on", "the dependency field the arguments layer needs")):
+        if term not in dm:
+            err(f"reference/data-model.md does not document `{term}` — {why}")
+
+    # A reason must never be written INTO an enum value. Everything downstream
+    # equality-tests confidence, so `needs_review — because x` breaks the
+    # index, the export emitter, every ceiling rule and every eval assertion.
+    # The proposal that suggested it was declined for exactly this reason, and
+    # a doc example is how a declined idea comes back.
+    for f in sorted(glob.glob("reference/*.md")) + [
+            f"skills/{d}/SKILL.md" for d in sorted(names)]:
+        body = open(f, encoding="utf-8").read()
+        for m in re.finditer(r"\*\*Confidence\*\*\s*:\s*(\w+)\s*[—-]\s*\w",
+                             body):
+            err(f"{f}: a confidence value carries a reason inside it "
+                f"({m.group(0)[:48]!r}). Use the `Confidence reason` field — "
+                "everything downstream equality-tests this value.")
+
+    # Both halves of the fidelity story, or neither is usable: something has to
+    # record what a connector can give back, and something has to read it.
+    wrote = "Verbatim fetch" in open("skills/corp-os-connect/SKILL.md",
+                                     encoding="utf-8").read()
+    reads = "Source fidelity" in open("skills/corp-os-claims/SKILL.md",
+                                      encoding="utf-8").read()
+    if wrote != reads:
+        err(f"source fidelity is handled by only one side: connect records "
+            f"the connector's capability={wrote}, claims reads it={reads}. "
+            "Recording it and never reading it leaves the backlog invisible, "
+            "which is the state this release exists to fix.")
+
+    # migrate_schema must never invent a value it cannot derive.
+    ms = open("scripts/migrate_schema.py", encoding="utf-8").read()
+    if "left blank" not in ms:
+        err("scripts/migrate_schema.py no longer says it leaves underivable "
+            "fields blank — a plausible wrong value is the failure this whole "
+            "model is built to prevent")
+
     # --- patterns: the shipped ones must actually bind, and must be portable.
     # A pattern that addresses a layer by NAME binds in exactly one OS -- the
     # one it was written in -- and fails everywhere else by rendering an empty

@@ -45,6 +45,14 @@ The temptation is to work oldest-first. Do not. Order by what a wrong answer wou
 
 Then say how long the sweep will take and offer to do it in batches. A worklist of 60 items presented at once gets abandoned; ten resolved is a real improvement.
 
+## Step 1.5 — write the proposal before resolving anything
+
+A sweep rewrites the derived layer, often across a dozen files in one pass, and until now this skill had no gate step at all. That is a real gap and it was found by measurement rather than review: the cross-cutting check that every derived-layer write has a proposal behind it **failed on three of four runs of this skill**, with one run rewriting fourteen files and filing nothing.
+
+The gate is not paperwork. A sweep is the operation most likely to *remove* things — retire a claim, downgrade a confidence, drop an assumption — and the declines are the valuable part of the record: they are the only trace of what someone deliberately chose not to keep. A retirement that happened in conversation and nowhere else is indistinguishable, six months later, from something that was never there.
+
+So write `proposals/PROPOSAL-<date>-sweep.md` **before** presenting anything: each item, what is being proposed for it, and what the evidence is. Then stamp it with the outcome afterwards, the same way `corp-os-claims` does. One proposal per sweep, not one per item — a sweep is a batch, and a batch behind one reviewable record is the point.
+
 ## Step 2 — interrogate, one item at a time
 
 For each item, show the claim with its citation and date, then ask the question that actually resolves it. Match the question to the bucket:
@@ -90,6 +98,14 @@ If a job's supporting claims mostly failed the check, say so directly. A job run
 End with a plain assessment: how many claims were checked, how many held, how many were retired, how many contradictions were found, and which active jobs are now running on weaker evidence than they appeared to be.
 
 Then set the next sweep. Recurring is better than heroic — offer to schedule a small regular pass over the past-decay bucket, per `${CLAUDE_PLUGIN_ROOT}/reference/scheduling.md`. A sweep that happens monthly and resolves ten items keeps an OS honest; one that happens once a year and resolves two hundred is an event nobody repeats.
+
+## The promotion backlog, and the arguments resting on one source
+
+Two things `build_index.py` now surfaces that belong in this sweep:
+
+**One call from promotion.** Entries whose fidelity is `summary` and whose source still exposes a verbatim fetch. This is not a list of what is weak — it is a list of what is **one call from being stronger**, which is actionable in a way a weakness list is not. Work the ones gating the nearest decisions first; promoting the whole backlog is not the goal, and auto-promoting any of it without the actual fetch would raise a number while lowering the corpus's honesty.
+
+**Arguments resting on one source.** An entry whose `Rests on` list traces back to a single raw file. Not wrong — an argument built on one conversation is a legitimate thing — but it is a different object from one built on nine, and the supporting count reads as breadth while measuring granularity. Ask whether it should be held more loosely, not whether it should be deleted.
 
 ## Also sweep the citation clusters
 

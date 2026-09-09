@@ -3,7 +3,7 @@
 The working document for this project. It records what Corp-OS is, every consequential decision and the reasoning behind it, what has been tested and how, and what is still open. Written so a session that has never seen this repo can pick it up cold and make correct changes.
 
 **Status:** v0.11.0 · 21 skills · 9 reference specs · 6 shipped scripts · 8 commands · 3 eval harnesses · 3 fixtures
-**Last substantive change:** patterns — the first mechanism in this suite that exists for a problem one operator does not have.
+**Last substantive change:** the schema work, and the first release where an existing OS has to change shape — which is what the upgrade path built in 0.11.0 was for.
 
 ---
 
@@ -483,6 +483,60 @@ The validator gained a check that every shipped pattern binds against the defaul
 
 A check that cannot fail is worse than no check, because it is counted as coverage. The only reason it surfaced is the repo's own rule: negative-test every check you add, by reintroducing the defect and confirming it fires. It did not fire, and that is the entire value of the rule.
 
+### 4.34 One enum was carrying three questions
+
+**Decision (0.14.0):** `source_fidelity`, separate from `confidence`.
+
+Confidence was answering three independent things at once: how faithful is the *medium* (a quote, a paraphrase, a reconstruction, or the original is gone), how many independent sources exist, and is the claim contested. Two of those are about evidence and one is about the recording.
+
+**What the collapse made invisible.** In the reporting corpus, **599 of 836 claims** were single-source summaries parked one step below the top value, and the config documented two routes upward — a second recording, or pulling the verbatim transcript through the same connector that produced the summary. The second is one API call. **Zero claims had taken it.** Meanwhile 60 claims sat lower because their originals genuinely no longer exist, and nothing distinguished the two populations. A ceiling that is *elective* looked exactly like one that is *permanent*, so it was treated as permanent.
+
+Splitting the medium out makes the difference expressible, and the index renders it as **One call from promotion** — a count of what is one step from being stronger, which is a different and more actionable object than a list of what is weak.
+
+**Why it is read rather than judged.** Fidelity is a property of the source, so `corp-os-connect` records each connector's `Medium` and `Verbatim fetch` and `corp-os-claims` reads them. Deciding it per entry would reintroduce exactly the per-entry judgment the field exists to remove, and `retrievable` is derived rather than stored so that disconnecting a source changes the backlog instead of leaving a field lying.
+
+### 4.35 F5 and S1 were one proposal
+
+The packet listed them separately: render `rests_on` as *N claims / M sources*, and add an argument-across-claims layer. But `rests_on` did not exist anywhere in the shipped model — not in `data-model.md`, not in a skill, not in a script. It was the reporting operator's own convention, and the audit says so in passing when it notes the claims layer had no `entry_schema` at all.
+
+So the rendering rule was not a fix to an existing field. It was **part of the schema of a field that had to be introduced first**, and they ship together or not at all.
+
+The rendering rule is the interesting half. A supporting-entry count reads as evidence breadth and does not measure it: entries are minted at whatever granularity a pass chose, so one conversation that yielded nine contributes nine. Measured: an argument resting on **nine entries that all traced to a single meeting** — one data point wearing a number that looked like breadth. It renders as two numbers always, and the index lists any argument whose distinct-source count is 1.
+
+Deliberately **not** restored: the prior system's hand-set signal-strength rating, dropped in its migration as decorative. Its actual function was counting independent witnesses, which is derived for free and cannot go stale. A hand-set number that measures something derivable is a second source of truth with extra steps.
+
+### 4.36 The line a schema migration draws
+
+**Decision (0.14.0):** `migrate_schema.py`, and the division of labour with `corp-os-upgrade`.
+
+`upgrade_os.py` has named migrations and refused to perform them since 0.11.0, on the grounds that moving someone's files is judgment. 0.14 is the first release that gives it anything to name, and it needed the other half: something that performs the migrations that are *not* judgment.
+
+The line: **a field whose value is derivable is bookkeeping; a field whose value is a judgment is not.** `source_fidelity` is derivable from the connector record, so it is filled mechanically. What no connector record answers is **left blank and counted**, because a blank field someone can see is honest and a plausible wrong value is the failure this whole model exists to prevent. The validator fails if that sentence ever leaves the script.
+
+Two more things were deliberately not made mechanical. `aliases` reads both the bare-string and object shapes, because requiring the object form would break every existing person record and the goal is to make an unconfirmed merge *visible*, not to force a migration. And nothing auto-promotes on `retrievable`: the point of making a route visible is that someone takes it, not that a number rises. Promotion still needs a person and an actual fetch.
+
+### 4.37 A reason belongs beside a value, never inside it
+
+The packet proposed letting a confidence value carry its own justification: `needs_review — explicitly an open unknown`. The observation behind it is right — one label covers a thin source, a genuinely contested reading, and a paraphrase that cannot satisfy a verbatim requirement, and a sweep cannot triage them apart.
+
+The form is wrong, and it is a technical objection rather than a stylistic one: everything that reads confidence equality-tests that string, including `build_index.py`, the export emitter, every ceiling rule and every eval assertion in the suite. `Confidence reason` as a sibling field carries the same information at no migration cost.
+
+The packet's own argument against the prior system's compact tag — unparseable, un-greppable — applies one level further than it took it. The validator now greps every reference doc and skill for a reason written inside a confidence value, because a declined idea comes back through a doc example.
+
+### 4.38 The suite found a missing gate, in the skill whose job is removing things
+
+The `fidelity-backlog` case was written to test the promotion backlog. It found something else.
+
+The cross-cutting check that every derived-layer write has a proposal behind it **failed on three of the first four runs of `corp-os-reality-check`** — one of them rewriting fourteen files and filing nothing. Reading the skill afterwards: it had no gate step at all. Not a weak one, none. It has shipped that way since 0.1.
+
+That is the worst skill in the suite to be missing it. A sweep is the operation most likely to *remove* things — retire an entry, downgrade a confidence, drop an assumption — and the declines are the valuable part of the gate's record: the only trace of what someone deliberately chose not to keep. A retirement that happened in conversation and nowhere else is indistinguishable, six months later, from something that was never there.
+
+Step 1.5 was added and the check went to **2/2**. Nothing about this was visible to review; it took a cross-cutting assertion running against a skill nobody suspected.
+
+**And in the same case, a needle that measured nothing.** `fetch` in the answer scored 1/2, then 2/2, then 0/2 across three batches. That spread is a coin flip on a word, not a skill behaving inconsistently: a run can treat the backlog as entirely actionable while writing *"pull the transcript"* or *"the original is still available"*. Removed, with the evidence stated — the fourth time this suite has checked for vocabulary and called it behaviour.
+
+What is left unmeasured, said plainly rather than papered over: whether the backlog is *framed* as actionable. That is a quality judgment about an answer and this harness cannot see it. The safety-critical half — nothing promoted without an actual fetch — is checkable, and has held on every run.
+
 ## 5. The skills
 
 | Skill | Job |
@@ -531,6 +585,7 @@ Being explicit, because much of this is unexercised.
 - `build_index.py --check` against a minimal no-config tree, exercising the reduced `DEFAULT_LAYERS` after `people`/`topics` were removed.
 - `scripts/validate.py` passes: frontmatter, name/directory match, cross-references, `${CLAUDE_PLUGIN_ROOT}` targets, step ordering, leakage.
 - **`build_index.py` is now executed by the build**, not merely parsed. `validate.py` copies `examples/fixture-os/` to a temp dir, runs the script against it, and asserts the counts, the custom layer's rendered `index_line`, the unprocessed queue, config-driven exclusions, the omission of the disabled layer, and that a second `--check` run finds no drift. Building the fixture immediately caught a real bug: an unrecognized key under `scan` fell back to defaults silently and rendered a plausible, wrong "not in the scan path" section. It is a warning now.
+- **`corp-os-reality-check` at 6/6 after a real fix.** The `fidelity-backlog` case caught a missing review gate in the skill that removes things (§4.38): three of four runs rewrote the derived layer with no proposal behind it, one of them across fourteen files. With the gate step, 2/2.
 - **`corp-os-pattern` at 6/6 across two repeats**, against the register fixture where the pattern deliberately cannot bind. Its first assertion forbade adding anything under `patterns/`, and failed at 50% because a run wrote `patterns/pack.json` — recording which pack the OS is on, which is Step 4 of the skill in as many words. The check forbade what the skill instructs; that is the eighth time in this suite an assertion has been wrong about a skill rather than the reverse.
 - **The routing eval at 23 skills**: 77 queries × 3 repeats, **100%**, including the three-way near-miss set — `pattern` against `configure`, `contribute` and `dashboard` — that the docket named as a risk *before* patterns shipped rather than after. `evals/runs/routing-v6.md`.
 - **`corp-os-migrate` at 10/10 across two repeats**, on the third version of its case. The first staged nothing on disk and then asserted files would be written; the second checked the answer for the string `retriev`, which a run can miss while distinguishing the populations perfectly; the third asserted a first pass files source and stops, which is stricter than the rule the skill states. Three wrong assertions, one working skill, and the corrections are in the case's own note.

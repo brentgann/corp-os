@@ -143,6 +143,30 @@
       ],
       "index_line": "{name} — {kind} · {target}",
       "note": "adopted output specs; portable because they address layers by role and field"
+    },
+    "arguments": {
+      "enabled": true,
+      "role": "derived",
+      "path": "arguments/",
+      "entry_schema": [
+        "id",
+        "so_what",
+        "timing",
+        "status",
+        "rests_on",
+        "confidence",
+        "sensitivity"
+      ],
+      "index_line": "{id} — {so_what} · {status}",
+      "order_by": "status",
+      "note": "conclusions across findings; rare on purpose, and the only layer here with a working removal rule"
+    },
+    "connectors": {
+      "enabled": true,
+      "role": "record",
+      "path": "connectors.md",
+      "entry_marker": "### ",
+      "note": "declared so a rebuild knows it exists"
     }
   },
   "decay": {

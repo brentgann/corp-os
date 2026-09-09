@@ -27,6 +27,7 @@ import argparse
 import filecmp
 import json
 import os
+import re
 import shutil
 import sys
 from datetime import date
@@ -40,7 +41,7 @@ PLUGIN_ROOT = os.path.dirname(HERE)
 # reintroduce it here.
 SHIPPED = ("build_index.py", "write_export.py", "log_run.py",
            "delete_source.py", "check_citations.py", "stagger_decay.py",
-           "bind_pattern.py", "check_shield.py")
+           "bind_pattern.py", "check_shield.py", "migrate_schema.py")
 
 
 def plugin_version():
@@ -130,7 +131,90 @@ def m_path_shape(root, cfg, covered=()):
 
 # Named migrations run first; the generic shape check runs last and defers to
 # anything they already covered.
-NAMED = (m_dashboards_registry,)
+def m_source_fidelity(root, cfg):
+    """0.14.0 — the medium split out of confidence."""
+    import glob as _g
+    n = 0
+    for name, spec in (cfg.get("layers") or {}).items():
+        if not spec.get("enabled") or spec.get("role") != "derived":
+            continue
+        path = (spec.get("path") or name).rstrip("/")
+        full = os.path.join(root, path)
+        files = ([full] if path.endswith(".md")
+                 else _g.glob(os.path.join(full, "*.md")))
+        for f in files:
+            if os.path.basename(f) in ("README.md", "INDEX.md"):
+                continue
+            try:
+                body = open(f, encoding="utf-8", errors="replace").read()
+            except OSError:
+                continue
+            heads = body.count(spec.get("entry_marker", "### "))
+            has = body.lower().count("**source fidelity**")
+            n += max(0, heads - has)
+    if not n:
+        return None
+    return {
+        "id": "source-fidelity",
+        "since": "0.14.0",
+        "covers": None,
+        "what": f"{n} derived entr{'y' if n == 1 else 'ies'} carry no "
+                "`Source fidelity`.",
+        "why": ("Confidence was carrying three questions at once, so a ceiling "
+                "that is elective looked exactly like one that is permanent. "
+                "In the corpus that reported it, 599 entries sat one connector "
+                "call from a higher confidence and zero had taken it."),
+        "how": ("`python3 scripts/migrate_schema.py --migration source_fidelity` "
+                "fills what the connector records already answer and leaves "
+                "the rest blank. Register each source's `Medium` and "
+                "`Verbatim fetch` in connectors.md first — that is what makes "
+                "the fill possible, and it is a corp-os-connect conversation."),
+    }
+
+
+def m_alias_provenance(root, cfg):
+    """0.14.0 — an assumed merge must not look like a confirmed one."""
+    import glob as _g
+    spec = None
+    for name, sp in (cfg.get("layers") or {}).items():
+        if sp.get("enabled") and "person" in name.lower() or name.lower() == "people":
+            spec = (name, sp)
+            break
+    if not spec:
+        return None
+    name, sp = spec
+    path = (sp.get("path") or name).rstrip("/")
+    bare = 0
+    for f in _g.glob(os.path.join(root, path, "*.md")):
+        try:
+            body = open(f, encoding="utf-8", errors="replace").read()
+        except OSError:
+            continue
+        m = re.search(r"^aliases:\s*\[(.*?)\]", body, re.M)
+        if m and m.group(1).strip():
+            bare += len([x for x in m.group(1).split(",") if x.strip()])
+    if not bare:
+        return None
+    return {
+        "id": "alias-provenance",
+        "since": "0.14.0",
+        "covers": None,
+        "what": f"{bare} alias(es) are bare strings, so a merge nobody "
+                "confirmed is indistinguishable from one somebody did.",
+        "why": ("`aliases` is the field deduplication reads. In one corpus, "
+                "three entries from a single quote disagreed about a name "
+                "resolution while both renderings were already in `aliases` — "
+                "the unconfirmed merge had been promoted into the field that "
+                "decides whether two people are one."),
+        "how": ("Convert to `{alias, resolved_by, resolved_on}` for the ones "
+                "somebody actually confirmed, and leave the rest bare. Bare "
+                "still parses and now means unresolved, which is the point — "
+                "this is not a migration to complete, it is a distinction to "
+                "start making."),
+    }
+
+
+NAMED = (m_dashboards_registry, m_source_fidelity, m_alias_provenance)
 
 
 def detect_migrations(root, cfg):
