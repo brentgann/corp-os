@@ -5,7 +5,7 @@ description: Takes material a person pastes, uploads, or hands over directly —
 
 # Corp-OS intake
 
-> **Mechanical pass** — filing what it is handed: name it, tag it, write it, recount. Little here is a judgment call, so run it on a cheaper model; the expensive one buys nothing and this is the kind of run that moves the most bytes.
+> **Mixed pass** — naming, writing and recounting are bookkeeping; inferring which jobs a piece of material serves, and drawing tags from the vocabulary already in use rather than inventing new ones, is not. Tagging badly is invisible on the day and degrades every recall afterwards, so this is not the place to economise.
 
 Most real context does not arrive through an API. Someone pastes a thread, forwards a doc, or types a note after a hallway conversation. That material deserves the same discipline as a connector pull: filed as-is, typed correctly, job-tagged, and never treated as reviewed knowledge until a person says so.
 

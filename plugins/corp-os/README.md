@@ -192,6 +192,18 @@ The model itself is specified in `reference/data-model.md`. Improvement packets 
 
 ## Version history
 
+**0.18.1** — three defects the cost work introduced, found by asking whether any of it reduced quality. Two were mine and one was silent.
+
+**A capped or triaged pull was losing material permanently.** Step 4 advanced the source cutoff unconditionally, written long before triage existed. So an item skipped by triage, and an item the batch cap never reached, both fell behind the cutoff and were never offered again — while 0.17's own release note said *"skipping is deferring, not losing."* That was false the moment it shipped.
+
+The cutoff now moves differently for the two cases, because they are not the same case. **A triage skip is a decision**: the ids are recorded in the connector block with a reason and the cutoff passes them, so they are written down rather than merely gone. **A batch remainder is not a decision**: the cutoff does not move past it, and it is the first thing the next pass offers.
+
+**`corp-os-rebuild` lost the spec for the thing it rebuilds.** The 0.16 split moved the claim record into its own file and rebuild kept pointing only at the spine — so the skill whose entire job is re-deriving claims from `raw/` no longer read the definition of a claim. It re-derives against whatever it remembers, which is exactly the failure the reference files exist to prevent.
+
+**`corp-os-intake` was classified as mechanical and is not.** It infers which jobs a piece of material serves and draws tags from the vocabulary already in use — and the skill itself warns that inventing categories is how a tag vocabulary fragments into uselessness. Bad tagging is invisible on the day and degrades every recall afterwards. It is a mixed pass; the distribution is now 3 mechanical, 6 mixed, 14 judgment.
+
+All three are checked now, so none can come back quietly.
+
 **0.18.0** — the other half of the cost problem, for sources a script cannot reach. 0.17 stopped fetching bodies nobody wanted. This stops paying three times for the ones you do.
 
 **When a source is behind MCP, the read is unavoidable and the write is not.** The body enters a context because a model has to call the tool — that cost is real and there is no way around it. What was avoidable was everything after: the model re-emitting the whole body as output to write the file, and then re-opening that file to propose claims from it. The same content, three times, and two of those passes bought nothing.

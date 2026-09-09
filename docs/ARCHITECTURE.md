@@ -654,6 +654,21 @@ That is not a question this model should answer on anyone's behalf, so it is `ca
 **The registry knew the protocol and not the shape.** Recording `Protocol: MCP` tells a skill it can reach a source. It says nothing about the fact that almost every source has an enumerate call and a fetch call differing by two orders of magnitude in cost — so the skill did the only thing the record described and fetched everything. `List call` and `Fetch call` are now first-class, and this is the third time a missing property of a source turned out to be the cause of an expensive behaviour downstream. The pattern is worth naming: **record what a source is, not just that it is connected.**
 
 
+### 4.48 Optimising for cost introduced three quality defects, one of them silent
+
+**Found (0.18.1) by asking whether any of the cost work reduced capability.** It had, in three places, and the pattern is worth more than the fixes.
+
+**A new mechanism met an old one and nobody checked the seam.** Triage and the batch cap were added in 0.17. The source cutoff was written years earlier, when every in-window item was always fetched, so advancing it unconditionally was correct. It stopped being correct the moment an item could go unfetched on purpose — and both new paths fell behind it. The release note claimed skipping was deferring rather than losing; the cutoff made that a false statement on the day it was written.
+
+The repair is a distinction the old design never needed: **a triage skip is a decision and gets recorded, a batch remainder is not a decision and holds the cutoff.** Same class as §4.15, where "never edited" and "flip `processed: true`" both shipped and could not both be true — a new rule laid over an old one, each defensible alone.
+
+**A refactor can remove a capability without touching the skill that had it.** §4.43 split the data model and routed each skill to what it needed. `corp-os-rebuild` was routed to the spine, which is correct for the layer rules it enforces and wrong for the fact that it re-derives claims and therefore needs the claim spec. The file-aware check added in that release verifies each *field* is documented in the right file; nothing verified that each *skill* still reaches everything it uses. Those are different checks and only one existed.
+
+**A classification is a judgment and mine was wrong.** `corp-os-intake` was labelled mechanical because filing is what it looks like. It also infers job tags and draws from an existing tag vocabulary, and the skill's own text warns that inventing categories fragments that vocabulary. Cheap-model tagging degrades every later recall and shows nothing at the time.
+
+The general lesson is the one this repo keeps paying for: **a change justified by one dimension has to be checked against the others, and cost is the easiest dimension to optimise blindly** because its feedback is immediate and quality's is not. The $40 was visible in a day. Losing a week of skipped meetings would have been visible in a quarter, if ever.
+
+
 ## 5. The skills
 
 | Skill | Job |

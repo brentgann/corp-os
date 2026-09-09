@@ -75,7 +75,14 @@ For `tags`: draw from the vocabulary already in use in the OS. Check recent raw 
 Non-negotiable, and independent of any claim decision:
 
 - Every new raw file appears in `INDEX.md`'s unprocessed queue with a one-line gist.
-- Counts recounted by running `scripts/build_index.py` in the OS rather than by hand; `cutoff` advanced per source; a dated `meta.json` history entry added.
+- Counts recounted by running `scripts/build_index.py` in the OS rather than by hand; a dated `meta.json` history entry added.
+
+**The cutoff moves differently for the two ways an item can go unfetched, and conflating them loses material silently.**
+
+- **Skipped by triage** — a decision was made about it. Record the ids in the source's connector block as `Skipped: <ids> — <date>` with the reason in one phrase, and let the cutoff pass them. They are not re-offered every run, and they are written down, which is what makes "skipping is deferring, not losing" true rather than a claim.
+- **Not reached because the batch filled** — no decision was made about it. **The cutoff does not move past it.** Advance the cutoff only to the newest item this pass actually resolved, so the remainder is the first thing the next pass offers.
+
+A cutoff that advances past everything in the window regardless turns both a cap and a triage list into permanent, invisible data loss. The source may still hold it; nothing in the OS will ever mention it again.
 
 A run that reports what it found only in chat, without updating `INDEX.md`, has not finished. Waiting on the claims decision before updating the index is a bug, not caution — the index describes what is in `raw/`, and that is already true.
 

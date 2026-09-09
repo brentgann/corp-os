@@ -9,7 +9,7 @@ description: Regenerates the entire derived layer of a Corp-OS knowledge base �
 
 The one operation permitted to restructure the derived layer, because none of it is destructive: `raw/` is untouched and the derived layer was always meant to be regenerable.
 
-Read `${CLAUDE_PLUGIN_ROOT}/reference/data-model.md` and the OS's own `README.md` (its conventions win over the shipped spec).
+Read `${CLAUDE_PLUGIN_ROOT}/reference/claim-record.md` — this skill re-derives claims, so it needs the spec for what one is — plus `${CLAUDE_PLUGIN_ROOT}/reference/data-model.md` and the OS's own `README.md` (its conventions win over the shipped spec).
 
 ## Pre-flight
 

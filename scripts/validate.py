@@ -346,6 +346,19 @@ def main():
         err("corp-os-pull no longer forbids re-reading what it just wrote — "
             "that is the same bytes at full price, for a file nothing has "
             "changed since writing")
+    # A cap and a triage list are only safe if the cutoff distinguishes "a
+    # decision was made about this" from "we never got to it". Advancing past
+    # both turns each into permanent invisible loss — the source may still hold
+    # the item and nothing in the OS will mention it again.
+    if "cutoff does not move past it" not in pl:
+        err("corp-os-pull no longer distinguishes how the cutoff moves for a "
+            "triage skip versus a batch remainder. Advancing past both makes "
+            "capping and triage silent data loss")
+    rb = open("skills/corp-os-rebuild/SKILL.md", encoding="utf-8").read()
+    if "claim-record.md" not in rb:
+        err("corp-os-rebuild does not read reference/claim-record.md. It "
+            "re-derives claims from raw/ — without the spec for what a claim "
+            "is, it is re-deriving against whatever it remembers")
     if "batch" not in pl or "list first" not in pl:
         err("corp-os-pull no longer caps the pass or lists before fetching. "
             "That is the instruction that made one intake run cost more than "
