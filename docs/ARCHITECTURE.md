@@ -679,6 +679,19 @@ The check now resolves `origin/main` and compares published version to local. It
 Worth naming what this cost, because the number is the argument. The cost work was measured at roughly a 10x reduction on a backlog pull. Its realised value was zero for its entire existence, and no amount of further optimisation would have changed that. **Distribution is not a step after the work; it is the step that decides whether the work happened.**
 
 
+### 4.50 A skill described itself correctly, then the same release made the description false
+
+**Found (0.18.2) while pricing model routing.** `model:` in skill frontmatter is a real feature, so the pass declarations added in 0.17 could stop being advice and start being executable. Pricing that meant re-reading what the three mechanical skills actually do, and two of them were not mechanical.
+
+`corp-os-pull` declared "fetch, dedupe, write, recount. Little here is a judgment call." True when written. **0.17 then added triage to that same skill**, whose Step 1 is "present the list with a proposed keep or skip and a one-line reason each," and whose Step 3 writes inferred `jobs` tags. The release that made the statement false shipped the statement. `corp-os-guide` declared the same thing while routing on distinctions its own text calls consequential: an open fork against a recorded decision, a job against a claim, *read the tense*.
+
+This is the third instance of one shape (§4.15, §4.48): **a new mechanism laid over an old statement, each defensible alone.** What is new here is the direction. Those two were an old rule outliving its assumptions. This is an old *self-description* outliving the skill, which is worse, because a description is what the next reader trusts instead of reading the steps — and under `model:` it is what the runtime trusts too. A stale declaration used to cost a paragraph of confusion. It now costs the model the work runs on.
+
+The check added catches the two markers those cases shared: a mechanical declaration alongside `infer` or `keep or skip`. It would have caught `corp-os-intake` in 0.18.1 and `corp-os-pull` here. **It would not have caught `corp-os-guide`**, whose judgment is a routing call in prose, and no keyword stands in for reading it. That case was found by asking of each mechanical skill what would break if it ran on a cheaper model, which is a review step, not a check. Recording it as unchecked is more useful than a keyword that pretends otherwise.
+
+The distribution is now 1 mechanical, 8 mixed, 14 judgment. One skill in twenty-three is safe to run cheap, and it is the rarest one. **The saving is not in routing judgment to a cheaper model; it is in having less judgment to route** — which returns the question to the rule this repo already has, that mechanism belongs in code.
+
+
 
 ## 5. The skills
 

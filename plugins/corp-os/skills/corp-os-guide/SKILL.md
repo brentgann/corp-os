@@ -5,7 +5,7 @@ description: Explains what Corp-OS is and routes to the right Corp-OS skill for 
 
 # Corp-OS guide
 
-> **Mechanical pass** — reading what exists and naming the next skill. Little here is a judgment call, so run it on a cheaper model; the expensive one buys nothing and this is the kind of run that moves the most bytes.
+> **Mixed pass** — reading what exists is bookkeeping; routing is not. Most of the table below is lookup, but the distinctions it turns on — an open fork against a recorded decision, a job against a claim — are the ones this suite recovers from worst, because a misfiled fork sits open for months with nothing forcing its date.
 
 Orient the person, then hand off. This skill never does the work itself.
 

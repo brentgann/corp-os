@@ -192,6 +192,16 @@ The model itself is specified in `reference/data-model.md`. Improvement packets 
 
 ## Version history
 
+**0.18.2** — two skills described themselves as mechanical and were not, found while pricing whether the pass declarations could drive `model:` in frontmatter.
+
+`corp-os-pull` said "little here is a judgment call" — accurate when written, and false by the end of the same release that wrote it, because 0.17 added triage to that skill. Proposing keep-or-skip is the one decision downstream cannot undo: nothing re-derives material that was never retrieved. `corp-os-guide` said it too, while routing on an open fork against a recorded decision against a job, distinctions its own text calls consequential.
+
+Both are now mixed passes. The validator fails a mechanical declaration that sits alongside `infer` or `keep or skip`, the two markers these cases and 0.18.1's `corp-os-intake` had in common. It does not catch `corp-os-guide`'s kind, and §4.50 records that rather than pretending a keyword would.
+
+One skill of twenty-three is now safe to run on a cheaper model, and it is the rarest one. The saving was never in routing judgment somewhere cheap; it is in having less judgment to route.
+
+Installing in Cowork is documented, which it was not: Cowork serves plugins from a separate account catalogue and does not read Claude Code's marketplaces at all.
+
 **0.18.1** — three defects the cost work introduced, found by asking whether any of it reduced quality. Two were mine and one was silent.
 
 **A capped or triaged pull was losing material permanently.** Step 4 advanced the source cutoff unconditionally, written long before triage existed. So an item skipped by triage, and an item the batch cap never reached, both fell behind the cutoff and were never offered again — while 0.17's own release note said *"skipping is deferring, not losing."* That was false the moment it shipped.

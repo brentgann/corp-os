@@ -5,7 +5,7 @@ description: Retrieves new material from the sources registered in a Corp-OS kno
 
 # Corp-OS pull
 
-> **Mechanical pass** — fetch, dedupe, write, recount. Little here is a judgment call, so run it on a cheaper model; the expensive one buys nothing and this is the kind of run that moves the most bytes.
+> **Mixed pass** — fetching, deduping, writing and recounting are bookkeeping. Deciding which items to capture is not, and it is the one call in this suite that downstream cannot undo: nothing re-derives material that was never retrieved. Keep the mechanical half in scripts so the model is paying for the triage rather than the typing.
 
 Executes against the connector registry. Writing to `raw/` is autonomous; everything downstream of that is proposed.
 

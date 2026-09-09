@@ -23,7 +23,7 @@ The first command reads `.claude-plugin/marketplace.json` from the repo root; th
 /plugin marketplace add https://github.com/brentgann/corp-os.git
 ```
 
-The `/plugin` slash command is Claude Code's. In the **desktop app**, use the plugin browser UI instead — same marketplaces, same installs, different surface. In a **cloud or web session** where neither is available, declare it in `.claude/settings.json`:
+The `/plugin` slash command is Claude Code's. **Cowork does not read these marketplaces at all** — see below; it is a separate catalogue, not a different button for the same one. In a **cloud or web session** where `/plugin` is unavailable, declare it in `.claude/settings.json`:
 
 ```json
 {
@@ -32,6 +32,20 @@ The `/plugin` slash command is Claude Code's. In the **desktop app**, use the pl
   }
 }
 ```
+
+### In Cowork — a separate catalogue
+
+Cowork serves plugins from your claude.ai account, synced into each session. It does not read Claude Code's marketplaces, so one added with `/plugin` on the same machine is invisible to it, and a push that updates every other surface does not reach it until Cowork syncs on its own.
+
+**Cowork** tab → **Customize** → **Plugins** → under **Personal plugins**, **+** → **Add marketplace** → **Add from a repository**, then:
+
+```
+https://github.com/brentgann/corp-os.git
+```
+
+Then install `corp-os` from the marketplace that appears.
+
+Use the repository route rather than uploading a built `.plugin` bundle. An uploaded bundle has no relationship to this repo: every later release becomes a rebuild and a re-upload, and the release rule below stops protecting you, because the version can bump and push correctly and still reach nothing.
 
 ### From a clone — for working on it
 
@@ -79,9 +93,14 @@ This is also why a documentation-only change to the plugin gets a version. `plug
 | Where | What it tells you |
 |---|---|
 | `/plugin` → Installed | the version of the plugin this client is running |
+| Cowork → Customize → Plugins | **that** it is installed, not **which version** — see below |
 | `claude plugin details corp-os@brentgann` | the same, without the panel |
 | `config.json` → `corpos_version` in an OS | the version that OS was last brought in line with |
 | `meta.json` → `history` in an OS | what was done to it, and on what date |
+
+**In Cowork, the number on screen is not this plugin's version.** The sync layer keeps its own upload counter and displays that; a plugin at `1.2.3` shows there as `0001`. To get the real one, ask the session to print `${CLAUDE_PLUGIN_ROOT}/.claude-plugin/plugin.json`, which resolves wherever the plugin actually loaded from. Failing that, the synced copy has been observed at `~/.claude/plugins/synced/*/corp-os/.claude-plugin/plugin.json`.
+
+The cheapest check needs no path at all: **run `corp-os-pull` and watch the first thing it does.** From 0.17.0 on it lists items and asks you to confirm keep-or-skip before fetching any bodies. If it starts fetching immediately, you are on an older copy whatever any panel says.
 
 The first two answer *what am I running*. The last two answer *what has this folder been through*, and they move only when `corp-os-upgrade` moves them.
 

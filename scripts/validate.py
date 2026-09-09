@@ -412,6 +412,29 @@ def main():
             "That is the instruction that made one intake run cost more than "
             "the connector it pulled from")
 
+    # A mechanical declaration is a claim that nothing here needs the
+    # expensive model. Three skills have now made that claim while inferring
+    # tags from an existing vocabulary or proposing what to keep -- work whose
+    # errors are invisible at the time and expensive later. These two markers
+    # are what those cases had in common; they do not catch every kind of
+    # judgment, and the ones they miss are still a reading call (§4.50).
+    for d in sorted(names):
+        path = f"skills/{d}/SKILL.md"
+        if not os.path.exists(path):
+            continue
+        body = open(path, encoding="utf-8").read()
+        if "> **Mechanical pass" not in body:
+            continue
+        for marker, why in (
+                ("infer", "inferring from an existing vocabulary is judgment, "
+                          "and cheap-model tagging degrades every later recall "
+                          "while showing nothing at the time"),
+                ("keep or skip", "choosing what to capture is the one decision "
+                                 "nothing downstream can undo")):
+            if marker in body:
+                err(f"{d}: declares a mechanical pass and contains "
+                    f"{marker!r} — {why}. Reclassify, or move that step out.")
+
     PASSES = ("Mechanical pass", "Mixed pass", "Judgment pass")
     for d in sorted(names):
         path = f"skills/{d}/SKILL.md"
