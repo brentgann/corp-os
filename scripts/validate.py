@@ -438,6 +438,21 @@ def main():
                 err(f"{d}: declares a mechanical pass and contains "
                     f"{marker!r} — {why}. Reclassify, or move that step out.")
 
+    # corp-os-guide routes and does not act. It stated that as a prohibition
+    # in one line while Step 4 said "offer to do it", and a conformance run
+    # caught it opening a decision, writing a job, and never naming the skill
+    # it was supposed to route to. The rule is now positive and names the two
+    # files it may write; this keeps it from drifting back to a bare "never".
+    gd = open("skills/corp-os-guide/SKILL.md", encoding="utf-8").read()
+    if "only files this one writes" not in gd:
+        err("corp-os-guide no longer states which files it may write. It is "
+            "the front door: a run that does the work instead of routing "
+            "skips the skill that has the rules for doing it properly")
+    if "offer to do it" in gd:
+        err("corp-os-guide tells itself to offer to do the work. That is the "
+            "instruction that had it opening decisions rather than naming "
+            "corp-os-decide — the offer is to hand off")
+
     PASSES = ("Mechanical pass", "Mixed pass", "Judgment pass")
     for d in sorted(names):
         path = f"skills/{d}/SKILL.md"

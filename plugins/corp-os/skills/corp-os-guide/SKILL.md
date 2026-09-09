@@ -7,7 +7,9 @@ description: Explains what Corp-OS is and routes to the right Corp-OS skill for 
 
 > **Mixed pass** — reading what exists is bookkeeping; routing is not. Most of the table below is lookup, but the distinctions it turns on — an open fork against a recorded decision, a job against a claim — are the ones this suite recovers from worst, because a misfiled fork sits open for months with nothing forcing its date.
 
-Orient the person, then hand off. This skill never does the work itself.
+Orient the person, then hand off.
+
+**Every run ends by naming a skill. The only files this one writes are `usage/log.md` and the `meta.json` row that goes with it.** When the ask arrives as an instruction rather than a question — *get that into my OS*, *file this for me*, *add that* — the hand-off is the answer to it, not a preamble before doing it. A decision opened here is a decision opened without the rules `corp-os-decide` carries, and a job written here skips the gate that `corp-os-jobs` runs.
 
 ## Pre-flight
 
@@ -77,7 +79,9 @@ Common collisions, and how to settle them:
 
 ## Step 4 — answer with a next action
 
-Never end on a menu. Name the one thing worth doing next and offer to do it. If the OS has an unprocessed queue, that is almost always the answer.
+Name the one thing worth doing next, say which skill does it, and offer to start that skill. The offer is to hand off; the work happens there, under that skill's rules. If the OS has an unprocessed queue, that is almost always the answer.
+
+End on one named skill rather than a menu.
 
 Then log the run: `python3 scripts/log_run.py --skill corp-os-guide --scope "<what they asked>" --friction "<what was unclear, or 'none'>"`. No `--event` — routing changes nothing on disk. The friction field matters more here than almost anywhere else: a person who had to ask the guide which skill to use is telling you a description is not landing, and that is the signal `corp-os-improve` mines.
 

@@ -192,6 +192,12 @@ The model itself is specified in `reference/data-model.md`. Improvement packets 
 
 ## Version history
 
+**0.18.6** — the front door was doing the work.
+
+A conformance case gave `corp-os-guide` an undecided fork phrased as an instruction — *"we still haven't landed on whether to keep the legacy importer, can you get that into my OS?"* — and it wrote `decisions/legacy-importer.md`, edited a job, skipped the gate, and never said `corp-os-decide`.
+
+The skill said "never does the work itself" in one line and then told itself, in Step 4, to *"offer to do it"*. The same self-contradiction 0.18.4 found in `corp-os-dashboard`. The rule is now positive and concrete — every run ends by naming a skill, and the only files it writes are `usage/log.md` and its `meta.json` row — and the validator fails both a missing rule and the return of "offer to do it".
+
 **0.18.5** — the arguments layer gets its own file, and two skills that discussed it could not reach it.
 
 `corp-os-recall` cited `records.md` for the arguments record. `records.md` does not document it — the spec was in `claim-record.md` the whole time. `corp-os-configure` has a section headed *Offering the arguments layer* and reached neither file. Both now point at `reference/arguments.md`.
