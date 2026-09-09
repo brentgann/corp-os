@@ -303,6 +303,54 @@ def main():
                     "those changes reach nobody — bump the version in both "
                     "manifests, or squash them into the bump commit.")
 
+    # --- the version on origin is the version people can actually install
+    #
+    # A marketplace install resolves against the pushed branch, so a release
+    # that exists only locally is a release nobody has. Three consecutive
+    # cost-reduction releases sat unpushed while the OS they were written to
+    # make cheaper went on running the old one, and every check in this file
+    # passed throughout: the repo was internally consistent and externally
+    # absent. The bump check above asks whether the version was raised. This
+    # one asks whether anyone received it.
+    #
+    # It reads the last-fetched origin ref instead of fetching, because a
+    # validator that reaches the network fails offline for reasons that have
+    # nothing to do with the plugin. A stale ref can make this check late; it
+    # cannot make it wrong in the direction that matters.
+    def semver(v):
+        try:
+            return tuple(int(part) for part in str(v).split("."))
+        except (TypeError, ValueError):
+            return None
+
+    if git("rev-parse", "--git-dir") and cur:
+        ref = next((r for r in ("origin/main", "origin/master")
+                    if git("rev-parse", "--verify", "--quiet", r)), None)
+        if ref is None:
+            warn("no origin ref to compare against, so whether this version "
+                 "has been published is unknown. Every other release check "
+                 "here is about the repo; this one is about what people can "
+                 "install.")
+        else:
+            blob = git("show", f"{ref}:{rel_manifest}")
+            try:
+                pub = json.loads(blob).get("version") if blob else None
+            except ValueError:
+                pub = None
+            local_v, pub_v = semver(cur), semver(pub)
+            if pub is None:
+                warn(f"{ref} carries no readable plugin manifest, so the "
+                     "published version is unknown.")
+            elif local_v and pub_v and local_v > pub_v:
+                err(f"version {cur} is not on {ref}, which still serves "
+                    f"{pub}. A marketplace install resolves against the "
+                    "pushed branch, so this release reaches nobody until it "
+                    "is pushed.")
+            elif local_v and pub_v and local_v < pub_v:
+                err(f"{ref} serves {pub}, which is ahead of the local {cur}. "
+                    "Pull before releasing, or the next push takes published "
+                    "work back off the shelf.")
+
     # --- every skill declares what kind of pass it is
     #
     # A real intake run cost $40 because a mechanical pass -- fetching forty

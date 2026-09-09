@@ -668,6 +668,17 @@ The repair is a distinction the old design never needed: **a triage skip is a de
 
 The general lesson is the one this repo keeps paying for: **a change justified by one dimension has to be checked against the others, and cost is the easiest dimension to optimise blindly** because its feedback is immediate and quality's is not. The $40 was visible in a day. Losing a week of skipped meetings would have been visible in a quarter, if ever.
 
+### 4.49 Every release check asked whether the repo was consistent; none asked whether anyone received it
+
+**Found while pricing three releases the person paying for them had never run.** 0.17.0, 0.18.0 and 0.18.1 were committed, validated, and packaged. `origin/main` served 0.16.0 the whole time. The OS those releases were written to make cheaper went on fetching every item since its cutoff and re-emitting every byte, because that is what the version people could install still said to do.
+
+Nothing was broken. §4.31 put the version-bump rule into code precisely because a client caches by version string, and that check passed: the version *had* been bumped, three times. It compares the manifest against `HEAD`, which is the right question for "did the content change without a bump" and silent on "did the bump ever leave this machine." **A validator built entirely out of local checks cannot see the one failure that makes all the others moot.**
+
+The check now resolves `origin/main` and compares published version to local. It reads the last-fetched ref rather than fetching, because a validator that reaches the network fails offline for reasons that have nothing to do with the plugin; a stale ref makes the check late, never wrong in the direction that matters. Being *behind* origin is an error too, and a different one: it means the next push would take published work back off the shelf.
+
+Worth naming what this cost, because the number is the argument. The cost work was measured at roughly a 10x reduction on a backlog pull. Its realised value was zero for its entire existence, and no amount of further optimisation would have changed that. **Distribution is not a step after the work; it is the step that decides whether the work happened.**
+
+
 
 ## 5. The skills
 
