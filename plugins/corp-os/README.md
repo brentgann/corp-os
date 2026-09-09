@@ -192,6 +192,14 @@ The model itself is specified in `reference/data-model.md`. Improvement packets 
 
 ## Version history
 
+**0.18.3** — the check §4.48 asked for, and two lessons from building it.
+
+Every skill must now name the reference file defining any spec field it uses. Eight gaps in six skills on the first run, including `corp-os-configure` enforcing `entry_schema` and `index_line` while never naming the file that defines them.
+
+Then: the first pointers were written as statements, which satisfied the check and pulled the whole file every run — `corp-os-configure` went 5,696 to 14,574 unconditional tokens before they were rewritten to name their branch. And the measurement that picked the work order scored `corp-os-guide` worst in the suite when it was already correct, because its condition trails the clause instead of opening it. §4.51.
+
+`docs/BACKLOG.md` now carries the running list of measured, unfixed things, with the command that produced each number.
+
 **0.18.2** — two skills described themselves as mechanical and were not, found while pricing whether the pass declarations could drive `model:` in frontmatter.
 
 `corp-os-pull` said "little here is a judgment call" — accurate when written, and false by the end of the same release that wrote it, because 0.17 added triage to that skill. Proposing keep-or-skip is the one decision downstream cannot undo: nothing re-derives material that was never retrieved. `corp-os-guide` said it too, while routing on an open fork against a recorded decision against a job, distinctions its own text calls consequential.

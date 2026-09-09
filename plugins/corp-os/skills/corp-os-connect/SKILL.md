@@ -95,7 +95,7 @@ Ask both, and record both in `connectors.md`:
 
 They are different questions and the second is the one that matters. A notetaker that writes summaries but keeps transcripts is a source whose entries are **one call from a higher confidence**; a notetaker that discards them is not. Without the distinction both look identical in the record, and neither gets acted on.
 
-Measured, in a real corpus: 599 entries were single-source summaries whose transcripts were still fetchable through the same connector that produced them, and **zero had taken that route** — because nothing in the record said the route existed. `corp-os-claims` reads these two fields to set `Source fidelity` without asking, and `build_index.py` turns them into a visible backlog.
+Measured, in a real corpus: 599 entries were single-source summaries whose transcripts were still fetchable through the same connector that produced them, and **zero had taken that route** — because nothing in the record said the route existed. `corp-os-claims` reads these two fields to set `Source fidelity` without asking — when a source's fidelity is not obvious from these two fields, its spec is in `${CLAUDE_PLUGIN_ROOT}/reference/claim-record.md` —, and `build_index.py` turns them into a visible backlog.
 
 If the person does not know whether verbatim fetch is available, write `unknown` rather than guessing. An unknown that is written down gets checked; a guess that reads as fact does not.
 

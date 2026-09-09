@@ -107,7 +107,7 @@ One line. The most useful next action given what the answer exposed — a specif
 
 Sometimes the answer you just assembled is not a lookup — it is a **conclusion built across several entries**, with something to do about it and a moment after which doing it stops helping. No shipped layer holds that: an entry is one fact with one citation, a topic file asserts nothing on its own, and a decision is a fork with an owner and a date.
 
-If this OS declares an arguments layer, offer to keep it, per `${CLAUDE_PLUGIN_ROOT}/reference/records.md`: the conclusion, the so-what, the timing, and `Rests on` naming the entries it depends on. **Inherit the weakest confidence** of what it rests on — an argument built on eleven `needs_review` entries is `needs_review` however convincing it reads.
+If this OS declares an arguments layer, offer to keep it, per `${CLAUDE_PLUGIN_ROOT}/reference/records.md`: the conclusion, the so-what, the timing, and `Rests on` naming the entries it depends on. If how confidence inherits is not obvious, that field's spec is in `${CLAUDE_PLUGIN_ROOT}/reference/claim-record.md`. **Inherit the weakest confidence** of what it rests on — an argument built on eleven `needs_review` entries is `needs_review` however convincing it reads.
 
 Offer it rarely. In the OS this came from, 23 across six months and 220 sources — and 13 of those 23 were later marked `spent`, which is the reason the layer is worth having at all. A layer that accumulates and never retires is a layer nobody trusts.
 

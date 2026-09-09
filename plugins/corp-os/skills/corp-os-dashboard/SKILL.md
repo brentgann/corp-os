@@ -9,7 +9,7 @@ description: Builds and refreshes dashboards from what a Corp-OS knowledge base 
 
 Renders what the OS holds. The governing rule: **never render what the OS does not have.** A panel that would need missing data shows the gap instead of an estimate, because the gap is the information the person needed.
 
-Read `${CLAUDE_PLUGIN_ROOT}/reference/dashboard-patterns.md` before building.
+If this OS has adopted no pattern that fits what they want, read the catalogue in `${CLAUDE_PLUGIN_ROOT}/reference/dashboard-patterns.md`. When one fits, Step 1 picks from `patterns/` and the catalogue adds nothing.
 
 ## Pre-flight
 
@@ -23,13 +23,13 @@ Read `config.json` first — it is the authority on this OS's layers, vocabulary
 
 Read `config.json` first — its `layers` block says what exists to render, `design` says what governs the look, and `dashboards.default_target` says whether output persists as an artifact or as a local file. Then `INDEX.md`, `jobs/INDEX.md`, `claims/INDEX.md`, `connectors.md`, and `dashboards.md`.
 
-A custom layer is dashboard material like any other: if its `index_line` renders, it can be a panel.
+A custom layer is dashboard material like any other: if its `index_line` renders, it can be a panel. When a custom layer has no `index_line`, read what one must contain in `${CLAUDE_PLUGIN_ROOT}/reference/data-model.md` before deciding it cannot be rendered.
 
 Check the registry before building anything. If the requested dashboard already exists, this is a **refresh to the same URL**, not a new build. A person with three generations of the same dashboard has no dashboard.
 
 ## Step 1 — pick from the person's jobs, not from the catalogue
 
-Read `patterns/` and offer from what this OS has adopted, matched to their active jobs — not from a catalogue in this file. Jobs blocked on missing information want an evidence-gaps view; jobs running on old entries want claim health; many jobs and unclear priorities want a job board. `${CLAUDE_PLUGIN_ROOT}/reference/patterns.md` describes the shape; the OS's own `patterns/` says what is actually available here.
+Read `patterns/` and offer from what this OS has adopted, matched to their active jobs — not from a catalogue in this file. Jobs blocked on missing information want an evidence-gaps view; jobs running on old entries want claim health; many jobs and unclear priorities want a job board. The OS's own `patterns/` says what is actually available here. If one of those files will not parse or carries a section this skill does not recognise, its format is specified in `${CLAUDE_PLUGIN_ROOT}/reference/patterns.md`.
 
 Build one well. Two half-built dashboards is worse than one, because neither gets trusted.
 
@@ -73,7 +73,7 @@ Publish as an artifact, since a dashboard exists to be returned to and shared. T
 
 On refresh, republish to the same URL and update `last built`. Never create a second artifact for the same dashboard.
 
-**If the dashboard stands on a bounded, nameable set of entries, record them as `Rests on`** — the same field the arguments layer uses, and the reason is the join it enables. A dashboard built from a whole layer has nothing to list and keeps `Source files` alone; listing a folder there is worse than listing nothing, because it renders as breadth nobody measured.
+**If the dashboard stands on a bounded, nameable set of entries, record them as `Rests on`** — the same field the arguments layer uses — if you are unsure what belongs in it, read its spec in `${CLAUDE_PLUGIN_ROOT}/reference/claim-record.md` — and the reason is the join it enables. A dashboard built from a whole layer has nothing to list and keeps `Source files` alone; listing a folder there is worse than listing nothing, because it renders as breadth nobody measured.
 
 **Then say what the recount says about the grounding.** `build_index.py` renders **Resting on evidence that has gone stale**: anything whose cited entries have gone past their decay window since it was built. If this dashboard is on that list, say so in the same breath as the refresh, with the number — *"republished; it rests on four claims and two of them went past their window in June."* A view that silently keeps rendering stale evidence is the exact failure decay exists to prevent, one layer up, and the person looking at the page has no way to see it from the page.
 
@@ -83,7 +83,7 @@ If the person framed this as a one-off look — "just show me what it'd look lik
 
 A dashboard nobody refreshes is a snapshot. Offer to schedule the refresh at the cadence in the registry, and offer `corp-os-brief` for the narrative version — the two work together, and the brief is what actually gets read on a Monday morning.
 
-Schedule it per `${CLAUDE_PLUGIN_ROOT}/reference/scheduling.md`; a refresh that silently stopped running is worse than no refresh, because the dashboard still looks current.
+If they accept, schedule it per `${CLAUDE_PLUGIN_ROOT}/reference/scheduling.md`; a refresh that silently stopped running is worse than no refresh, because the dashboard still looks current.
 
 ## Every run ends with
 

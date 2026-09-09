@@ -45,7 +45,7 @@ Propose the disposition and get it confirmed before writing anything. If the per
 
 ## Step 2 — write raw, append-only, with the original dates
 
-Each item becomes a file in `raw/` under the shipped naming shape, with frontmatter carrying `source`, `person`, `date`, `type`, `tags`, `external_id`, `processed: false`.
+Each item becomes a file in `raw/` under the shipped naming shape, with frontmatter carrying `source`, `person`, `date`, `type`, `tags`, `external_id`, `processed: false`. If any of those fields is ambiguous for this source, read the raw-file spec in `${CLAUDE_PLUGIN_ROOT}/reference/records.md` — `external_id` is what every later dedupe reads.
 
 **Use the original date, never today's.** The date is what makes elapsed time recoverable, and elapsed time is the primary ranking signal for everything about what has not been settled. One audited migration stamped every item with its migration date and lost six months of age in a single pass, with nothing recording that it had happened.
 

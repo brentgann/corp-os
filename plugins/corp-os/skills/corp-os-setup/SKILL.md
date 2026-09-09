@@ -138,7 +138,7 @@ Write `connectors.md` from area 6: category, protocol, auth shape, what it feeds
 
 Build one, not four. Default to the job board unless the interrogation pointed clearly elsewhere — area 4 answers about what they keep re-looking-up usually name the right first panel.
 
-Follow `${CLAUDE_PLUGIN_ROOT}/reference/dashboard-patterns.md` and hand off the actual build to `corp-os-dashboard` rather than reimplementing it here. Panels can be near-empty at this stage; that is fine and honest. An empty evidence-gaps panel that says "nothing captured yet — run corp-os-pull" is doing its job.
+Hand off the actual build to `corp-os-dashboard`, which reads the pattern library itself — reimplementing it here duplicates the skill that owns it. If the interrogation named a panel shape the job board does not cover, read `${CLAUDE_PLUGIN_ROOT}/reference/dashboard-patterns.md` first so the hand-off names a specific pattern rather than a wish. Panels can be near-empty at this stage; that is fine and honest. An empty evidence-gaps panel that says "nothing captured yet — run corp-os-pull" is doing its job.
 
 ## Step 8 — verify, log, and hand off with one action
 

@@ -54,7 +54,7 @@ Interrogate the shape before writing it:
 1. **What is one entry?** Get a concrete example, not a category name.
 2. **What is its `role`?** `source` (its own truth, never regenerated), `derived` (regenerable from raw), or `record` (an audit trail). This is the field that destroys data when wrong — a `source` layer mislabeled `derived` gets overwritten by the next rebuild with nothing to restore from. **Default to `source` when there is any doubt**; that is the direction that fails safely.
 3. **What fields does an entry carry, and which are required?**
-4. **What does one line of it look like in `INDEX.md`?** Write the `index_line` template. This is not cosmetic: without it the layer becomes a folder that must be opened to be understood, and the scan contract degrades one layer at a time.
+4. **What does one line of it look like in `INDEX.md`?** Write the `index_line` template. If either it or `entry_schema` is unclear, read their spec in `${CLAUDE_PLUGIN_ROOT}/reference/data-model.md` — a layer may not be enabled without both. This is not cosmetic: without it the layer becomes a folder that must be opened to be understood, and the scan contract degrades one layer at a time.
 5. **Is it a category or a tier?** A tier — insights, decisions of record, confirmed findings — needs a `promotion_bar` written as prose, or it fills with everything adjacent and stops being read.
 6. **Does it carry provenance?** It should. A layer that opts out of source and confidence is a notes folder with extra steps, and `corp-os-reality-check` cannot see it.
 7. **Is it gated?** Almost always yes for anything `derived`.
@@ -102,7 +102,7 @@ Then run `build_index.py` and report any drift the change introduced.
 
 ## Offering the arguments layer
 
-Optional, and offered rather than scaffolded. It holds a conclusion built across entries, with a `timing` field and a `Rests on` list — the thing no shipped layer can express.
+Optional, and offered rather than scaffolded. It holds a conclusion built across entries, with a `timing` field and a `Rests on` list — the thing no shipped layer can express. If they want one, read the `Rests on` spec in `${CLAUDE_PLUGIN_ROOT}/reference/claim-record.md` first, rather than inventing a local shape.
 
 Offer it to a decision-heavy or orientation-shaped role. Do not offer it to a build-heavy or operate-heavy one: they would write two a year and the layer would read as overhead, which is how an unused layer becomes a cost rather than a neutral.
 

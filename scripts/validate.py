@@ -753,6 +753,36 @@ def main():
                 + (f" (it is in {elsewhere[0]}, whose readers are a different set "
                    "of skills)" if elsewhere else ""))
 
+    # --- every skill reaches the reference file that defines what it uses
+    #
+    # §4.48. The 0.16 split verified each FIELD is documented in the right
+    # file. Nothing verified each SKILL still reaches everything it uses, and
+    # corp-os-rebuild spent two releases re-deriving claims with no spec for
+    # what a claim is. Converting unconditional reads into pointers is that
+    # same operation performed twenty more times on purpose, so this has to
+    # exist before those conversions do. A pointer counts: the test is whether
+    # the file is named in the skill at all, not whether it is read every run.
+    OWNS = (
+        ("Rests on", "claim-record.md"),
+        ("Source fidelity", "claim-record.md"),
+        ("Confidence reason", "claim-record.md"),
+        ("Retrievable", "claim-record.md"),
+        ("external_id", "records.md"),
+        ("entry_schema", "data-model.md"),
+        ("index_line", "data-model.md"),
+    )
+    for d in sorted(names):
+        sp = f"skills/{d}/SKILL.md"
+        if not os.path.exists(sp):
+            continue
+        sbody = open(sp, encoding="utf-8").read()
+        for term, owner in OWNS:
+            if term in sbody and owner not in sbody:
+                err(f"{d}: uses `{term}` and never names "
+                    f"reference/{owner}, which defines it. A skill that "
+                    "enforces a field without reaching its spec is enforcing "
+                    "whatever it remembers.")
+
     # A reason must never be written INTO an enum value. Everything downstream
     # equality-tests confidence, so `needs_review — because x` breaks the
     # index, the export emitter, every ceiling rule and every eval assertion.

@@ -692,6 +692,23 @@ The check added catches the two markers those cases shared: a mechanical declara
 The distribution is now 1 mechanical, 8 mixed, 14 judgment. One skill in twenty-three is safe to run cheap, and it is the rarest one. **The saving is not in routing judgment to a cheaper model; it is in having less judgment to route** — which returns the question to the rule this repo already has, that mechanism belongs in code.
 
 
+### 4.51 The check found eight real gaps, and then the fix for them cost more than the gap did
+
+**Built (0.18.3) because §4.48 named a missing check and nobody built it.** The 0.16 split verified that each *field* was documented in the right file. Nothing verified that each *skill* still reaches everything it uses, which is why `corp-os-rebuild` spent two releases re-deriving claims with no spec for what a claim is.
+
+The check is small: a term with a home file, a skill that uses the term, and an assertion that the skill names the file. **It found eight gaps in six skills on its first run** — among them `corp-os-configure` enforcing `entry_schema` and `index_line`, which is the whole of its job, while never naming the file that defines either. None were noticed by anyone in sixteen releases.
+
+Two things went wrong next, and both are worth more than the fix.
+
+**The first pointers satisfied the check and defeated its purpose.** Written as statements — "`Rests on` is specified in `reference/claim-record.md`" — they made the file reachable and gave the model no condition under which to stop reading. `corp-os-configure` went from 5,696 unconditional reference tokens to 14,574. A check for reachability, satisfied in the cheapest way to write, produced the expensive thing it was built to make avoidable. Rewriting the same seven pointers to name their branch — *"if either is unclear, read their spec in …"* — moved 14,712 tokens from unconditional to conditional with the check still green.
+
+**The measurement that chose the target was wrong.** The first pass classified a read as conditional only when the clause *opened* with a conditional word. `corp-os-guide` gates its reads with the condition trailing — "read those if the person is asking how the system is structured rather than what to do next" — and was scored 16,898 unconditional, the worst in the suite, and made the top of the work list. It was already correct. A paragraph-scoped detector puts it at zero and moves the real total from 125,289 to 103,521.
+
+A third and fourth version were needed before the number stopped moving, and the two failures point in opposite directions, which is what makes the rule worth stating. Scoping the detector to a paragraph and requiring every reference-bearing sentence in it to be gated marked `corp-os-setup`'s already-conditional read as unconditional, because its pre-flight commands two reads and only then gates a third. Scoping to a bare sentence marked `corp-os-dashboard`'s already-conditional read as unconditional, because its bullet opens *"If a pattern needs a layer this OS has not declared"* and the read sits in the sentence after. **A condition governs what follows it inside its block and nothing that precedes it** — one rule, and it settles both. The suite total moved 125,289 → 118,233 → 103,521 → 101,945 → 92,969 across those revisions, without a single skill changing.
+
+The general form: **a metric built to rank work will rank the work, including work that does not exist.** The first target on the list was the strongest evidence the list was right, and it was an artifact of the regex. What caught it was reading the skill before editing it, which is the step a confident ranking makes feel unnecessary.
+
+
 
 ## 5. The skills
 
