@@ -2,12 +2,14 @@
 dist/
 *.plugin
 
-# the printed skill map -- a render of a file that regenerates itself. The
-# README says it is deliberately not committed; this is that rule enforced
-# rather than stated, because a binary in the tree is the one artifact here
-# nothing could check for staleness.
-docs/skill-map.pdf
-docs/architecture-diagram.pdf
+# rendered output kept in docs/ for convenience and never committed. The
+# README has said since 0.11.1 that the printed skill map is deliberately not
+# committed; this is that rule enforced rather than stated, and generalized,
+# because a binary render of something authored elsewhere is the one artifact
+# in this tree nothing could check for staleness. One rule beats a line per
+# file -- the per-file version had already grown twice in a day.
+docs/*.pdf
+docs/img/
 
 # os / editor
 .DS_Store
