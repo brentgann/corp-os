@@ -260,6 +260,20 @@ Every derived entry carries two independent fields:
 - **`incidental`** — the content is sensitive and the analysis does not depend on it. Someone's compensation band, a personal circumstance mentioned in passing. Removing it makes an answer thinner, not wrong.
 - **`load_bearing`** — the analysis is wrong without it. A departure that invalidates three plans. A constraint nobody outside the room knows about. A number that changes a conclusion.
 
+#### `placement:` — an operator instruction that outranks the schema
+
+Placement is normally decided by schema, and that is what makes regeneration safe. But an operator sometimes gives an instruction the schema disagrees with: *"this stays out of her person record"*, *"file it, leave no pointer."* Under a purely schema-driven model that instruction is unrepresentable, so it gets written into a derived file or into nothing, and a rebuild honours the schema and violates the instruction.
+
+So it lives in the **raw** file's frontmatter, with the source it governs:
+
+```yaml
+placement: sensitive_only    # a declared layer name, or `none` to derive nothing
+```
+
+`corp-os-intake` writes it at the moment the instruction is given. `corp-os-rebuild` reads every one before deriving anything and refuses to guess when the named layer is not declared.
+
+This is the only failure mode in the model that destroys a commitment rather than degrading an answer, and it surfaces the first time someone runs the operation this suite recommends when a derived layer tangles.
+
 #### Where an entry lives follows from `bearing`, not from `sensitivity`
 
 | `sensitivity` | `bearing` | Where it lives |
@@ -275,6 +289,8 @@ So load-bearing sensitive material stays where the scan can reach it. The confid
 #### The test, and which way to fail
 
 Ask: **would an answer computed without this be *wrong*, or just thinner?** If removing it changes a conclusion, a priority, a number, or who is responsible, it is `load_bearing`. If it only removes colour, it is `incidental`.
+
+**Required on `sensitive` entries; optional everywhere else, defaulting to `load_bearing`.** The axis only has a behavioural consequence on sensitive entries and at the export boundary, and asking for it everywhere costs a judgment per entry that routes nothing. Measured in a real corpus: 727 of 836 entries carried `load_bearing` — 87%, including 100% of sensitive entries and 70–100% within every kind — and the field routed **zero** entries anywhere. An axis that is right to default is an axis that mostly reports its default, and collecting it 767 more times does not make it more informative.
 
 **Default to `load_bearing` when it is genuinely unclear.** The two errors are not symmetric. Wrongly marking something `incidental` quarantines a fact the person needed and produces silent wrong answers. Wrongly marking something `load_bearing` means it sits in the scan path and `corp-os-redact` has one more thing to strip on the way out — visible, recoverable, and caught by a skill built for exactly that. Fail toward the recoverable direction, the same way a new layer defaults to `role: source`.
 

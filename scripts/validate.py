@@ -474,6 +474,39 @@ def main():
                 "corp-os-upgrade detects by content rather than by date")
 
 
+
+    # --- the 0.12 rules, each checked because each was invisible before.
+    dm = open("reference/data-model.md", encoding="utf-8").read()
+    if "placement:" not in dm:
+        err("reference/data-model.md does not document `placement:` — the "
+            "override that a rebuild reads instead of destroying a commitment")
+    # An override is only durable if BOTH ends exist: something writes it at
+    # the moment the instruction is given, and something reads it before
+    # deriving. Shipping one without the other leaves the door open, which is
+    # worse than neither because the record looks complete.
+    wrote = "placement" in open("skills/corp-os-intake/SKILL.md",
+                                encoding="utf-8").read()
+    reads = "placement" in open("skills/corp-os-rebuild/SKILL.md",
+                                encoding="utf-8").read()
+    if wrote != reads:
+        err("`placement:` is handled by only one side: "
+            f"intake writes it={wrote}, rebuild reads it={reads}. An override "
+            "that is written and never read, or read and never written, is "
+            "not an override.")
+
+    # The export boundary refusal has to be reachable from the skill that
+    # guards it, not merely present as a script nobody calls.
+    if "check_citations.py" not in open("skills/corp-os-redact/SKILL.md",
+                                        encoding="utf-8").read():
+        err("corp-os-redact does not call check_citations.py — the per-claim "
+            "redaction it performs was mechanically correct on 836 claims in "
+            "a real corpus and the boundary still leaked")
+
+    if "stagger_decay.py" not in open("skills/corp-os-migrate/SKILL.md",
+                                      encoding="utf-8").read():
+        err("corp-os-migrate does not spread the decay windows — a migrated "
+            "OS is then born with an unclearable first sweep")
+
     # --- docs/skill-map.html is generated, and has to still be current.
     # A skill map states how many skills exist and what each refuses. Committed
     # as a static file it becomes the fifth instance of the defect this repo

@@ -109,6 +109,14 @@ Carry out confirmed local fixes: retire the unused category (relocating its cont
 
 Update the OS `README.md` on any structural change. A structure that changed while its documentation did not is worse than either the old or new structure alone.
 
+## Read the config notes, not only the usage log
+
+Every block in `config.json` may carry a free `note`, and in practice that is where an operator's reasoning about their own OS actually accumulates — decay windows tuned to what rots in this work, a taxonomy kept from a prior system because it carries more signal, a field marked load-bearing rather than a nicety, a ceiling declared with its escape route.
+
+This matters because of what it means when the usage log is empty. In an audited OS the log had zero rows after a full-day migration, and the conclusion looked like *this operator does not reflect on their system*. The opposite was true: nearly every config block carried a note explaining why it deviated from the shipped default. The reflection had happened and had gone somewhere this skill was not looking.
+
+So read the notes as a first-class input. They answer *why is it shaped this way*, which the log cannot; the log answers *where does it hurt*, which the notes cannot. A proposal that contradicts a stated reason without addressing it will be rejected, and rightly.
+
 ## Every run ends with
 
 Close the run with `scripts/log_run.py` in the OS rather than editing the files by hand — it writes the `usage/log.md` row and the dated `meta.json` history entry in one call, and refuses a blank friction field:

@@ -106,9 +106,13 @@ PHASES = [
 ]
 
 # Not a sequence, so deliberately not numbered and deliberately not on the rail.
-BENCH = ["corp-os-guide", "corp-os-setup", "corp-os-configure",
-         "corp-os-upgrade", "corp-os-rebuild", "corp-os-improve",
-         "corp-os-audit", "corp-os-contribute"]
+# corp-os-migrate fills raw/, which is Capture's job, and it is still not in
+# the loop: it happens once, at an OS's founding, and it is setup's sibling
+# rather than intake's. What decides it is repetition, not what the skill
+# writes to.
+BENCH = ["corp-os-guide", "corp-os-setup", "corp-os-migrate",
+         "corp-os-configure", "corp-os-upgrade", "corp-os-rebuild",
+         "corp-os-improve", "corp-os-audit", "corp-os-contribute"]
 
 # How often a person actually reaches for it. Judgment, and the honest kind:
 # nothing measures this yet -- see the open question about which commands get
@@ -129,6 +133,7 @@ RHYTHM = {
     "corp-os-redact": "Every time something leaves",
     "corp-os-guide": "Whenever you are unsure",
     "corp-os-setup": "Once",
+    "corp-os-migrate": "Once, at the start",
     "corp-os-configure": "When the shape stops fitting",
     "corp-os-upgrade": "After every plugin update",
     "corp-os-rebuild": "Rarely",

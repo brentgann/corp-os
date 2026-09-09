@@ -1,0 +1,136 @@
+{
+  "model": "claude-opus-5",
+  "passed": 10,
+  "total": 10,
+  "runs": [
+    {
+      "id": "migrate-cohort-and-cliff",
+      "skill": "corp-os-migrate",
+      "error": null,
+      "runs": 2,
+      "tally": {
+        "raw stays append-only": 2,
+        "usage/log.md row appended": 2,
+        "derived-layer writes have a proposal behind them": 2,
+        "raw files written for the material that should come across": 2,
+        "the disposition record exists": 2,
+        "the batch went through the gate as a persisted proposal": 2,
+        "a cohort ceiling was recorded before minting": 2,
+        "the run closed its own books": 2,
+        "unprocessed raw files are reachable from INDEX.md": 2,
+        "the calendar log is declined rather than filed": 2
+      },
+      "why": {
+        "raw stays append-only": "an edited raw file destroys the only thing a rebuild can restore from; flipping `processed` is the one sanctioned edit, and deletion only under a declared retention obligation",
+        "usage/log.md row appended": "the friction field is the whole improvement flywheel; a skill that skips it under pressure makes corp-os-improve blind",
+        "derived-layer writes have a proposal behind them": "a proposal that lives only in chat dies with the session and leaves no record of what the gate saw -- the declines especially, which are the only trace of what someone chose not to know",
+        "raw files written for the material that should come across": "the migration's actual work. A run that plans and files nothing has produced a conversation, not an OS",
+        "the disposition record exists": "the only artifact that makes a migration auditable rather than trusted, and the only place the calendar log's exclusion is recoverable six months later. In the corpus that surfaced this, the operator happened to write one and it was the sole reason an audit could verify the migration at all",
+        "the batch went through the gate as a persisted proposal": "a migration mints many entries at once, which is exactly when a gate degrades into a formality. The proposal file is what makes the batch reviewable after the session that produced it",
+        "a cohort ceiling was recorded before minting": "a migrated corpus is structurally weaker in a way per-claim judgment cannot catch, because every claim in the batch looks equally plausible alone",
+        "the run closed its own books": "every failing conformance check in this suite has been the last step of a run, and a migration is the most informative run an OS ever has",
+        "unprocessed raw files are reachable from INDEX.md": "a file that exists but is missing from the queue is invisible to every later run's scan, and the person's queue silently under-reports",
+        "the calendar log is declined rather than filed": "a record that meetings happened is not source material, and filing it is how a prior system's headline count came to be inflated by roughly a fifth with meeting logs sitting in its resolved tier. Uses the material's own word rather than one I picked, so it tests the judgment and not the vocabulary"
+      },
+      "diff": {
+        "added": [
+          "proposals/PROPOSAL-2026-09-09-migration-disposition.md",
+          "proposals/PROPOSAL-2026-09-09-migration-findings.md",
+          "raw/2026-02-11--meeting--notetaker-sync-1.md",
+          "raw/2026-03-01--note--reconstructed-1.md",
+          "raw/2026-03-02--note--reconstructed-2.md",
+          "raw/2026-03-03--note--reconstructed-3.md",
+          "raw/2026-03-12--meeting--notetaker-sync-2.md",
+          "raw/2026-04-13--meeting--notetaker-sync-3.md",
+          "raw/2026-05-14--meeting--notetaker-sync-4.md",
+          "raw/2026-06-15--meeting--notetaker-sync-5.md",
+          "raw/2026-07-16--meeting--notetaker-sync-6.md",
+          "raw/2026-08-17--meeting--notetaker-sync-7.md",
+          "raw/2026-09-18--meeting--notetaker-sync-8.md",
+          "usage/MIGRATION-2026-09-09.md"
+        ],
+        "changed": [
+          "INDEX.md",
+          "README.md",
+          "claims/pricing.md",
+          "jobs/renewal-risk.md",
+          "meta.json",
+          "usage/log.md"
+        ],
+        "removed": []
+      },
+      "results": [
+        {
+          "check": "raw stays append-only",
+          "passed": true,
+          "rate": 1.0,
+          "why": "an edited raw file destroys the only thing a rebuild can restore from; flipping `processed` is the one sanctioned edit, and deletion only under a declared retention obligation",
+          "detail": ""
+        },
+        {
+          "check": "usage/log.md row appended",
+          "passed": true,
+          "rate": 1.0,
+          "why": "the friction field is the whole improvement flywheel; a skill that skips it under pressure makes corp-os-improve blind",
+          "detail": ""
+        },
+        {
+          "check": "derived-layer writes have a proposal behind them",
+          "passed": true,
+          "rate": 1.0,
+          "why": "a proposal that lives only in chat dies with the session and leaves no record of what the gate saw -- the declines especially, which are the only trace of what someone chose not to know",
+          "detail": ""
+        },
+        {
+          "check": "raw files written for the material that should come across",
+          "passed": true,
+          "rate": 1.0,
+          "why": "the migration's actual work. A run that plans and files nothing has produced a conversation, not an OS",
+          "detail": ""
+        },
+        {
+          "check": "the disposition record exists",
+          "passed": true,
+          "rate": 1.0,
+          "why": "the only artifact that makes a migration auditable rather than trusted, and the only place the calendar log's exclusion is recoverable six months later. In the corpus that surfaced this, the operator happened to write one and it was the sole reason an audit could verify the migration at all",
+          "detail": ""
+        },
+        {
+          "check": "the batch went through the gate as a persisted proposal",
+          "passed": true,
+          "rate": 1.0,
+          "why": "a migration mints many entries at once, which is exactly when a gate degrades into a formality. The proposal file is what makes the batch reviewable after the session that produced it",
+          "detail": ""
+        },
+        {
+          "check": "a cohort ceiling was recorded before minting",
+          "passed": true,
+          "rate": 1.0,
+          "why": "a migrated corpus is structurally weaker in a way per-claim judgment cannot catch, because every claim in the batch looks equally plausible alone",
+          "detail": ""
+        },
+        {
+          "check": "the run closed its own books",
+          "passed": true,
+          "rate": 1.0,
+          "why": "every failing conformance check in this suite has been the last step of a run, and a migration is the most informative run an OS ever has",
+          "detail": ""
+        },
+        {
+          "check": "unprocessed raw files are reachable from INDEX.md",
+          "passed": true,
+          "rate": 1.0,
+          "why": "a file that exists but is missing from the queue is invisible to every later run's scan, and the person's queue silently under-reports",
+          "detail": ""
+        },
+        {
+          "check": "the calendar log is declined rather than filed",
+          "passed": true,
+          "rate": 1.0,
+          "why": "a record that meetings happened is not source material, and filing it is how a prior system's headline count came to be inflated by roughly a fifth with meeting logs sitting in its resolved tier. Uses the material's own word rather than one I picked, so it tests the judgment and not the vocabulary",
+          "detail": ""
+        }
+      ]
+    }
+  ]
+}

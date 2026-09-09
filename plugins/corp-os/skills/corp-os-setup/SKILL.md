@@ -39,6 +39,8 @@ The scaffold is minimal and empty on purpose. Everything after this makes it the
 
 ## Step 0.5 — check nothing already exists
 
+**If they already have a body of work** — a wiki, a notes app, a previous second brain, a folder of documents — scaffold and interrogate here as normal, then hand off to `corp-os-migrate` rather than filing any of it yourself. Bringing material across has its own failure modes (a cohort ceiling nobody set, dates replaced by today's, decay that all fires on one day, and no record of what was deliberately left behind), and none of them is visible until months later. Say so in one line and finish this skill first: the interrogation decides the shape the material lands in, so doing it afterwards means reshaping around whatever the migration happened to produce.
+
 Look for an existing Corp-OS root — `INDEX.md` + `meta.json`, with `config.json` beside them as confirmation — wherever the person means. If one exists, stop and say so: this skill does not re-scaffold over a live OS. Offer `corp-os-jobs` to add jobs, `corp-os-configure` to reshape structure, or `corp-os-rebuild` to re-derive.
 
 **Never make the presence of `jobs/`, `claims/`, or any other layer part of that test.** Those layers are optional by design, and a `jobs`-disabled OS that reads as "no OS" is one confirmation away from being overwritten — the only path in this suite that destroys a working system.

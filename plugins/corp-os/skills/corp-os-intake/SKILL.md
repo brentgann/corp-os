@@ -76,6 +76,8 @@ Read the material against the open evidence lists and say plainly whether it mov
 
 Then write the proposal to `proposals/PROPOSAL-<date>-<slug>.md` and present it — each claim with full provenance and an explicit recommendation (enrich an existing claim, create a new one, flag a conflict, decline). Hand the writing to `corp-os-claims`.
 
+**If the person gives an instruction about where derived content may live** — *"this stays out of her person record"*, *"file it but leave no pointer"* — write it into the raw file's frontmatter as `placement:`, per `${CLAUDE_PLUGIN_ROOT}/reference/data-model.md`. An instruction recorded only in a derived file, or only in the conversation, is one a rebuild will not read: regeneration is schema-driven, so it faithfully re-derives the content the person asked you not to produce. That is the one failure in this suite that destroys a commitment rather than degrading an answer, and the override has to live with the source it governs.
+
 **If the material's natural shape does not fit any layer that exists**, do not force it into a claim just because `claims/` is what is there. A directory of people, a set of live decisions, a register of obligations — each has its own shape, and a claim distorts it. Hand off to `corp-os-configure` to declare the layer properly first, then come back and propose entries into it.
 
 A layer improvised inline skips the interrogation that catches shape mistakes — the wrong `role`, a missing `index_line`, a path that looks like a directory but behaves like a single grouped file. That last one shipped in this plugin for five releases and silently undercounted the moment a second entry landed. The interrogation exists because those errors are cheap to prevent and expensive to unpick.

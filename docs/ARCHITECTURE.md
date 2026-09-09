@@ -3,7 +3,7 @@
 The working document for this project. It records what Corp-OS is, every consequential decision and the reasoning behind it, what has been tested and how, and what is still open. Written so a session that has never seen this repo can pick it up cold and make correct changes.
 
 **Status:** v0.11.0 · 21 skills · 9 reference specs · 6 shipped scripts · 8 commands · 3 eval harnesses · 3 fixtures
-**Last substantive change:** the skill map ships with the repo, generated rather than written, because a hand-kept one would have been the fifth instance of the defect this project keeps finding in itself.
+**Last substantive change:** the first release driven by an audit of a real OS rather than by the eval suite, and the findings were a different kind — correctness and confidentiality, not close-out discipline.
 
 ---
 
@@ -419,6 +419,30 @@ So the page is generated. Descriptions are parsed out of the frontmatter that al
 
 **The page and the published artifact are the same bytes.** `--fragment` emits the head-less form an Artifact wants; `docs/skill-map.html` is the standalone document a browser opens off disk. One template, so the shared link and the repo cannot drift.
 
+### 4.29 What an audit of a real OS found that eleven releases of evals did not
+
+**Release 0.12.0.** Every prior finding in this record came from the suite: a check that fired, a rate that would not move, a harness that lied. 0.12.0 came from someone running the thing on 220 sources and 836 claims for a day and then auditing it. The findings are a different species, and the difference is worth stating because it says what the suite is blind to.
+
+The evals measure **whether a skill does what it says**. They cannot measure **whether the model can hold the thing being built**. Every 0.12.0 finding is the second kind: a field that cannot express what an operator needs, a boundary that is correct per entry and wrong in aggregate, an instruction with nowhere durable to live.
+
+**The one that destroys something.** An operator gave an instruction that overrides the schema — content that must not reach a particular person record, with no pointer left anywhere. Placement is schema-driven, and regeneration is safe *because* placement is schema-driven, so the override was unrepresentable and got written into a derived file outside the scan path. A rebuild — the operation this suite *recommends* when a derived layer tangles — would have honoured the schema, violated the instruction, and had the raw source still sitting there as justification. `placement:` in raw frontmatter fixes it, and the validator fails unless both ends exist: intake writing it and rebuild reading it. An override written and never read is not an override.
+
+**The one that was correct everywhere and wrong anyway.** Sensitivity is set per entry; the thing being protected is the source text. The model mints entries per topic, so one quote yields several entries across several files written by several passes, and nothing reconciles their classifications. Per-entry redaction was mechanically correct on all 836 claims and the export still leaked: it withheld the sensitive member as a stub and emitted the byte-identical quote in full, twice. **Every per-entry check passes on that corpus.** `check_citations.py` clusters on the quote and refuses.
+
+**The one nobody had noticed was structural.** A migration verifies everything on the day it runs, so every decay window fires on the same day: 79 entries, then 71, then 410. The rubric already said a backlog nobody can clear teaches people to skip the sweep entirely, so a migrated OS was born with its central discipline pre-broken — and every teammate migrating into their own OS gets the same phase, so a team reaches its cliffs together and concludes collectively that the machinery was decorative. Neither the audit nor the packet listed it as a model finding; both had it as a local scheduling problem.
+
+**And the fix that was wrong the first time.** The plan said spread the `Verified` dates. Writing the script made it obvious that this falsifies a record in a system whose entire premise is provenance — asserting a review happened on a day no review happened, with every count and sweep downstream inheriting it. The **window** is the policy choice and the date is the fact, so the window is what varies. `stagger_decay.py` never touches a verification date.
+
+### 4.30 Two proposals from the packet were declined, and one was promoted
+
+Worth recording because the packet is a good document and these are the parts to argue with.
+
+**A reason suffix on an enum breaks every parser.** S5 is right that `needs_review` covers three situations — thin source, genuinely contested, and a paraphrase that cannot satisfy a verbatim requirement — and that a sweep cannot triage them apart. But the proposed `needs_review — explicitly an open unknown` puts free text inside a value that `build_index.py`, the export emitter, every ceiling rule and every eval assertion equality-tests. Sibling fields carry the same information at no migration cost. The packet's own argument against the prior system's compact tag applies one level further than it took it.
+
+**F7 proposed the approach measured as failing.** Its diagnosis is the best-evidenced thing in the document — zero usage rows after a full-day migration — and its fix, *"make the row a required output of the operations themselves"*, is more instruction aimed at the least-attended moment of a run. That is what §4.21 and §4.22 exist to record. Its own "cheaper interim" was the real answer and is what shipped: `build_index.py` says when the log has no rows while the derived layer is full. **The detector, not the instruction.**
+
+**And one correction that changed what got built.** The packet listed F5 (render `rests_on` as *N claims / M sources*) and S1 (an argument-across-claims layer) as independent deltas. `rests_on` does not exist in the shipped model — not in `data-model.md`, not in any skill, not in any script. It is the reporting operator's own convention. So F5 is not a rendering fix to an existing field; it is part of the schema of a field that has to be introduced first. They are one proposal, deferred together.
+
 ## 5. The skills
 
 | Skill | Job |
@@ -467,6 +491,8 @@ Being explicit, because much of this is unexercised.
 - `build_index.py --check` against a minimal no-config tree, exercising the reduced `DEFAULT_LAYERS` after `people`/`topics` were removed.
 - `scripts/validate.py` passes: frontmatter, name/directory match, cross-references, `${CLAUDE_PLUGIN_ROOT}` targets, step ordering, leakage.
 - **`build_index.py` is now executed by the build**, not merely parsed. `validate.py` copies `examples/fixture-os/` to a temp dir, runs the script against it, and asserts the counts, the custom layer's rendered `index_line`, the unprocessed queue, config-driven exclusions, the omission of the disabled layer, and that a second `--check` run finds no drift. Building the fixture immediately caught a real bug: an unrecognized key under `scan` fell back to defaults silently and rendered a plausible, wrong "not in the scan path" section. It is a warning now.
+- **`corp-os-migrate` at 10/10 across two repeats**, on the third version of its case. The first staged nothing on disk and then asserted files would be written; the second checked the answer for the string `retriev`, which a run can miss while distinguishing the populations perfectly; the third asserted a first pass files source and stops, which is stricter than the rule the skill states. Three wrong assertions, one working skill, and the corrections are in the case's own note.
+- **The routing eval at 22 skills**: 71 queries × 3 repeats, **100%**, including a four-way near-miss set built to pull `corp-os-migrate` toward `setup`, `intake`, `pull` and `audit` — the neighbourhood a bulk import sits in. `evals/runs/routing-v5.md`.
 - **The routing eval at 20 skills**: 64 queries × 3 repeats, **100%**, including three near-miss pairs written to pull `corp-os-upgrade` toward `configure`, `rebuild` and `setup`. `evals/runs/routing-v4.md`.
 - **The whole conformance suite re-run under the fixed harness** (§4.27), the first numbers in this repo where the shipped scripts actually executed: **114/122 across 19 cases, 16 skills and 3 fixtures**, at one repeat — a baseline, not rates. `setup-from-empty` 9/9 and `upgrade-stale-os` 10/10 replace 3/10 and 5/10. The eight remaining failures are the honest starting point for the next round rather than a regression, because there is no comparable earlier number to regress from.
 - **The routing eval**, three times. 44 queries × 3 repeats at first, then 58 after hardening: 93%, then 100%, then 100% over the harder set. Every run is committed under `evals/runs/` — the reports, not just the scores, because the confusion table is the part that says *which* pair collided.

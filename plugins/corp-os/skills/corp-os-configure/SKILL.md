@@ -98,6 +98,14 @@ Write `config.json`, update the OS's `README.md` to match, add a dated `meta.jso
 
 Then run `build_index.py` and report any drift the change introduced.
 
+## Every non-regenerable file is a declared layer
+
+If a file holds content that a rebuild could not reproduce from `raw/`, it is a layer and it needs a `role` — even when it is one file rather than a directory, and even when it is deliberately outside the scan path.
+
+Listing it in `scan.excluded_from_scan` is **not** a declaration. That keeps it out of the scan path and leaves it roleless, which is the state that caused the only irreversible failure in the audit record: a quarantine file named nowhere but the exclusion list, holding the sole copy of an operator instruction, invisible to every skill including the one that would have overwritten it.
+
+`build_index.py` reports undeclared root files on every run for this reason. Declare them here with a role and `in_scan_path: false` where that applies.
+
 ## Every run ends with
 
 Close the run with `scripts/log_run.py` in the OS rather than editing the files by hand — it writes the `usage/log.md` row and the dated `meta.json` history entry in one call, and refuses a blank friction field:

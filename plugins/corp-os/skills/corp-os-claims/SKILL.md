@@ -111,6 +111,14 @@ Statements can be sharpened, citations added, decay adjusted, jobs re-linked. Tw
 - **Never edit a citation.** It is a quotation. If it was wrong, the claim was wrong — retire and replace.
 - **Log any confidence change** in the claim's `Verified` field with the date and what changed it. A claim that quietly became `confirmed` is indistinguishable from one that was always guessed at.
 
+## Stamp the proposal with its outcome
+
+After review, write the result back into the proposal file as a header — what was accepted, what was declined, what changed during the conversation, and the date. Then say plainly in the file that it is a record rather than a live list.
+
+Without the stamp, a proposal nobody reviewed and a proposal reviewed and accepted are the same artifact on disk. The declines are the valuable part of the gate, and a decline is only legible if the outcome was written down: in an audited OS the gate had produced two empty placeholders where the prior system had three stamped records, and no one could tell whether the gate had run.
+
+**A bulk pass sets its ceiling first.** If this batch comes from a structurally weaker source — a migration, a set of AI-generated summaries, a backfill from memory — record the cohort ceiling in `meta.json` before minting, and give it an escape route if one exists. A ceiling that reads as permanent gets treated as permanent: in one corpus, 599 entries sat one connector call from promotion with zero having taken it.
+
 ## Every run ends with
 
 Close the run with `scripts/log_run.py` in the OS rather than editing the files by hand — it writes the `usage/log.md` row and the dated `meta.json` history entry in one call, and refuses a blank friction field:

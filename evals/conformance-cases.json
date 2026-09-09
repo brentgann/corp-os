@@ -530,6 +530,51 @@
         }
       ],
       "_note": "Runs against examples/fixture-stale, the only fixture that is deliberately wrong: version 0.9.0, an older build_index.py, no delete_source.py, and the pre-0.10.1 dashboards layout. validate.py asserts all four of those are still broken, because repairing the fixture would leave this case passing against an OS with nothing to upgrade -- which reads as coverage and is not.\n\nThe expect_untouched on dashboards/ is the real assertion here. Everything else this case checks is a script invocation, and the script does its own refusing."
+    },
+    {
+      "id": "migrate-cohort-and-cliff",
+      "skill": "corp-os-migrate",
+      "prompt": "There's a folder called `_incoming` in this OS with old material I want brought in. Have a look at what's there and migrate it.",
+      "answers": "The notetaker that produced the summaries is still paid for, so those transcripts can still be fetched. The tool behind the reconstructions was cancelled and the originals are gone for good.",
+      "expect_added": [
+        {
+          "name": "raw files written for the material that should come across",
+          "prefix": "raw/",
+          "min_count": 3,
+          "why": "the migration's actual work. A run that plans and files nothing has produced a conversation, not an OS"
+        },
+        {
+          "name": "the disposition record exists",
+          "prefix": "usage/MIGRATION",
+          "contains": "migration",
+          "why": "the only artifact that makes a migration auditable rather than trusted, and the only place the calendar log's exclusion is recoverable six months later. In the corpus that surfaced this, the operator happened to write one and it was the sole reason an audit could verify the migration at all"
+        },
+        {
+          "name": "the batch went through the gate as a persisted proposal",
+          "prefix": "proposals/",
+          "why": "a migration mints many entries at once, which is exactly when a gate degrades into a formality. The proposal file is what makes the batch reviewable after the session that produced it"
+        }
+      ],
+      "expect_changed": [
+        {
+          "name": "a cohort ceiling was recorded before minting",
+          "prefix": "meta.json",
+          "why": "a migrated corpus is structurally weaker in a way per-claim judgment cannot catch, because every claim in the batch looks equally plausible alone"
+        },
+        {
+          "name": "the run closed its own books",
+          "prefix": "usage/log.md",
+          "why": "every failing conformance check in this suite has been the last step of a run, and a migration is the most informative run an OS ever has"
+        }
+      ],
+      "expect_output": [
+        {
+          "name": "the calendar log is declined rather than filed",
+          "needle": "calendar",
+          "why": "a record that meetings happened is not source material, and filing it is how a prior system's headline count came to be inflated by roughly a fifth with meeting logs sitting in its resolved tier. Uses the material's own word rather than one I picked, so it tests the judgment and not the vocabulary"
+        }
+      ],
+      "_note": "Second version. The first described the material in the prompt instead of staging it, then asserted raw files would be written — incoherent, because there was nothing on disk to file, and it failed 0/2 for that reason rather than any of the skill's. The material now lives in fixture-os/_incoming/, which the generator ignores because of the leading underscore.\n\nThe first version also checked the answer for the string 'retriev', which is the vocabulary mistake this suite has now made three times — a run can distinguish the two populations perfectly while saying 'fetchable' or 'still have access to'. What replaced it is the calendar log, which has to be declined, named with the material's own word.\n\nThe expect_untouched on claims/ stays as the assertion most likely to be wrong: Step 4 says mint in batches through the gate, so a run that goes on to mint with a proposal is also defensible. If it fails that way, the check changes and the reason gets written here.\n\nThird version, and the flagged assertion was the one that broke. expect_untouched on claims/ encoded 'a first pass files source and stops', which the skill does not say — Step 4 says mint in batches through the gate. Both runs did exactly that: they filed source, then minted with a proposal, and the universal gate check passed on both. The rule I asserted was stricter than the rule that exists, which is the seventh time an assertion in this suite has been wrong about a skill rather than the reverse. Replaced with the property that actually matters at a migration's scale: the batch left a persisted proposal behind."
     }
   ]
 }

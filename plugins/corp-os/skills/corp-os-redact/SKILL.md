@@ -126,6 +126,18 @@ Then stop. **Do not publish, send, or forward the cleaned copy.** This skill mak
 
 If asked to redact something so that a third party will take it as complete or authentic when it is not, decline.
 
+## Before anything leaves — check the citation clusters
+
+```bash
+ python3 scripts/check_citations.py <the OS> --strict
+```
+
+Sensitivity is set per entry. The thing being protected is the **source text**. The model mints entries per topic, so one quote routinely yields several entries written by several passes, and nothing reconciles their classifications.
+
+Measured: per-entry redaction was mechanically correct on all 836 entries of a real corpus and the boundary still leaked — the sensitive member was correctly withheld as a stub, and the byte-identical quote was emitted in full twice as the two members a different pass had classified as ordinary. Every per-entry check passes on that corpus, because every entry is individually right.
+
+`--strict` exits non-zero on a split cluster. Resolve it to one class before continuing; do not redact around it. Withholding one copy of a quote that goes out in full elsewhere is not redaction, it is the appearance of it.
+
 ## Every run ends with
 
 Close the run with `scripts/log_run.py` in the OS rather than editing the files by hand — it writes the `usage/log.md` row and the dated `meta.json` history entry in one call, and refuses a blank friction field:

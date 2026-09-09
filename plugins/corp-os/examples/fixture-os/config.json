@@ -30,7 +30,7 @@
       "enabled": true,
       "role": "derived",
       "path": "jobs/",
-      "index_line": "{id} \u2014 {statement}"
+      "index_line": "{id} — {statement}"
     },
     "claims": {
       "enabled": true,
@@ -90,13 +90,21 @@
           "type": "list"
         }
       },
-      "index_line": "{id} \u2014 {statement} \u00b7 {owner} \u00b7 by {decide_by}",
+      "index_line": "{id} — {statement} · {owner} · by {decide_by}",
       "decay": "none"
     },
     "dashboards": {
       "enabled": true,
       "role": "record",
       "path": "dashboards.md"
+    },
+    "sensitive": {
+      "enabled": true,
+      "role": "record",
+      "path": "sensitive.md",
+      "in_scan_path": false,
+      "entry_marker": "### ",
+      "note": "quarantine for incidental sensitive material; declared as a layer so a rebuild knows it exists"
     }
   },
   "decay": {

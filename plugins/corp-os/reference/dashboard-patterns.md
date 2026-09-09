@@ -67,7 +67,13 @@ Never invent a second palette for a second dashboard in the same OS. Consistency
 
 ## Publishing and refresh
 
-Dashboards persist as published artifacts by default, because a dashboard exists to be returned to. Record every one in `dashboards.md`:
+Dashboards persist as a **self-contained local file by default**, and publishing is a separate decision made out loud.
+
+The reason is the model working as designed. `bearing` deliberately keeps load-bearing sensitive material in the scan path, because quarantining it produces confidently wrong answers rather than visible gaps. A dashboard reads the scan path. So a dashboard renders sensitive material by default, and publishing it puts that one share away from an audience.
+
+Publish when the person asks, from a redacted build, and record the decision and its reason in `dashboards.md` beside the URL. A redacted build filters **once at the data-load boundary**, not per panel: a reference implementation that filtered only its search index left the same material rendering in three other views, and disclosed it honestly, which is not the same as fixing it.
+
+A dashboard still exists to be returned to. Record every one in `dashboards.md`:
 
 ```markdown
 ### Job board

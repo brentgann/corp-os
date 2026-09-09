@@ -2,7 +2,7 @@
 
 Scan this first. Most questions should be answerable from this file alone; open a detail file only when the one-liners here are not enough.
 
-_Regenerated 2026-09-06 by scripts/build_index.py (counts and listings only — no retagging)._
+_Regenerated 2026-09-09 by scripts/build_index.py (counts and listings only — no retagging)._
 
 ## Counts
 
@@ -28,6 +28,14 @@ _Regenerated 2026-09-06 by scripts/build_index.py (counts and listings only — 
 Raw material not yet folded into the derived layer.
 
 - [2026-08-21--note--hallway](raw/2026-08-21--note--hallway.md) — note
+
+## Open evidence
+
+What the jobs still need, oldest first. One list, because the alternative is the same question spread across every job file.
+
+- Whether the churn started before or after the price change — `signal exists` · job-001
+- Which accounts are seat-capped rather than usage-capped — `open` · job-001
+- Which surface generated the August ticket spike — `partial` · job-002
 
 ## Not in the scan path
 

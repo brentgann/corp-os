@@ -385,6 +385,48 @@
       "expect": "corp-os-setup",
       "probes": "pair:upgrade-vs-setup",
       "query": "i installed the plugin, now what — i don't have one of these folders yet"
+    },
+    {
+      "id": "migrate-1",
+      "expect": "corp-os-migrate",
+      "probes": "coverage:migrate",
+      "query": "i've got about six months of notes in notion and a wiki. how do i get all that into this thing"
+    },
+    {
+      "id": "migrate-2",
+      "expect": "corp-os-migrate",
+      "probes": "coverage:migrate",
+      "query": "bring my old second brain across"
+    },
+    {
+      "id": "migrate-3",
+      "expect": "corp-os-migrate",
+      "probes": "coverage:migrate",
+      "query": "i exported everything from the old tool, there's like 400 files. what now"
+    },
+    {
+      "id": "migrate-near-1",
+      "expect": "corp-os-setup",
+      "probes": "pair:migrate-vs-setup",
+      "query": "i want to build one of these for my role. i don't have anything set up yet"
+    },
+    {
+      "id": "migrate-near-2",
+      "expect": "corp-os-intake",
+      "probes": "pair:migrate-vs-intake",
+      "query": "here's the transcript from this morning, add it"
+    },
+    {
+      "id": "migrate-near-3",
+      "expect": "corp-os-pull",
+      "probes": "pair:migrate-vs-pull",
+      "query": "grab whatever's new from my meeting notes since last week"
+    },
+    {
+      "id": "migrate-near-4",
+      "expect": "corp-os-audit",
+      "probes": "pair:migrate-vs-audit",
+      "query": "take a look at the notes system i've been keeping and tell me what's weak about it"
     }
   ]
 }

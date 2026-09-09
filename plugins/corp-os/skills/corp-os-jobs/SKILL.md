@@ -77,6 +77,20 @@ On retirement:
 
 `jobs/INDEX.md` and `meta.json` counts get updated in the same pass as any confirmed write. A job record that exists without its one-line index entry breaks the scan contract for every other skill.
 
+## Evidence items have a shape
+
+Each item under a job's open-questions section is written as:
+
+```
+- <what is still unknown> — `<status>` · opened <YYYY-MM-DD>
+```
+
+with `moved <date>` appended when the status changes. Statuses are declarable in `config.json` under `vocabulary.evidence_status`; `open` / `signal exists` / `partial` / `in motion` are the shipped default, and `vocabulary.evidence_resolved` names the ones that count as closed.
+
+Both halves earn their place from the same measurement. In an audited OS, 33 of 42 evidence items already carried one of four prose status markers — an operator had invented the vocabulary because the need is real — and because it was declared nowhere, nothing could group, sort or surface it. **Not one item carried a date.** Elapsed time is the primary ranking signal for a layer about what has not been settled, so without it the layer cannot rank itself, and "this has been open since June" is unrecoverable.
+
+`build_index.py` renders the open items across every job into one section of the root index, oldest first. That single ranked view is what a decision-heavy operator asks for most, and it is what gets lost when open questions are spread across a job file, a decision file and a topic file with nothing assembling them.
+
 ## Every run ends with
 
 Close the run with `scripts/log_run.py` in the OS rather than editing the files by hand — it writes the `usage/log.md` row and the dated `meta.json` history entry in one call, and refuses a blank friction field:

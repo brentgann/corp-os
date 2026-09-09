@@ -31,6 +31,14 @@ Rebuilds are expensive and often unnecessary. Diagnose before proceeding:
 
 Say plainly that the current derived layer will be replaced by a fresh derivation. Nothing is actually at risk — `raw/` is the backup — but the person should hear it before it happens.
 
+## Step 0.5 — read the placement overrides before deriving anything
+
+Scan `raw/` frontmatter for `placement:` and honour every one of them. These are instructions the person gave about where derived content may and may not live, and they **override the schema** — which is the whole reason they exist, and the reason they are written where regeneration reads rather than in the file they govern.
+
+A rebuild is schema-driven, and that is exactly what makes it safe in every other respect. It is also what makes this the one operation that can destroy a commitment: told nothing, it will re-derive personal content into a person record that someone explicitly said must not carry it, faithfully and irreversibly, with the original still sitting in `raw/` as justification.
+
+If a `placement:` value names a layer this OS has not declared, stop and say so rather than guessing. An override that cannot be resolved is not an override that can be ignored.
+
 ## Step 1 — read config and refuse to touch what is not derived
 
 Read `config.json`. **A rebuild only ever regenerates layers whose `role` is `derived`.** Layers marked `source` or `record` are off limits — `raw/` obviously, but also `proposals/` and any custom layer the person declared as its own truth.
@@ -91,6 +99,12 @@ The report is the deliverable. Specifically:
 ## What this never does
 
 Never edits, deletes, or rewrites anything in `raw/`. Never touches a layer whose role is not `derived`. Never drops provenance or sensitivity flags. Never renumbers existing IDs. Never finishes without the structural report.
+
+## Write the disposition record
+
+A rebuild that splits, merges or retires anything writes `usage/MIGRATION-<date>.md` the same way `corp-os-migrate` does: what changed shape, what was retired and why, and anything that came out of a grouping and did not go back into one.
+
+The reason is the same in both cases. A structural pass is the moment where things quietly stop existing, and six months later nobody can tell a deliberate retirement from a loss. The record costs a paragraph and it is the only thing that can answer the question later.
 
 ## Every run ends with
 

@@ -91,6 +91,19 @@ End with a plain assessment: how many claims were checked, how many held, how ma
 
 Then set the next sweep. Recurring is better than heroic — offer to schedule a small regular pass over the past-decay bucket, per `${CLAUDE_PLUGIN_ROOT}/reference/scheduling.md`. A sweep that happens monthly and resolves ten items keeps an OS honest; one that happens once a year and resolves two hundred is an event nobody repeats.
 
+## Also sweep the citation clusters
+
+```bash
+ python3 scripts/check_citations.py <the OS>
+```
+
+Reporting, not strict — a split cluster is something to resolve, not something to be stopped by, until the moment it is about to leave. Two findings come out of it:
+
+- **Split** — entries sharing a quote and disagreeing about its sensitivity. A confidentiality failure waiting for an export, and invisible to every per-entry check.
+- **Unlinked** — entries sharing a quote, agreeing on sensitivity, and not referencing each other. Usually two passes minting near-duplicates from one source. In one audited corpus, thirteen of fifteen shared-citation groups were unlinked and one of them contradicted itself on substance, with one member asserting a resolution as settled and another, from the same quote, stating it was never confirmed.
+
+Treat a self-contradicting cluster as a contradiction finding, because that is what it is.
+
 ## Every run ends with
 
 Close the run with `scripts/log_run.py` in the OS rather than editing the files by hand — it writes the `usage/log.md` row and the dated `meta.json` history entry in one call, and refuses a blank friction field:

@@ -31,7 +31,8 @@ from datetime import date
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 PLUGIN_ROOT = os.path.dirname(HERE)
-SHIPPED = ("build_index.py", "write_export.py", "log_run.py", "delete_source.py")
+SHIPPED = ("build_index.py", "write_export.py", "log_run.py",
+           "delete_source.py", "check_citations.py", "stagger_decay.py")
 
 
 def plugin_version():
