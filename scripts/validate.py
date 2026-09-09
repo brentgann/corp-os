@@ -453,6 +453,25 @@ def main():
             "instruction that had it opening decisions rather than naming "
             "corp-os-decide — the offer is to hand off")
 
+    # A rule stated after the step it governs is a rule the run has already
+    # passed. corp-os-jobs put its write gate forty lines below "Adding a
+    # job" and a conformance run wrote two job files with no proposal behind
+    # either. Position is the check, not presence.
+    jb = open("skills/corp-os-jobs/SKILL.md", encoding="utf-8").read()
+    if "## The write gate" not in jb or "## Adding a job" not in jb:
+        err("corp-os-jobs lost one of its section headings; the gate-order "
+            "check cannot run")
+    elif jb.index("## The write gate") > jb.index("## Adding a job"):
+        err("corp-os-jobs states its write gate after the sections that "
+            "write. `jobs/` is derived, so every creation, edit, split and "
+            "retirement is proposed first — a rule read after the step is a "
+            "rule the run has already passed")
+    im = open("skills/corp-os-improve/SKILL.md", encoding="utf-8").read()
+    if "writes only under `usage/`" not in im:
+        err("corp-os-improve no longer says where it may write. Asked to "
+            "study the usage log it wrote a claim, which arrives with no "
+            "proposal behind it and no source anyone can check")
+
     PASSES = ("Mechanical pass", "Mixed pass", "Judgment pass")
     for d in sorted(names):
         path = f"skills/{d}/SKILL.md"

@@ -11,6 +11,8 @@ The OS watches how it gets used and reshapes itself from evidence. This is what 
 
 The discipline that makes this skill worth running: **every proposal carries a count.** A hunch about what would be nicer is worth less than one line of the usage log, because a hunch is how the previous system got over-built.
 
+**This skill writes only under `usage/`.** It studies how the OS is used and proposes changes to the OS; it does not add to what the OS knows. Material worth capturing that surfaces while reading the log goes to `corp-os-intake` or `corp-os-claims`, which carry the citation and gate rules for it. A claim written from here arrives with no proposal behind it and no source anyone can check.
+
 Read `${CLAUDE_PLUGIN_ROOT}/reference/improvement-packet.md` and `${CLAUDE_PLUGIN_ROOT}/reference/data-model.md`.
 
 ## Pre-flight

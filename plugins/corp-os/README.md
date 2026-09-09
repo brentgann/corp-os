@@ -192,6 +192,12 @@ The model itself is specified in `reference/data-model.md`. Improvement packets 
 
 ## Version history
 
+**0.18.7** — two skills whose rules were in the wrong place.
+
+`corp-os-jobs` wrote two job files with no proposal behind either. Its write gate was correct and sat forty lines below *Adding a job*, so a run reached the action first and the constraint after. The gate now precedes all four sections that write, and the validator checks the ordering rather than the presence.
+
+`corp-os-improve`, asked to study the usage log, wrote `claims/pricing.md`. Nothing in the skill said where it may write. It now says it writes only under `usage/` and hands anything worth capturing to the skills that carry the citation and gate rules.
+
 **0.18.6** — the front door was doing the work.
 
 A conformance case gave `corp-os-guide` an undecided fork phrased as an instruction — *"we still haven't landed on whether to keep the legacy importer, can you get that into my OS?"* — and it wrote `decisions/legacy-importer.md`, edited a job, skipped the gate, and never said `corp-os-decide`.

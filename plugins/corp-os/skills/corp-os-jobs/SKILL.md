@@ -31,6 +31,12 @@ If this OS has `layers.jobs.enabled: false`, or has an open-items layer already 
 
 Say so if that is the finding, and say what to do instead — usually splitting the open-items layer by grammatical form (findings, errands, decisions) rather than adding a layer above it. Being wrong about this costs the person a migration and costs the model its credibility.
 
+## The write gate
+
+`jobs/` is derived-layer. Propose every job creation, edit, split, merge, and retirement, and wait for confirmation before writing — including changes that look purely mechanical.
+
+`jobs/INDEX.md` and `meta.json` counts get updated in the same pass as any confirmed write. A job record that exists without its one-line index entry breaks the scan contract for every other skill.
+
 ## Adding a job
 
 **Do not accept the first phrasing.** People describe tasks and deliverables; a job is neither.
@@ -72,12 +78,6 @@ On retirement:
 2. Find claims that served **only** this job. Propose retiring them too — this is the pruning rule that keeps the OS from growing forever, and it is the whole payoff of job-organization. Never delete them silently.
 3. Note anything learned that outlives the job, and propose it as a durable claim with `Decay: none`.
 4. Update `jobs/INDEX.md` and recount.
-
-## The write gate
-
-`jobs/` is derived-layer. Propose every job creation, edit, split, merge, and retirement, and wait for confirmation before writing — including changes that look purely mechanical.
-
-`jobs/INDEX.md` and `meta.json` counts get updated in the same pass as any confirmed write. A job record that exists without its one-line index entry breaks the scan contract for every other skill.
 
 ## Evidence items have a shape
 
