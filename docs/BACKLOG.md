@@ -8,11 +8,13 @@ Items leave this list by being done or by being declined in §8, never by being 
 
 ## 1. Unconditional reference reads
 
-**85,879 tokens read unconditionally across 23 skills, against 90,846 behind a condition.** An unconditional read costs on every invocation of that skill whether or not the branch needing it fires. Conditional now exceeds unconditional; it did not when this list was written.
+**84,823 tokens read unconditionally across 23 skills, against 89,458 behind a condition.** An unconditional read costs on every invocation of that skill whether or not the branch needing it fires. Conditional now exceeds unconditional; it did not when this list was written.
 
 Re-derive with `python3 scripts/ref_load.py`. Add `--skill <name>` for the sentence-by-sentence view, and **read that before editing anything** — four successive versions of this measurement set the work order wrong, all recorded in §4.51.
 
 Six skills sit at zero: `brief`, `dashboard`, `guide`, `recall`, `redact`, `glossary`.
+
+**A file's home is decided by how many skills read it unconditionally, not by subject.** Moving `capture` from `configuration.md` to `records.md` was right on subject and wrong on cost: records has more unconditional readers, so the suite total went up 1,154. Its own file, read by the two skills that use it, was strictly better than either. Check the reader count before re-homing anything.
 
 | skill | unconditional | reads every run |
 |---|---|---|

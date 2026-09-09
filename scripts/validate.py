@@ -359,12 +359,15 @@ def main():
     # and which are reasoning. The declaration is for the person choosing, and
     # for corp-os-guide when it routes.
     # capture is what decides a run's cost, so it is documented and honoured
-    cfgdoc = open("reference/configuration.md", encoding="utf-8").read()
+    # It lives in records.md, not configuration.md: pull and intake are its
+    # only readers and neither reads configuration.md, while the six skills
+    # that do read it were paying for a block none of them uses.
+    cfgdoc = open("reference/capture.md", encoding="utf-8").read()
     for term, why in (("\"capture\"", "the block that caps what a run fetches"),
                       ("Verbatim fetch", "the connector field that decides "
                        "whether skipping an item defers it or destroys it")):
         if term not in cfgdoc:
-            err(f"reference/configuration.md does not document {term} — {why}")
+            err(f"reference/capture.md does not document {term} — {why}")
     # The two-call shape is what makes triage possible; without it recorded, a
     # skill knows it can reach a source and nothing about reaching it cheaply.
     for term, why in (("List call", "what enumerates a source without bodies"),
@@ -387,7 +390,7 @@ def main():
                       ("excerpt", "the mode that costs what the material was "
                        "used for rather than how long it is")):
         if term not in cfgdoc:
-            err(f"reference/configuration.md does not document {term} — {why}")
+            err(f"reference/capture.md does not document {term} — {why}")
 
     pl = open("skills/corp-os-pull/SKILL.md", encoding="utf-8").read()
     if "re-open a file this run just wrote" not in pl:

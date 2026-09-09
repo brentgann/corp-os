@@ -192,6 +192,14 @@ The model itself is specified in `reference/data-model.md`. Improvement packets 
 
 ## Version history
 
+**0.18.4** — `corp-os-dashboard` reads nothing unconditionally, and the capture spec now lives where its readers are.
+
+Dashboard went from 12,786 unconditional reference tokens to zero. Three gates: the pattern catalogue is read only when no adopted pattern fits (Step 1 already said to pick from `patterns/`, "not from a catalogue in this file" — the skill was contradicting itself), the pattern *format* only when a file will not parse, and the scheduling spec only if the person accepts the cadence Step 6 offers.
+
+The `capture` block lived in `configuration.md`, which `corp-os-pull` and `corp-os-intake` do not read — so the block governing what a run fetches was unreachable by the only two skills it governs, and charged to six that do not use it. It now has its own file. Moving it to `records.md` first made the suite total *worse*, because records has more unconditional readers; that is recorded rather than quietly corrected.
+
+Suite unconditional reference load is 84,823 against 89,458 conditional. Six skills read nothing unconditionally.
+
 **0.18.3** — the check §4.48 asked for, and two lessons from building it.
 
 Every skill must now name the reference file defining any spec field it uses. Eight gaps in six skills on the first run, including `corp-os-configure` enforcing `entry_schema` and `index_line` while never naming the file that defines them.
