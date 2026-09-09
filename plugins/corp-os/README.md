@@ -192,6 +192,20 @@ The model itself is specified in `reference/data-model.md`. Improvement packets 
 
 ## Version history
 
+**0.19.0** — the index carries what the OS holds; a new `usage/health.md` carries what is wrong with it.
+
+Measured against a generated 800-claim OS, which is the first fixture large enough to show any of this. `INDEX.md` was **1,440 tokens, 1,029 of them findings** — *resting on stale evidence*, *arguments on one source*, *one call from promotion*, *open evidence*. Every skill read all of it on every run and almost none of them act on it.
+
+Capping the lists was the obvious fix and the wrong one: these sections exist to make problems visible, and finding #31 is the one nobody goes looking for. They move out whole and **uncapped** into `usage/health.md`, which `corp-os-reality-check` owns. `INDEX.md` keeps a line saying they exist.
+
+**INDEX.md 1,440 → 468. Pre-flight floor, paid by every skill on every run, 2,513 → 1,541.**
+
+`write_layer_index` counted files while the problem it exists for is about entries, so 800 claims grouped into 25 topic files fell under the 40 threshold and the largest layer in the OS was the one with no enumerated entry point — the "reachable only by grep" case its own docstring names. Either count crossing is now enough, and `claims/INDEX.md` generates at 965 tokens.
+
+All three fixtures carried a 414-line `build_index.py` against a shipped 888, and `fixture-stale` — deliberately two releases behind — was newer than the two that are not. Sixteen skills run the OS's copy, so every conformance result about script behaviour was measured against something else. Synced, and drift now fails the build.
+
+New: `scripts/corpus_load.py` reports what each skill reads on pre-flight against a real OS, and `scripts/make_fixture.py` generates a corpus of any size. Both cost nothing to run — no model, no tokens.
+
 **0.18.7** — two skills whose rules were in the wrong place.
 
 `corp-os-jobs` wrote two job files with no proposal behind either. Its write gate was correct and sat forty lines below *Adding a job*, so a run reached the action first and the constraint after. The gate now precedes all four sections that write, and the validator checks the ordering rather than the presence.

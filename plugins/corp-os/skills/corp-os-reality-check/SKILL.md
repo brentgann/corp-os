@@ -103,7 +103,9 @@ Then set the next sweep. Recurring is better than heroic — offer to schedule a
 
 ## The promotion backlog, and the arguments resting on one source
 
-Two things `build_index.py` now surfaces that belong in this sweep:
+Both are generated into `usage/health.md` by `build_index.py`, alongside `INDEX.md` and uncapped. That file is this skill's working input: the index carries what the OS holds, `health.md` carries what is wrong with it, and nothing truncates it because a finding visible only when it is one of the first thirty is not visible.
+
+Two things it surfaces that belong in this sweep:
 
 **One call from promotion.** Entries whose fidelity is `summary` and whose source still exposes a verbatim fetch. This is not a list of what is weak — it is a list of what is **one call from being stronger**, which is actionable in a way a weakness list is not. Work the ones gating the nearest decisions first; promoting the whole backlog is not the goal, and auto-promoting any of it without the actual fetch would raise a number while lowering the corpus's honesty.
 

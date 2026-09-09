@@ -25,7 +25,7 @@ import json
 import os
 import re
 import sys
-from datetime import date
+from datetime import date, timedelta
 
 FM = re.compile(r"^---\s*\n(.*?)\n---\s*\n", re.S)
 
@@ -67,6 +67,10 @@ DEFAULT_LAYERS = {
     "company":   {"enabled": False, "role": "derived",
                   "index_line": "{company} — {relationship}"},
     "proposals": {"enabled": True, "role": "record"},
+    # Path is the file, not a directory. The registry is one file holding many
+    # entries, and the counting strategy below branches on that shape -- see
+    # the path/shape warning in survey().
+    "dashboards": {"enabled": True, "role": "record", "path": "dashboards.md"},
 }
 
 
@@ -183,7 +187,28 @@ def survey(root, cfg):
                 "in_scan": spec.get("in_scan_path", True),
             }
             continue
-        s[name] = md_files(root, path)
+        # A directory-shaped path holding one grouped file is the mismatch that
+        # shipped for five releases: `dashboards/registry.md` counted files (1)
+        # where it meant to count entry headers (3), and stayed silent because
+        # both readings agree while there is only one entry.
+        #
+        # The packet that found it argued against a generic check, on the
+        # grounds that fixing the layout removes the problem more cheaply than
+        # a heuristic needing its own maintenance. Fair for `dashboards`, and
+        # the layout is fixed. But `corp-os-configure` Step 3 walks people
+        # through declaring custom layers with their own paths, so the class
+        # recurs on shapes no layout fix reaches. The condition here is exact
+        # rather than heuristic -- one .md in the directory, and it carries
+        # entry headers -- and it warns rather than fails, which is the right
+        # weight for "this is probably not what you meant".
+        entries = md_files(root, path)
+        if len(entries) == 1 and count_headers(entries[0]) > 1:
+            print(f"WARNING: layer '{name}' declares a directory path "
+                  f"('{spec.get('path') or name}') but holds one file with "
+                  f"{count_headers(entries[0])} entry headers. It is being "
+                  "counted as 1. If it is really one file of many entries, "
+                  f"point its path at the file itself.")
+        s[name] = entries
     s.setdefault("raw", md_files(root, "raw"))
     s.setdefault("claims", [])
     s["claim_entries"] = sum(count_headers(f) for f in s.get("claims", []))
@@ -200,11 +225,359 @@ def survey(root, cfg):
         if os.path.isdir(os.path.join(root, d))
         and not d.startswith((".", "_"))
         and d not in ("scripts", "usage")
-        and d not in {(sp.get("path") or n).rstrip("/")
+        # A layer whose path points at a file inside a directory
+        # (`decisions/registry.md`) still declares that directory. Without the
+        # first component, following the path/shape warning above earns a
+        # spurious "undeclared directory" complaint for the same layer -- which
+        # is how a warning becomes something people route around.
+        and d not in {(sp.get("path") or n).rstrip("/").split("/")[0]
                       for n, sp in cfg["layers"].items()}
         and d not in {"archive", "_archive"}
     )
+    # A hand-made *file* at the root is invisible in a way a directory is not.
+    # `sensitive.md` was declared nowhere except as a string in the scan
+    # exclusion list, so it had no role, nothing knew it was a layer, and a
+    # rebuild would have re-derived over content that existed only there. The
+    # undeclared-directory check could not see it because it is a file.
+    # Being in `excluded_from_scan` is NOT a declaration. That is precisely
+    # the state the reporting OS was in -- `sensitive.md` named only as a
+    # string in the exclusion list, so it had no role and nothing knew it was
+    # a layer. Counting exclusion as declaration would reproduce the bug this
+    # check exists to find.
+    declared_files = {(sp.get("path") or n).rstrip("/")
+                      for n, sp in cfg["layers"].items()}
+    s["unlisted_files"] = sorted(
+        f for f in os.listdir(root)
+        if os.path.isfile(os.path.join(root, f))
+        and f.endswith(".md")
+        and f not in ("INDEX.md", "README.md")
+        and not f.startswith((".", "_"))
+        and f not in declared_files
+    )
+    # -- the usage log, which is the one file whose emptiness is invisible.
+    # Not an mtime comparison: a fresh clone stamps every file with the
+    # checkout time, so mtimes would make every clone look stale. The
+    # unambiguous condition is the one that actually happened -- a full
+    # migration built six layers and left the log with zero rows.
+    derived = sum(len(v) for k, v in s.items()
+                  if isinstance(v, list) and k not in
+                  ("raw", "unprocessed", "unlisted", "unlisted_files"))
+    log = os.path.join(root, "usage", "log.md")
+    rows = 0
+    if os.path.exists(log):
+        rows = sum(1 for ln in open(log, encoding="utf-8", errors="replace")
+                   if re.match(r"^\|\s*\d{4}-\d{2}-\d{2}\s*\|", ln))
+    s["log_rows"] = rows
+    s["log_silent"] = bool(derived and rows == 0)
     return s
+
+
+# ------------------------------------------------ rests_on breadth (F5 + S1)
+# A list of supporting entry ids reads as evidence breadth and does not measure
+# it. Entries are minted at whatever granularity a pass chose, so one
+# conversation that yielded nine contributes nine. Measured in a real corpus:
+# an argument resting on nine entries that all traced to a single meeting. The
+# number looked like breadth and was one data point.
+#
+# So it renders as two numbers, always, and the ratio is the signal.
+RESTS_RE = re.compile(r"^[-*]?\s*\*\*Rests on\*\*\s*:\s*(.+?)\s*$", re.I | re.M)
+SRC_RE = re.compile(r"^[-*]?\s*\*\*Source\*\*\s*:\s*(.+?)\s*$", re.I | re.M)
+FID_RE = re.compile(r"^[-*]?\s*\*\*Source fidelity\*\*\s*:\s*(\w+)", re.I | re.M)
+
+
+def entry_blocks(path, marker="### "):
+    """(id, body) per entry. Shared by everything that reads entry fields."""
+    out, cur, buf = [], None, []
+    try:
+        lines = open(path, encoding="utf-8", errors="replace").read().split("\n")
+    except OSError:
+        return out
+    for ln in lines:
+        if ln.startswith(marker):
+            if cur:
+                out.append((cur, "\n".join(buf)))
+            cur, buf = ln[len(marker):].split("—")[0].strip(), [ln]
+        elif cur:
+            buf.append(ln)
+    if cur:
+        out.append((cur, "\n".join(buf)))
+    return out
+
+
+def source_map(root, cfg):
+    """entry id -> set of raw paths it cites, across every derived layer."""
+    m = {}
+    for name, spec in (cfg.get("layers") or {}).items():
+        if not spec.get("enabled") or spec.get("role") != "derived":
+            continue
+        path = (spec.get("path") or name).rstrip("/")
+        full = os.path.join(root, path)
+        files = ([full] if path.endswith(".md")
+                 else [f for f in md_files(root, path)])
+        for f in files:
+            for eid, body in entry_blocks(f, spec.get("entry_marker", "### ")):
+                srcs = set()
+                for s in SRC_RE.findall(body):
+                    for tok in re.split(r"[,;]| and ", s):
+                        tok = tok.strip().split(" — ")[0].strip()
+                        if tok.startswith("raw/"):
+                            srcs.add(tok)
+                m[eid] = srcs
+    return m
+
+
+def rests_ids(body):
+    """The entry ids in a Rests on list, or []. One parser, because two
+    readers of the same field is how they drift apart."""
+    ids = []
+    for line in RESTS_RE.findall(body):
+        ids += [x.strip() for x in re.split(r"[,;]", line) if x.strip()]
+    return ids
+
+
+def breadth(body, smap):
+    """(n entries, m distinct sources) for one Rests on list."""
+    ids = rests_ids(body)
+    if not ids:
+        return None
+    srcs = set()
+    for i in ids:
+        srcs |= smap.get(i, set())
+    return len(ids), len(srcs)
+
+
+# ------------------------------------------------ grounding that went stale
+# Decay is modelled on the claim and swept by corp-os-reality-check. It is not
+# modelled on the things BUILT from claims, and nothing joined the two -- so a
+# dashboard registered in March off four claims, two of which went past their
+# window in June, reads exactly like one refreshed yesterday. Same class as the
+# finding that produced "Open evidence": every field was already on disk and no
+# view assembled them.
+DECAY_RE = re.compile(r"^[-*]?\s*\*\*Decay\*\*\s*:\s*(\S+)", re.I | re.M)
+VERIFIED_RE = re.compile(r"^[-*]?\s*\*\*Verified\*\*\s*:\s*(\d{4}-\d{2}-\d{2})",
+                         re.I | re.M)
+
+
+def decay_state(body, today):
+    """'stale' | 'never' | 'fresh' | 'durable' | None.
+
+    None means the entry declares no decay window at all, which is not the same
+    as a durable one and must not be reported as either.
+    """
+    m = DECAY_RE.search(body or "")
+    if not m:
+        return None
+    win = m.group(1).strip().rstrip(".,").lower()
+    if win in ("none", "never", "-", "n/a"):
+        return "durable"
+    d = re.fullmatch(r"(\d+)\s*d", win)
+    if not d:
+        return None                      # an unparseable window is not a claim
+    v = VERIFIED_RE.search(body or "")
+    if not v:
+        return "never"
+    try:
+        y, mo, dy = (int(x) for x in v.group(1).split("-"))
+        due = date(y, mo, dy) + timedelta(days=int(d.group(1)))
+    except ValueError:
+        return None
+    return "stale" if due < today else "fresh"
+
+
+def entry_bodies(root, s, cfg):
+    """entry id -> body, across every enabled layer. The lookup table the
+    Rests on lists are resolved against."""
+    out = {}
+    for name, spec in (cfg.get("layers") or {}).items():
+        if not spec.get("enabled") or not isinstance(s.get(name), list):
+            continue
+        for f in s[name]:
+            for eid, body in entry_blocks(f, spec.get("entry_marker", "### ")):
+                out.setdefault(eid, body)
+    return out
+
+
+def stale_grounding(root, s, cfg, today):
+    """(id, n_stale, n_never, n_cited, relpath) for anything resting on
+    evidence that has gone stale underneath it.
+
+    Deliberately not restricted to one layer role. An argument and a registered
+    dashboard have the same exposure, and the field they declare it with is the
+    same field.
+    """
+    bodies = entry_bodies(root, s, cfg)
+    out = []
+    for name, spec in (cfg.get("layers") or {}).items():
+        if not spec.get("enabled") or not isinstance(s.get(name), list):
+            continue
+        for f in s[name]:
+            for eid, body in entry_blocks(f, spec.get("entry_marker", "### ")):
+                ids = rests_ids(body)
+                if not ids:
+                    continue
+                states = [decay_state(bodies.get(i), today) for i in ids]
+                n_stale = states.count("stale")
+                n_never = states.count("never")
+                if n_stale or n_never:
+                    out.append((eid, n_stale, n_never, len(ids),
+                                os.path.relpath(f, root)))
+    return sorted(out)
+
+
+def retrievable_backlog(root, cfg):
+    """Entries whose medium is a summary and whose source can still be fetched.
+
+    Not a count of what is weak -- a count of what is one call from being
+    stronger, which is a different and actionable thing. In the corpus that
+    produced this, that number was 599 and nobody could see it.
+    """
+    conn = os.path.join(root, "connectors.md")
+    fetchable = set()
+    if os.path.exists(conn):
+        cur = None
+        for ln in open(conn, encoding="utf-8", errors="replace"):
+            if ln.startswith("### "):
+                cur = ln[4:].strip().lower()
+            m = re.match(r"^[-*]?\s*\*\*Verbatim fetch\*\*\s*:\s*(\w+)", ln, re.I)
+            if m and cur and m.group(1).lower() in ("yes", "true"):
+                fetchable.add(cur)
+    if not fetchable:
+        return 0
+    n = 0
+    for name, spec in (cfg.get("layers") or {}).items():
+        if not spec.get("enabled") or spec.get("role") != "derived":
+            continue
+        path = (spec.get("path") or name).rstrip("/")
+        files = ([os.path.join(root, path)] if path.endswith(".md")
+                 else md_files(root, path))
+        for f in files:
+            for _eid, body in entry_blocks(f, spec.get("entry_marker", "### ")):
+                fid = FID_RE.search(body)
+                if not fid or fid.group(1).lower() != "summary":
+                    continue
+                src = SRC_RE.search(body)
+                blob = (src.group(1).lower() if src else "")
+                if any(c in blob for c in fetchable):
+                    n += 1
+    return n
+
+
+# --------------------------------------------------------- open evidence (F4)
+# A job's evidence list is where "what do I still not know" lives, and it was
+# the one structure with no declared shape: in the corpus that reported it, 33
+# of 42 items carried one of four prose status markers that appeared in no
+# config, no schema and no index, and not one carried a date. So nothing could
+# group them, sort them or surface them, and the single ranked view of open
+# items -- the question a decision-heavy operator asks most -- had no home.
+#
+# Both spellings parse, because the prose one is what every existing OS holds:
+#     - Whether the churn started before the price change — `signal exists`
+#     - Whether the churn started before the price change — `open` · opened 2026-08-04
+EVIDENCE_RE = re.compile(
+    r"^[-*]\s+(?P<text>.+?)\s+[—-]\s+`(?P<status>[^`]+)`"
+    r"(?:\s*·\s*opened\s+(?P<opened>\d{4}-\d{2}-\d{2}))?"
+    r"(?:\s*·\s*moved\s+(?P<moved>\d{4}-\d{2}-\d{2}))?\s*$")
+
+
+def open_evidence(root, s, cfg):
+    """Evidence items across every job, with the job they serve.
+
+    Resolved values are declarable, because an operator renames vocabulary.
+    Anything not named as resolved is open, which is the safe direction: a
+    status nobody declared should show up needing attention rather than
+    silently vanish from the one view that exists to catch it.
+    """
+    spec = cfg["layers"].get("jobs") or {}
+    if not spec.get("enabled"):
+        return []
+    vocab = cfg.get("vocabulary") or {}
+    done = {v.lower() for v in vocab.get("evidence_resolved",
+                                         ["answered", "resolved", "closed"])}
+    out = []
+    for f in s.get("jobs", []):
+        fm = frontmatter(f)
+        jid = fm.get("id") or os.path.basename(f)[:-3]
+        for line in open(f, encoding="utf-8", errors="replace"):
+            m = EVIDENCE_RE.match(line.rstrip())
+            if not m:
+                continue
+            if m.group("status").strip().lower() in done:
+                continue
+            out.append({"job": jid, "text": m.group("text").strip(),
+                        "status": m.group("status").strip(),
+                        "opened": m.group("opened"),
+                        "moved": m.group("moved")})
+    # Oldest first: elapsed time is the ranking signal for a layer about what
+    # has not been settled, and an item with no date sorts last rather than
+    # first, because an undated item is not evidence of age.
+    out.sort(key=lambda e: (e["opened"] is None, e["opened"] or ""))
+    return out
+
+
+# ------------------------------------------------------ per-layer index (F3)
+GEN_MARK = "<!-- generated by build_index.py — do not edit below this line -->"
+
+
+def write_layer_index(root, name, files, spec, cfg, threshold):
+    """A grouped summary for a layer too large to list entry by entry.
+
+    The root index deliberately emits a bare count for a layer of hundreds,
+    which is right -- a per-entry listing there would swamp the scan contract.
+    The consequence nobody designed was that such a layer then has NO
+    enumerated entry point at all, so its contents are reachable only by grep.
+    The reasoning that a hand-kept count in a second place goes wrong is
+    correct; the conclusion to carry no counts was the wrong half. Generate
+    them instead.
+    """
+    # The threshold counted FILES while the problem this function exists for
+    # is about ENTRIES. 800 claims grouped into 25 topic files is 25 < 40, so
+    # the layer with the most in it was the one that got no index -- exactly
+    # the "reachable only by grep" case named two paragraphs up. Either count
+    # crossing is enough.
+    entries = sum(count_headers(f, spec.get("entry_marker", "### "))
+                  for f in files)
+    if len(files) < threshold and entries < threshold:
+        return None
+    idx = os.path.join(root, (spec.get("path") or name).rstrip("/"), "INDEX.md")
+    preamble = ""
+    if os.path.exists(idx):
+        existing = open(idx, encoding="utf-8", errors="replace").read()
+        preamble = existing.split(GEN_MARK)[0].rstrip()
+    if not preamble:
+        preamble = f"# {_lbl(name, cfg['layers'], cfg)}"
+
+    marker = spec.get("entry_marker", "### ")
+    enums = [k for k in ("kind", "confidence", "status") if k]
+    rows, totals = [], {"entries": 0}
+    for f in sorted(files):
+        n = count_headers(f, marker)
+        body = open(f, encoding="utf-8", errors="replace").read()
+        mixes = {}
+        for field in enums:
+            vals = re.findall(rf"^[-*]?\s*\**{field}\**\s*:\s*`?([\w-]+)",
+                              body, re.I | re.M)
+            if vals:
+                c = {}
+                for v in vals:
+                    c[v.lower()] = c.get(v.lower(), 0) + 1
+                mixes[field] = ", ".join(f"{k} {v}" for k, v in
+                                         sorted(c.items(), key=lambda x: -x[1]))
+        unjobbed = len(re.findall(r"^[-*]?\s*\**jobs?\**\s*:\s*`?none",
+                                  body, re.I | re.M))
+        rows.append((os.path.basename(f)[:-3], n, mixes, unjobbed))
+        totals["entries"] += n
+
+    L = [preamble, "", GEN_MARK, "",
+         f"_{len(files)} files · {totals['entries']} entries · regenerated "
+         f"{date.today().isoformat()}._", "",
+         "| group | entries | mix | unjobbed |", "|---|---|---|---|"]
+    for base, n, mixes, unjobbed in rows:
+        mix = " · ".join(f"{k}: {v}" for k, v in mixes.items()) or "—"
+        L.append(f"| [{base}]({base}.md) | {n} | {mix} | "
+                 f"{unjobbed if unjobbed else ''} |")
+    L.append("")
+    open(idx, "w", encoding="utf-8").write("\n".join(L))
+    return idx
 
 
 def render_index(root, s, cfg):
@@ -215,7 +588,14 @@ def render_index(root, s, cfg):
     # A misspelled key here fails silently and renders a plausible but wrong
     # "not in the scan path" section, so say so rather than falling back mutely.
     for k in scan:
-        if k not in ("excluded_from_scan", "stop_early", "order"):
+        # `note` is accepted here because it is accepted in every other config
+        # block, and the inconsistency was not cosmetic: this warned on every
+        # single run of every OS carrying a documented scan block, and a
+        # warning that always fires is what teaches people to skip the one
+        # that matters. In the corpus that reported it, the ignored warning
+        # was a real undeclared directory.
+        if k not in ("excluded_from_scan", "stop_early", "order", "note",
+                     "per_layer_index_threshold"):
             print(f"WARNING: config scan.{k} is not a key this script knows — "
                   "check reference/configuration.md; it is being ignored.")
     excluded = scan.get("excluded_from_scan", ["sensitive.md", "raw/_archive/"])
@@ -278,8 +658,18 @@ def render_index(root, s, cfg):
         # already said.
         order_by = spec.get("order_by")
         if order_by:
-            values = (spec.get("entry_schema", {}).get(order_by, {})
-                      .get("values") or [])
+            # entry_schema is a dict in some OSes and a list of field names in
+            # others. Both are legitimate and both are in the wild; assuming
+            # the dict form crashed the whole index the first time a config
+            # used the list form with order_by. A list declares names without
+            # values, so there is no ordering to read -- fall back to
+            # alphabetical rather than failing.
+            es = spec.get("entry_schema")
+            values = []
+            if isinstance(es, dict):
+                spec_field = es.get(order_by)
+                if isinstance(spec_field, dict):
+                    values = spec_field.get("values") or []
             rank = {v: i for i, v in enumerate(values)}
             files = sorted(
                 files,
@@ -329,6 +719,100 @@ def render_index(root, s, cfg):
                      (f" — {gist}" if gist else ""))
         L.append("")
 
+    # -- The health report. It used to live in INDEX.md, which every skill
+    # reads on every run, and at 800 claims it was 1,029 of that file's 1,440
+    # tokens: 71% of the index every skill pays for, to carry findings almost
+    # none of them act on. Capping the lists was the obvious fix and the wrong
+    # one -- these sections exist to make problems visible, and finding #31 is
+    # the one nobody goes looking for. So they move out whole and uncapped,
+    # and INDEX.md keeps a line saying they exist.
+    H = [
+        "# Health",
+        "",
+        "Generated by `build_index.py` alongside `INDEX.md`. Findings about "
+        "the corpus rather than an inventory of it: what rests on too little, "
+        "what has decayed underneath something built from it, and what could "
+        "be promoted cheaply. `corp-os-reality-check` is the skill that acts "
+        "on this file.",
+        "",
+        "Nothing here is truncated. A finding that is only visible when it is "
+        "one of the first thirty is not visible.",
+        "",
+    ]
+    # -- rests_on breadth, wherever it appears.
+    smap = source_map(root, cfg)
+    thin = []
+    for name, spec in cfg["layers"].items():
+        if not spec.get("enabled") or not isinstance(s.get(name), list):
+            continue
+        for f in s[name]:
+            for eid, body in entry_blocks(f, spec.get("entry_marker", "### ")):
+                b = breadth(body, smap)
+                if b and b[1] <= 1:
+                    thin.append((eid, b[0], b[1], os.path.relpath(f, root)))
+    if thin:
+        H += ["## Arguments resting on one source", "",
+              "Not wrong, and not the same object as one resting on nine. "
+              "Only the record can tell them apart, so it says so.", ""]
+        for eid, n, m, rel in sorted(thin):
+            H.append(f"- {eid} — **{n} entr{'y' if n == 1 else 'ies'} / "
+                     f"{m} source{'' if m == 1 else 's'}** · "
+                     f"[{os.path.basename(rel)[:-3]}]({rel})")
+        H.append("")
+
+    # -- grounding that decayed underneath something built from it.
+    stale = stale_grounding(root, s, cfg, date.today())
+    if stale:
+        H += ["## Resting on evidence that has gone stale", "",
+              "Decay is carried by the entry, and swept by "
+              "corp-os-reality-check. What is listed here is the join nothing "
+              "else performs: the things **built from** those entries, which "
+              "inherit the staleness and say nothing about it. A view "
+              "published in March off four entries, two of them past their "
+              "window in June, reads exactly like one refreshed yesterday.", ""]
+        for eid, n_st, n_nv, n_all, rel in stale:
+            bits = []
+            if n_st:
+                bits.append(f"**{n_st} of {n_all}** past its window")
+            if n_nv:
+                bits.append(f"**{n_nv}** never verified")
+            H.append(f"- {eid} — {' · '.join(bits)} · "
+                     f"[{os.path.basename(rel)[:-3]}]({rel})")
+        H += ["", "Re-verify what it rests on, or retire it. An output nobody "
+              "re-grounds is the same defect as a claim nobody re-checks, one "
+              "layer up.", ""]
+
+    back = retrievable_backlog(root, cfg)
+    if back:
+        H += ["## One call from promotion", "",
+              f"**{back}** entr{'y is a summary' if back == 1 else 'ies are summaries'} "
+              "whose source still exposes a verbatim fetch. Pulling the "
+              "original is the cheapest confidence this OS can buy, and a "
+              "ceiling that looks permanent gets treated as permanent — in "
+              "the corpus that surfaced this, the number was 599 and nothing "
+              "showed it.", ""]
+
+    ev = open_evidence(root, s, cfg)
+    if ev:
+        H += ["## Open evidence", "",
+              "What the jobs still need, oldest first. One list, because the "
+              "alternative is the same question spread across every job file.",
+              ""]
+        for e in ev[:30]:
+            age = f" · opened {e['opened']}" if e["opened"] else ""
+            H.append(f"- {e['text']} — `{e['status']}` · {e['job']}{age}")
+        if len(ev) > 30:
+            H.append(f"- _…and {len(ev) - 30} more._")
+        H.append("")
+
+    health = [x for x in H if x.startswith("## ")]
+    if health:
+        L += ["## Health", "",
+              "`usage/health.md` carries " +
+              ", ".join(x[3:].lower() for x in health) +
+              ". Regenerated with this file; read it when the task is the "
+              "state of the corpus rather than its contents.", ""]
+
     L += ["## Not in the scan path", ""]
     for x in excluded:
         L.append(f"- `{x}` — excluded by config. Open only when the task "
@@ -341,7 +825,7 @@ def render_index(root, s, cfg):
               + ", ".join(f"`{d}/`" for d in s["unlisted"])
               + ". Every skill treats config as the authority, so these are "
               "invisible to all of them. Declare or remove them.", ""]
-    return "\n".join(L)
+    return "\n".join(L), "\n".join(H)
 
 
 def main():
@@ -387,9 +871,20 @@ def main():
     if check_only:
         sys.exit(1 if drift else 0)
 
-    open(os.path.join(root, "INDEX.md"), "w", encoding="utf-8").write(
-        render_index(root, s, cfg)
-    )
+    index_md, health_md = render_index(root, s, cfg)
+    open(os.path.join(root, "INDEX.md"), "w", encoding="utf-8").write(index_md)
+    os.makedirs(os.path.join(root, "usage"), exist_ok=True)
+    open(os.path.join(root, "usage", "health.md"), "w",
+         encoding="utf-8").write(health_md)
+
+    threshold = ((cfg.get("scan") or {}).get("per_layer_index_threshold") or 40)
+    made = []
+    for name, spec in cfg["layers"].items():
+        if not spec.get("enabled") or not isinstance(s.get(name), list):
+            continue
+        made_path = write_layer_index(root, name, s[name], spec, cfg, threshold)
+        if made_path:
+            made.append(os.path.relpath(made_path, root))
 
     if meta:
         meta.setdefault("counts", {}).update(counted)
@@ -403,9 +898,25 @@ def main():
         if counted[k]:
             parts.append(f"{counted[k]} {k}")
     print("INDEX.md regenerated: " + ", ".join(parts) + ".")
+    if made:
+        print("Per-layer index regenerated: " + ", ".join(made)
+              + f" (layers at or over {threshold} files or entries).")
     if s.get("unlisted"):
         print("Undeclared directories (invisible to every skill): "
               + ", ".join(s["unlisted"]))
+    if s.get("unlisted_files"):
+        print("Undeclared files (no role, and a rebuild does not know they "
+              "exist): " + ", ".join(s["unlisted_files"])
+              + "\n  Declare each in config.json layers with a role. Listing "
+                "it in scan.excluded_from_scan is not a declaration -- that "
+                "keeps it out of the scan path and still leaves it roleless. "
+                "A file holding the only copy of something, that nothing "
+                "knows is a layer, is how a rebuild destroys it.")
+    if s.get("log_silent"):
+        print(f"usage/log.md has no rows, and the derived layer holds "
+              f"{sum(len(v) for k, v in s.items() if isinstance(v, list) and k not in ('raw','unprocessed','unlisted','unlisted_files'))} "
+              "entries. corp-os-improve reads that file and only that file; "
+              "with no rows it is blind. Close runs with scripts/log_run.py.")
     if s["unprocessed"]:
         print("Unprocessed material is waiting — run corp-os-claims to work the queue.")
 

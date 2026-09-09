@@ -632,6 +632,24 @@ def main():
         # and several skills tell the model to run it. A fixture without one
         # tests the fixture rather than the skill -- that gap produced a false
         # failure once.
+        # Present is not enough: it has to be the CURRENT one. All three
+        # fixtures carried a 414-line build_index.py against a shipped 888 --
+        # fixture-stale, which is deliberately behind, was NEWER than the two
+        # that are not. Sixteen skills call scripts at the OS path, so every
+        # conformance result about script behaviour was measured against a
+        # script half the size of the one that ships. §4.27 is the same
+        # finding one layer down: a harness that runs the wrong artifact
+        # reports on the wrong artifact, confidently.
+        if "fixture-stale" not in fixture:
+            for script in sorted(os.listdir(os.path.join(PLUGIN, "scripts"))):
+                if not script.endswith(".py"):
+                    continue
+                fp = os.path.join(fixture, "scripts", script)
+                if os.path.exists(fp) and not filecmp.cmp(
+                        os.path.join(PLUGIN, "scripts", script), fp, shallow=False):
+                    err(f"{fixture}/scripts/{script} has drifted from the "
+                        "shipped copy. Skills run the OS's copy, so a stale "
+                        "one means every case measured something else")
         for script in ("build_index.py", "write_export.py", "log_run.py",
                        "delete_source.py"):
             if not os.path.exists(os.path.join(fixture, "scripts", script)):
@@ -682,6 +700,25 @@ def main():
                     f"{(r.stderr or r.stdout).strip()[:400]}")
                 continue
             idx = open(os.path.join(work, "INDEX.md"), encoding="utf-8").read()
+            hp = os.path.join(work, "usage", "health.md")
+            health = open(hp, encoding="utf-8").read() if os.path.exists(hp) else ""
+            # The findings moved out of INDEX.md into usage/health.md, which
+            # is the point: at 800 claims they were 1,029 of the index's 1,440
+            # tokens and every skill read them on every run. Expectations are
+            # checked against both, and then the split itself is asserted --
+            # otherwise a regression that put them back would pass here.
+            if not health:
+                err(f"{fixture}: build_index.py wrote no usage/health.md. The "
+                    "findings have to land somewhere; uncapped in a file one "
+                    "skill reads is the whole trade")
+            for moved in ("## Resting on evidence that has gone stale",
+                          "## Arguments resting on one source",
+                          "## One call from promotion", "## Open evidence"):
+                if moved in idx:
+                    err(f"{fixture}: {moved!r} is back in INDEX.md. Every "
+                        "skill reads that file on every run and almost none "
+                        "act on these; they belong in usage/health.md")
+            idx = idx + "\n" + health
             for needle, why in expectations:
                 if needle not in idx:
                     err(f"{fixture} render is missing {why}: {needle!r}")

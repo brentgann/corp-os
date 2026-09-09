@@ -11,7 +11,7 @@ _Regenerated 2026-09-09 by scripts/build_index.py (counts and listings only — 
 - **Findings**: 4
 - **Arguments**: 2
 - **Decisions**: 2
-- **Patterns**: 1
+- **Patterns**: 2
 - **Proposals**: 1
 - **Connectors**: 2
 - **Dashboards**: 2
@@ -37,31 +37,9 @@ Raw material not yet folded into the derived layer.
 
 - [2026-08-21--note--hallway](raw/2026-08-21--note--hallway.md) — note
 
-## Arguments resting on one source
+## Health
 
-Not wrong, and not the same object as one resting on nine. Only the record can tell them apart, so it says so.
-
-- AR-0002 — **1 entry / 1 source** · [support-surface](arguments/support-surface.md)
-
-## Resting on evidence that has gone stale
-
-Decay is carried by the entry, and swept by corp-os-reality-check. What is listed here is the join nothing else performs: the things **built from** those entries, which inherit the staleness and say nothing about it. A view published in March off four entries, two of them past their window in June, reads exactly like one refreshed yesterday.
-
-- AR-0002 — **1 of 1** past its window · [support-surface](arguments/support-surface.md)
-
-Re-verify what it rests on, or retire it. An output nobody re-grounds is the same defect as a claim nobody re-checks, one layer up.
-
-## One call from promotion
-
-**1** entry is a summary whose source still exposes a verbatim fetch. Pulling the original is the cheapest confidence this OS can buy, and a ceiling that looks permanent gets treated as permanent — in the corpus that surfaced this, the number was 599 and nothing showed it.
-
-## Open evidence
-
-What the jobs still need, oldest first. One list, because the alternative is the same question spread across every job file.
-
-- Whether the churn started before or after the price change — `signal exists` · job-001
-- Which accounts are seat-capped rather than usage-capped — `open` · job-001
-- Which surface generated the August ticket spike — `partial` · job-002
+`usage/health.md` carries arguments resting on one source, resting on evidence that has gone stale, one call from promotion, open evidence. Regenerated with this file; read it when the task is the state of the corpus rather than its contents.
 
 ## Not in the scan path
 

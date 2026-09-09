@@ -2,15 +2,18 @@
 
 Scan this first. Most questions should be answerable from this file alone; open a detail file only when the one-liners here are not enough.
 
-_Regenerated 2026-09-05 by scripts/build_index.py (counts and listings only — no retagging)._
+_Regenerated 2026-09-09 by scripts/build_index.py (counts and listings only — no retagging)._
 
 ## Counts
 
 - **Raw files**: 3 (1 unprocessed)
 - **Entries**: 4
 - **Open-Items**: 3
+- **Patterns**: 1
 - **Playbooks**: 2
 - **Proposals**: 1
+- **Unlisted Files**: 1
+- **Dashboards**: 0
 
 ## Open-Items
 
@@ -22,6 +25,12 @@ _Regenerated 2026-09-05 by scripts/build_index.py (counts and listings only — 
 
 - **[Escalation ladder](playbooks/escalation.md)** — hand-maintained
 - **[Vendor offboarding](playbooks/vendor-offboarding.md)** — hand-maintained
+
+## Unlisted Files
+
+- **[connectors](../../../../connectors.md)**
+
+> **Incomplete index.** These layers have no `index_line` in `config.json`, so their entries are listed as bare links and cannot be scanned without opening each file: `unlisted_files`. Run corp-os-configure to give each one a template.
 
 ## Unprocessed queue
 
