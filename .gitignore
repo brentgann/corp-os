@@ -49,3 +49,6 @@ dist/*.tgz
 !plugins/corp-os/examples/fixture-*/usage/
 !plugins/corp-os/examples/fixture-*/usage/**
 !plugins/corp-os/examples/fixture-*/sensitive.md
+
+# files the desktop app drops here when it delivers a result
+Claude outputs/
