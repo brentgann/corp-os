@@ -55,6 +55,8 @@ docs/skill-map.html  every skill, mapped to the phase it belongs to — generate
 
 **[`docs/skill-map.html`](docs/skill-map.html)** is the one-page tour: what each skill does, what it refuses, which phase it belongs to, and the commands and scripts underneath. Open it in a browser. It is **generated** — every count, description and eval number on it is read from the plugin at build time, and `validate.py` fails if it has drifted. The only thing declared by hand is which phase a skill belongs to, and the generator refuses to run until a new skill has been placed.
 
+For a PDF, open it and print to PDF: the page carries print styles, so it paginates properly rather than reproducing the screen layout. The PDF itself is deliberately **not** committed &mdash; it is a render of a file that regenerates itself, and a binary in the tree is the one artifact here nothing could check for staleness.
+
 `validate.py` is not only a linter. It enforces the rules that live in nineteen files at once — the pre-flight and config-first blocks, the usage-log row, and the rule that no optional layer may be used to detect whether an OS exists. Those had all drifted by 0.5.0, which is why they are checked rather than merely documented.
 
 Start at [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) to work on this. Start at [`plugins/corp-os/README.md`](plugins/corp-os/README.md) to use it.

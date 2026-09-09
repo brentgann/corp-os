@@ -46,7 +46,8 @@ OUT = os.path.join(ROOT, "docs", "skill-map.html")
 # a map rather than a table of contents.
 PHASES = [
     {
-        "key": "capture", "name": "Capture", "tok": "p1",
+        "key": "capture",
+        "rail": "Material lands in the append-only layer. Existing there means <em>said</em>, not true.", "name": "Capture", "tok": "p1",
         "for": "Getting things said into a layer that is never edited, never "
                "summarized in place, never deleted outside a declared "
                "obligation. One sanctioned exception: flipping "
@@ -57,7 +58,8 @@ PHASES = [
         "skills": ["corp-os-intake", "corp-os-pull", "corp-os-connect"],
     },
     {
-        "key": "curate", "name": "Curate", "tok": "p2",
+        "key": "curate",
+        "rail": "Raw becomes citable &mdash; a kind, a confidence, a verbatim quote, a decay window.", "name": "Curate", "tok": "p2",
         "for": "Turning a pile into knowledge, behind a review gate written to "
                "disk before it is presented. The declines are the valuable "
                "part &mdash; the only record of what someone chose not to know.",
@@ -68,7 +70,8 @@ PHASES = [
                    "corp-os-glossary", "corp-os-company"],
     },
     {
-        "key": "consult", "name": "Consult", "tok": "p3",
+        "key": "consult",
+        "rail": "The only phase that pays you back. Questions answered with provenance attached.", "name": "Consult", "tok": "p3",
         "for": "Getting the knowledge back out with its provenance still "
                "attached. Three shapes, because a question, a standing digest, "
                "and a page you return to are genuinely different needs.",
@@ -78,7 +81,8 @@ PHASES = [
         "skills": ["corp-os-recall", "corp-os-brief", "corp-os-dashboard"],
     },
     {
-        "key": "correct", "name": "Correct", "tok": "p4",
+        "key": "correct",
+        "rail": "Confidence outlives its evidence unless something goes looking for it.", "name": "Correct", "tok": "p4",
         "for": "The fifth invariant made routine: something has to remove "
                "things. Claims past their decay window, claims never verified, "
                "contradictions, assumptions still worn as facts.",
@@ -88,7 +92,8 @@ PHASES = [
         "skills": ["corp-os-reality-check"],
     },
     {
-        "key": "release", "name": "Release", "tok": "p5",
+        "key": "release",
+        "rail": "The boundary. Where an OS stops helping and starts costing you something.", "name": "Release", "tok": "p5",
         "for": "One operator, but exports land in multi-person systems. "
                "Sensitivity is two axes: <code>sensitivity</code> says what "
                "must not leave, <code>bearing</code> says whether the OS can "
@@ -316,7 +321,7 @@ def render(d, fragment=False):
     rail = "".join(f"""
     <div class="step" style="--sc:var(--{p['tok']}); --st:var(--{p['tok']}-text)">
       <div class="n">PHASE {i}</div><h4>{E(p['name'])}</h4>
-      <p>{p['skip'].split('.')[0]}.</p>
+      <p>{p['rail']}</p>
     </div>""" for i, p in enumerate(PHASES, 1))
 
     phases = ""
@@ -646,6 +651,63 @@ footer{margin-top:40px; padding-top:18px; border-top:1px solid var(--line-soft);
 @media (prefers-reduced-motion:no-preference){
   .card,.step{transition:box-shadow 200ms cubic-bezier(.4,0,.2,1)}
   .card:hover,.step:hover{box-shadow:var(--shadow-md)}
+}
+@media print{
+  /* Print is a third theme, and it has to beat both stamps: someone printing
+     from a dark-themed browser would otherwise get white text on white paper,
+     because [data-theme] outranks a bare :root. */
+  :root, :root[data-theme="dark"], :root:not([data-theme="light"]){
+    --ink:#17132B; --ink-soft:#4A4459; --ink-faint:#6E6880;
+    --paper:#FFFFFF; --paper-raised:#FFFFFF;
+    --line:#9ED3DE; --line-soft:#C9E8ED; --line-pink:#EAB8D2;
+    --p1-tint:#EAE8F8; --p2-tint:#E4EEF7; --p3-tint:#E1F3EE;
+    --p4-tint:#FBF0DC; --p5-tint:#FCE7E3;
+    --pink-tint:#FAE5F0; --cyan-tint:#DFF6F8; --navy-tint:#E4EBF1;
+    --navy-text:#1B3A5C;
+    --p1-text:#4B3F95; --p2-text:#2D6CAD; --p3-text:#177561;
+    --p4-text:#7A5910; --p5-text:#A9483B;
+    --pink-text:#A93D78; --cyan-text:#087580;
+    --shadow-sm:none; --shadow-md:none;
+  }
+  @page{ margin:14mm 12mm; }
+  html,body{background:#fff}
+  *{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  .wrap{max-width:none; padding:0}
+  body{font-size:10.5pt; line-height:1.45}
+  h1{font-size:26pt}
+  .thesis{font-size:11.5pt}
+  .phase-head h2,.bench-head h2,.layer h2{font-size:16pt}
+  .step h4{font-size:12pt}
+  .fact b{font-size:15pt}
+  /* Nothing that reads as one object may be split across a page. */
+  .card,.step,.phase-why div,.notes li,tr,.facts,.loopnote{break-inside:avoid}
+  .phase-head,.bench-head,.layer h2,.notes h2{break-after:avoid}
+  .phase,.bench,.layer,.notes{break-inside:auto}
+  .bench,.layer,.notes{margin-top:24px}
+  .phase{margin-top:22px}
+  .rail-block{margin:22px 0 4px}
+  /* The responsive breakpoints below fire in print, because the print
+     viewport is about 590 CSS px wide. The rail collapsing to two columns
+     destroys the one thing it exists to show — that these five are a
+     sequence — so print restates the wide layout after them. */
+  .rail{grid-template-columns:repeat(5,1fr)}
+  .phase-why{grid-template-columns:1fr 1fr}
+  /* Grid does not fragment across a page break: Chromium stops placing items
+     at the boundary and leaves the rest of the section empty. The workbench
+     lost half a page that way. Multi-column fragments correctly. */
+  .cards{display:block; columns:2; column-gap:10px}
+  .cards .card{display:block; margin:0 0 10px}
+  .bench{padding:16px 18px}
+  .card{padding:12px 14px 11px; gap:7px}
+  /* A horizontally scrolling container is a screen affordance; on paper it
+     just clips the right-hand column off the page. */
+  .scroll{overflow:visible}
+  table{min-width:0}
+  th,td{padding:7px 10px}
+  .step{padding:10px 11px 12px}
+  .notes{border-style:solid}
+  footer{margin-top:24px}
+  a{text-decoration:none}
 }
 </style>"""
 

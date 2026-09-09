@@ -177,6 +177,63 @@ footer{margin-top:40px; padding-top:18px; border-top:1px solid var(--line-soft);
   .card,.step{transition:box-shadow 200ms cubic-bezier(.4,0,.2,1)}
   .card:hover,.step:hover{box-shadow:var(--shadow-md)}
 }
+@media print{
+  /* Print is a third theme, and it has to beat both stamps: someone printing
+     from a dark-themed browser would otherwise get white text on white paper,
+     because [data-theme] outranks a bare :root. */
+  :root, :root[data-theme="dark"], :root:not([data-theme="light"]){
+    --ink:#17132B; --ink-soft:#4A4459; --ink-faint:#6E6880;
+    --paper:#FFFFFF; --paper-raised:#FFFFFF;
+    --line:#9ED3DE; --line-soft:#C9E8ED; --line-pink:#EAB8D2;
+    --p1-tint:#EAE8F8; --p2-tint:#E4EEF7; --p3-tint:#E1F3EE;
+    --p4-tint:#FBF0DC; --p5-tint:#FCE7E3;
+    --pink-tint:#FAE5F0; --cyan-tint:#DFF6F8; --navy-tint:#E4EBF1;
+    --navy-text:#1B3A5C;
+    --p1-text:#4B3F95; --p2-text:#2D6CAD; --p3-text:#177561;
+    --p4-text:#7A5910; --p5-text:#A9483B;
+    --pink-text:#A93D78; --cyan-text:#087580;
+    --shadow-sm:none; --shadow-md:none;
+  }
+  @page{ margin:14mm 12mm; }
+  html,body{background:#fff}
+  *{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  .wrap{max-width:none; padding:0}
+  body{font-size:10.5pt; line-height:1.45}
+  h1{font-size:26pt}
+  .thesis{font-size:11.5pt}
+  .phase-head h2,.bench-head h2,.layer h2{font-size:16pt}
+  .step h4{font-size:12pt}
+  .fact b{font-size:15pt}
+  /* Nothing that reads as one object may be split across a page. */
+  .card,.step,.phase-why div,.notes li,tr,.facts,.loopnote{break-inside:avoid}
+  .phase-head,.bench-head,.layer h2,.notes h2{break-after:avoid}
+  .phase,.bench,.layer,.notes{break-inside:auto}
+  .bench,.layer,.notes{margin-top:24px}
+  .phase{margin-top:22px}
+  .rail-block{margin:22px 0 4px}
+  /* The responsive breakpoints below fire in print, because the print
+     viewport is about 590 CSS px wide. The rail collapsing to two columns
+     destroys the one thing it exists to show — that these five are a
+     sequence — so print restates the wide layout after them. */
+  .rail{grid-template-columns:repeat(5,1fr)}
+  .phase-why{grid-template-columns:1fr 1fr}
+  /* Grid does not fragment across a page break: Chromium stops placing items
+     at the boundary and leaves the rest of the section empty. The workbench
+     lost half a page that way. Multi-column fragments correctly. */
+  .cards{display:block; columns:2; column-gap:10px}
+  .cards .card{display:block; margin:0 0 10px}
+  .bench{padding:16px 18px}
+  .card{padding:12px 14px 11px; gap:7px}
+  /* A horizontally scrolling container is a screen affordance; on paper it
+     just clips the right-hand column off the page. */
+  .scroll{overflow:visible}
+  table{min-width:0}
+  th,td{padding:7px 10px}
+  .step{padding:10px 11px 12px}
+  .notes{border-style:solid}
+  footer{margin-top:24px}
+  a{text-decoration:none}
+}
 </style>
 </head>
 <body>
@@ -200,23 +257,23 @@ footer{margin-top:40px; padding-top:18px; border-top:1px solid var(--line-soft);
   <div class="rail">
     <div class="step" style="--sc:var(--p1); --st:var(--p1-text)">
       <div class="n">PHASE 1</div><h4>Capture</h4>
-      <p>Nothing downstream can cite anything.</p>
+      <p>Material lands in the append-only layer. Existing there means <em>said</em>, not true.</p>
     </div>
     <div class="step" style="--sc:var(--p2); --st:var(--p2-text)">
       <div class="n">PHASE 2</div><h4>Curate</h4>
-      <p>You have a folder of transcripts.</p>
+      <p>Raw becomes citable &mdash; a kind, a confidence, a verbatim quote, a decay window.</p>
     </div>
     <div class="step" style="--sc:var(--p3); --st:var(--p3-text)">
       <div class="n">PHASE 3</div><h4>Consult</h4>
-      <p>You have built a write-only diary.</p>
+      <p>The only phase that pays you back. Questions answered with provenance attached.</p>
     </div>
     <div class="step" style="--sc:var(--p4); --st:var(--p4-text)">
       <div class="n">PHASE 4</div><h4>Correct</h4>
-      <p>The OS keeps answering with confidence it has not earned since March.</p>
+      <p>Confidence outlives its evidence unless something goes looking for it.</p>
     </div>
     <div class="step" style="--sc:var(--p5); --st:var(--p5-text)">
       <div class="n">PHASE 5</div><h4>Release</h4>
-      <p>The wrong sentence goes out in a paste.</p>
+      <p>The boundary. Where an OS stops helping and starts costing you something.</p>
     </div>
   </div>
   <div class="loopnote">
