@@ -315,7 +315,7 @@ html{{scroll-behavior:smooth}}
     </div>
     <div class="measured">
       <div class="fig {'ok' if not PARTIAL else ''}"><b>{HEADLINE}</b><span>conformance</span></div>
-      <div class="fig"><b>{CONF['cases'] or '&mdash;'}</b><span>cases</span></div>
+      <div class="fig"><b>{'&mdash;' if PARTIAL else CONF['cases']}</b><span>cases</span></div>
       <div class="fig"><b>{CONF['skills_total']}</b><span>skills</span></div>
     </div>
   </div>
@@ -329,7 +329,7 @@ html{{scroll-behavior:smooth}}
 <div class="wrap" id="intro">
   <div class="openbox">
     <p class="eyebrow">Four open checks, named here rather than left out</p>
-    <p class="openlead">Five checks failed in the run above. One was the
+    <p class="openlead">Five checks failed in the last full suite. One was the
        harness asserting the wrong thing &mdash; it read the OS&rsquo;s own
        capture rule as a fabricated source &mdash; and that assertion has been
        replaced. Four are real, in two skills:</p>
@@ -340,7 +340,7 @@ html{{scroll-behavior:smooth}}
 <main class="wrap">{''.join(panels)}</main>
 
 <footer><div class="wrap">
-  Generated from the repository's own markdown at v{VER}. {COVER_NOTE}.
+  Generated from the repository's own markdown at v{VER}. {COVER_NOTE.rstrip('.')}.
   Rebuild with <code>python3 scripts/build_docs.py --data</code> then
   <code>scripts/build_page.py --standalone</code>.
 </div></footer>
