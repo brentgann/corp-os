@@ -15,6 +15,7 @@ one invocation of each skill pays before it does any work.
 """
 import argparse
 import glob
+import json
 import os
 import re
 import sys
@@ -63,6 +64,19 @@ def index_sections(text):
     return sorted(((n, tok(b)) for n, b in parts), key=lambda x: -x[1])
 
 
+def _notes(o):
+    """Every `note` value at any depth. They are for people and cost tokens."""
+    if isinstance(o, dict):
+        for k, v in o.items():
+            if k == "note" and isinstance(v, str):
+                yield v
+            else:
+                yield from _notes(v)
+    elif isinstance(o, list):
+        for v in o:
+            yield from _notes(v)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("os_root")
@@ -97,6 +111,31 @@ def main():
         print()
 
     if a.sections:
+        # config.json is the authority and every skill reads it first, so its
+        # size is paid on every run of every skill and has never once been
+        # counted. In one real OS it was 3,846 tokens, 40% of the pre-flight
+        # floor, against 1,073 in a synthetic one -- the difference being
+        # layer count and prose `note` fields, which are documentation the
+        # model re-reads forever.
+        try:
+            cfg = json.loads(cfgtxt)
+            print("  config.json by key:")
+            rows = [(k, tok(json.dumps(v))) for k, v in cfg.items()]
+            for k, n in sorted(rows, key=lambda x: -x[1]):
+                print(f"    {k[:44]:<46} {n:>7}")
+            if isinstance(cfg.get("layers"), dict):
+                print("    layers, by layer:")
+                for k, v in sorted(cfg["layers"].items(),
+                                   key=lambda x: -tok(json.dumps(x[1]))):
+                    print(f"      {k[:42]:<44} {tok(json.dumps(v)):>7}")
+            notes = sum(tok(str(v)) for v in _notes(cfg))
+            if notes:
+                print(f"\n    prose `note` fields, total          {notes:>9}"
+                      "  documentation, re-read every run")
+            print()
+        except ValueError:
+            print("  (config.json did not parse)\n")
+
         print("  INDEX.md by section:")
         for n, c in index_sections(root_index):
             if c:
