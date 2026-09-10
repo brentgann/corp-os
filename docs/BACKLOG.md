@@ -22,6 +22,22 @@ Items leave this list by being done or by being declined in §8, never by being 
 
 ## Open
 
+### 0a. Where the four failing checks ended up (0.25.3, `--repeats 3`)
+
+**17/18.** The four things carried into this round, and what each turned out to be:
+
+| Check | Before | Now | What it was |
+|---|---|---|---|
+| `no dashboards/ directory was created` | 2/3 | **3/3, twice** | A layer is a file or a folder, never both. Checked at close. |
+| `the declared layer has an index_line` | 2/3 | **3/3** | `build_index.py` already rendered the banner; nothing read it. Checked at close. |
+| `the missing layer is raised as a proposal` | 1/5 | **5/6** | Prose beside a numbered procedure, made a numbered command. |
+| `unprocessed raw files are reachable from INDEX.md` | "1/3" | **PASS** | Never failed. A conditional check divided by the run count. §4.55. |
+
+`corp-os-glossary` is 6/6 for the first time.
+
+**The one open number is the pattern refusal at 5/6**, and it is being left as a rate rather than patched. Three of the four rows above were fixed by a mechanical check; this one cannot be — deciding a layer is warranted is judgment, and the refusal only makes the decision visible. A fourth attempt at it on the strength of one round of three is the exact move §4.55 was written about.
+
+
 ### 0. The enforcement chain has one model-dependent link left
 
 **Measured 2026-09-10 at 0.25.1, both models.** Sonnet 4.5, full suite: **137/163**. Opus 5, seven cases at `--repeats 3`: **36/40**, with the gate and the log row 3/3 in every case.
