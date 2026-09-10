@@ -477,6 +477,19 @@ def main():
             "study the usage log it wrote a claim, which arrives with no "
             "proposal behind it and no source anyone can check")
 
+    # A conformance run rebuilt `dashboards/` as a directory, which is the
+    # shape the layout fix removed -- the index reported 1 however many
+    # dashboards were in it. The rule lived in reference/dashboard-patterns.md,
+    # which 0.18.4 gated behind "if no adopted pattern fits", so a run with a
+    # pattern never read it. §4.48 again: a refactor removed a capability
+    # without touching the skill that had it, and the cost showed up two
+    # releases later in a case that had passed for months.
+    db = open("skills/corp-os-dashboard/SKILL.md", encoding="utf-8").read()
+    if "registry file, not a folder" not in db:
+        err("corp-os-dashboard no longer says `dashboards` is a registry file "
+            "rather than a folder. A run that recreates the directory brings "
+            "back a layer that counts 1 no matter what is in it")
+
     PASSES = ("Mechanical pass", "Mixed pass", "Judgment pass")
     for d in sorted(names):
         path = f"skills/{d}/SKILL.md"

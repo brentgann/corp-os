@@ -192,6 +192,14 @@ The model itself is specified in `reference/data-model.md`. Improvement packets 
 
 ## Version history
 
+**0.19.12** — a gated read cost `corp-os-dashboard` a rule it had for five releases.
+
+The first full conformance run since 0.18.5 came back **152/163**, and one of the eleven failures was caused by this repo's own cost work. `dashboard-hub-and-registry` had passed at 7/7 for months; it now rebuilds `dashboards/` as a directory — the shape whose removal was the point of the layout fix, because a registry-as-directory made the index report `1` however many dashboards were in it.
+
+The rule lived in `reference/dashboard-patterns.md`. 0.18.4 gated that read behind *"if this OS has adopted no pattern that fits"*, which is correct for a catalogue and wrong for a rule. A run with an adopted pattern never read it again.
+
+§4.48 exactly: a refactor removes a capability without touching the skill that had it. The rule is now in the skill, ungated, with the reason attached, and the validator fails its absence.
+
 **0.19.11** — the unknown-role warning only looks at enabled layers.
 
 `fixture-register` turns `jobs` off and gives it no role, which is fine and which 0.19.9 warned about on every run. A disabled layer's role changes nothing, and a warning that fires when nothing is wrong is what teaches people to skip the one that matters — the reason the `scan.*` warning was scoped the same way two releases earlier.

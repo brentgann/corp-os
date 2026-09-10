@@ -26,11 +26,31 @@ Items leave this list by being done or by being declined in §8, never by being 
 
 `corp-os-upgrade` now declares `model: sonnet`. The documentation for that field is Claude Code's. **Whether Cowork honours it is unverified**, and an ignored field is a change that reaches nobody — the failure this repo is named after by now. One run of that skill in each surface settles it.
 
-### 2. Conformance has not run since any of this
+### 2. Conformance: 152/163 at 0.19.11, and eleven things it found
 
-The last run was 69/79 on 0.18.5, and everything since has changed the skills, the scripts, the fixtures and the harness. That number is not a baseline for anything.
+First full run since 0.18.5, thirteen releases back. Was 69/79. `corp-os-guide` went **4/7 → 7/7** (0.18.6 landed), and `setup` 9/9, `upgrade` 10/10, `migrate` 10/10, `configure` 8/8 — including the hand-off §4.25 recorded as landing 2 times in 5.
 
-`--repeats 5 --case recall-load-bearing-sensitive` first: it is a rate, not a result (§7.2), it costs about eight minutes, and §4.28 records three wording passes made against `corp-os-configure` before anyone established its rate.
+**Caused by this repo's own cost work — fixed in 0.19.12:**
+
+- `dashboard-hub-and-registry` rebuilt `dashboards/` as a directory. Passed at 7/7 for months. 0.18.4 gated the read of `reference/dashboard-patterns.md`, which carried the rule. §4.48 again.
+
+**Two fixes from 0.18.7 did not take. Both confirmed still failing:**
+
+- **`corp-os-improve` wrote `claims/pricing.md`** against a fixture holding one friction note, and wrote proposals from that single occurrence. 0.18.7 added *"writes only under `usage/`"* to the skill and it did not hold. The wording is not the fix; this needs the constraint somewhere a run meets before it acts, or in code.
+- **`corp-os-jobs` wrote three job files with no proposal.** 0.18.7 moved the write gate above all four sections that write. It still did not fire. Same conclusion.
+
+**Newly detected rather than newly broken** — the gate list became config-driven in 0.19.x, so these were always failing and nothing was looking:
+
+- `corp-os-decide` wrote claims, decisions and jobs with no proposal file.
+- `corp-os-glossary` wrote `glossary.md` with no proposal.
+
+**Not results:**
+
+- `rebuild-respects-roles` **timed out at 600s** and lost only its final log-row check. Re-run with `--timeout 900` before reading anything into it.
+- `recall-load-bearing-sensitive` is now **1 pass in 4 observations** across three months. No longer plausibly a coin flip; treat it as a real failure and diagnose it. CL-0004 is the case where being wrong matters most — an answer computed around a load-bearing fact signals nothing about the omission.
+- `dashboard-missing-layer` fails the same check it failed in `conformance-v11.json`. Pre-existing, not a regression.
+
+**The pattern across the four gate failures is one pattern.** Four skills write to derived layers without persisting a proposal, and two of them have had a prose fix applied that did not work. The gate is the third invariant. A rule stated in a skill body is not holding it, and the next attempt should be a check the skill cannot pass by wording — the same move that took filing out of the model in 0.19.1.
 
 ### 3. Descriptions: measured, and deliberately not cut
 

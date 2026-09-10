@@ -71,6 +71,8 @@ Build it theme-aware and responsive: define the light palette as tokens, redefin
 
 Publish as an artifact, since a dashboard exists to be returned to and shared. Then record it in `dashboards.md`: name, URL, owning job, source files, cadence, last built.
 
+**`dashboards` is a registry file, not a folder. Never create a `dashboards/` directory to hold a built page.** It was a directory holding one file for five releases, and that shape made the index report `1` however many dashboards were registered — recreating it reintroduces the bug the layout fix removed. When a build has to land as a local file rather than an artifact, write it under `usage/` and put its path in the registry row. Check the layer's declared `path` in `config.json` before writing anywhere: a layer whose path ends in `.md` is a file, and a directory of that name is a second, competing copy of it.
+
 On refresh, republish to the same URL and update `last built`. Never create a second artifact for the same dashboard.
 
 **If the dashboard stands on a bounded, nameable set of entries, record them as `Rests on`** — the same field the arguments layer uses — if you are unsure what belongs in it, read its spec in `${CLAUDE_PLUGIN_ROOT}/reference/claim-record.md` — and the reason is the join it enables. A dashboard built from a whole layer has nothing to list and keeps `Source files` alone; listing a folder there is worse than listing nothing, because it renders as breadth nobody measured.
