@@ -24,7 +24,11 @@ Items leave this list by being done or by being declined in §8, never by being 
 
 ### 0. The enforcement chain has one model-dependent link left
 
-**Measured 2026-09-10, full suite at `claude-sonnet-4-5`: 137/163.** The Opus figure to compare against is 152/163 and it is six releases stale, so this is not yet a clean A/B — an Opus run at 0.25.1 is the missing half.
+**Measured 2026-09-10 at 0.25.1, both models.** Sonnet 4.5, full suite: **137/163**. Opus 5, seven cases at `--repeats 3`: **36/40**, with the gate and the log row 3/3 in every case.
+
+**On the seven cases both models ran, they are within a check of each other** — Sonnet 35/39, Opus 36/40, and Sonnet won `dashboard-hub-and-registry` 7/7 against Opus's 6/7. The suite-level gap is not spread across the skills; it is concentrated in `setup` (2/9), `intake` (5/8), `connect` (3/5), `decide` (3/5), `pattern`, `redact-strips`, `guide`, `brief` and `configure`.
+
+Those are the skills whose mechanism is still in the model. The seven that tie are the ones where it is not: `jobs`, `improve`, `glossary`, `claims`, `pull`, `recall`, `rebuild` all run through `propose.py`, `file_raw.py`, `build_index.py`, `friction_scan.py` and `log_run.py`. **Model sensitivity tracks how much of a skill is still judgment**, which is the claim `COST.md` has made since 0.18.2 without a measurement behind it. It has one now, and it means the routing question answers itself release by release rather than once.
 
 What it already settles is the design question 0.25.0 rests on. **The gate held 24 of 25 cases at Sonnet**, including the three skills that were 1/3 and 2/3 at Opus a release earlier. Moving it into `log_run.py` made it model-independent, which is the result that was hoped for.
 
@@ -36,7 +40,7 @@ Clean at Sonnet: `recall` ×3, `rebuild`, `pull`, `redact-external`, `reality-ch
 
 **So the cheap split does not survive contact.** "Sonnet where the tokens are" pointed at `intake` first, and `intake` is the one case that did the work and left none of the record. Two things worth doing before any routing decision:
 
-1. **Opus at 0.25.1**, so the comparison is same-code.
+1. ~~Opus at 0.25.1~~ — done, above.
 2. **Decide whether a run's close can be made non-optional.** A `Stop` hook is the only place genuinely outside the model, and whether Cowork honours one is unverified — the same open question as item 1 below, and the same failure mode if it does not.
 
 
