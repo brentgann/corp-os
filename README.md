@@ -47,6 +47,21 @@ Five properties are not configurable, because everything else rests on them:
 
 That last one is what most systems lack and what decides whether yours survives two years.
 
+## Measured, not asserted
+
+Every skill has a conformance case, and each case runs the real skill against a throwaway copy of a fixture and scores what it did to the filesystem — not what it said about it.
+
+**203 of 208 checks, 28 cases, 23 of 23 skills** (Opus 5, one run each). Reports are committed under `evals/runs/`, so the figures here are the ones in the repo rather than the ones remembered.
+
+Three failures are open and named:
+
+- `corp-os-guide` opens a decision itself instead of handing off, and does not route the fork to `corp-os-decide`. Both passed at 0.18.6 and regressed since; undiagnosed.
+- `corp-os-recall` dropped a load-bearing sensitive fact in this run. It has scored 1-in-4, then 7/7, then this — a rate rather than a state, and the highest-stakes check in the suite.
+
+What the harness measures has been wrong three times, and each time is recorded next to what it cost: a conditional check divided by the run count, a plugin guard that reported this repo's own commit, and a case that asserted against the OS's own capture rule. `docs/BACKLOG.md` carries all of them.
+
+Costs were measured too, on a real 852-claim OS rather than the fixture: the per-run pre-flight floor went **9,508 → 5,501 tokens**, and one generated index went **14,943 → 244**. `docs/COST.md` has the journey and the things that did *not* save money.
+
 ## Everything else is yours
 
 Layer names, label vocabulary, decay windows, how long source material is kept, and how strict the review gate is are declared in a `config.json` that every skill reads first. A layer the model never imagined — `experiments/`, `matters/`, `readouts/` — gets its own field schema and index template, and every skill then treats it like a shipped one.

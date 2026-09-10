@@ -198,7 +198,7 @@ The model itself is specified in `reference/data-model.md`. Improvement packets 
 
 **0.26.1** — the plugin guard reported the repo's own commit; "the directory changed" is not "this run changed it".
 
-**0.26.0** — every skill has a conformance case, and the harness watches its own plugin.
+**0.26.0** — every skill has a conformance case, and the harness watches its own plugin. The suite goes to **203/208 across 28 cases and 23 of 23 skills**; `audit`, `company` and `contribute` had never been measured.
 
 **0.25.4** — a source layer's index is the shape of the archive, not a listing of it: 14,943 tokens to 244.
 
