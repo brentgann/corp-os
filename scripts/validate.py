@@ -385,6 +385,21 @@ def main():
     # leaves the person believing they are covered. The two states have to
     # stay distinguishable in the text or the distinction is not enforced
     # anywhere.
+    # A warehouse is a third source shape. It has no list and no cutoff, so a
+    # pull that includes it asks for everything since Tuesday from a system
+    # that will try. And it is the only shape where a decayed claim can be
+    # re-verified exactly, which nothing was doing.
+    if "Access: query" not in open(
+            "reference/records.md", encoding="utf-8").read():
+        err("reference/records.md no longer documents `Access: query`. A "
+            "warehouse registered as a listed source produces a run that asks "
+            "it for everything since the cutoff")
+    if "re-run, not chased" not in open(
+            "skills/corp-os-reality-check/SKILL.md", encoding="utf-8").read():
+        err("corp-os-reality-check no longer re-runs a decayed metric from a "
+            "queried source. It is the one bucket clearable without a person, "
+            "and a changed number is a finding rather than a stale claim")
+
     # A selector narrows to a slice; nothing measured whether the slice was
     # worth it. Triage decides per item on metadata, the weakest evidence
     # available, while the strongest -- what the last two hundred items from

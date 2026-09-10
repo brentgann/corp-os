@@ -192,6 +192,18 @@ The model itself is specified in `reference/data-model.md`. Improvement packets 
 
 ## Version history
 
+**0.22.0** — a warehouse is a third source shape, and it is never pulled.
+
+Two shapes were assumed everywhere: a source you *list and fetch from*, and a source you *export from*. Redshift, session analytics, a metrics store are neither — the data is generated faster than anyone could capture it, there is no list worth walking, and no cutoff means anything. Registered as a listed source it reads like any other connector and produces a run that asks a warehouse for everything since Tuesday.
+
+`Access: query` says so. No selector (it is scoped per question, not per slice), `Cadence: on demand`, a read-only role, and `corp-os-pull` skips it outright and reports that it did.
+
+**What lands in `raw/` is a measurement, not the data.** One file per question asked: the question, the statement verbatim, the result, the run date. So **the query is the citation** — and it is a better one than a quote, because a sentence can only be re-read while a statement can be re-run and either reproduces the number or does not.
+
+That is what makes the last part possible, and it is the real payoff. **The failure this shape has is not over-capture; it is an OS where numbers go to get stale.** A metric captured once and never re-run looks exactly like a sourced claim and is quietly wrong a quarter later.
+
+So a decayed metric from a queried source is **re-run, not chased**. Same number and `Verified` moves — the cheapest confidence in the model and the only kind that costs no judgment. Different number and it is **not a stale claim to retire, it is a finding**: the thing changed, and two run dates now bracket when. Query no longer runs, and that is a more urgent finding still — every claim resting on it just became unverifiable.
+
 **0.21.1** — what a source produced, against how much of it became anything.
 
 A `Selector` narrows a shared system to a slice. Inside the slice, most of what a wiki or a tracker holds still will not earn a claim, and nothing measured which sources those were.

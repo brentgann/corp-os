@@ -25,6 +25,8 @@ Read `INDEX.md`, `jobs/INDEX.md`, `connectors.md`, and `meta.json` (for the `cut
 
 Then decide scope with the person if it is not obvious: all sources, or one? Since when? Default to everything since each source's recorded cutoff.
 
+**Skip every source whose record says `Access: query`.** A warehouse or an analytics store has no cutoff and no list; it is reached when someone has a question, and a pull that includes it is asking for everything since Tuesday from a system that will happily try. If one is in scope, say it was skipped and why.
+
 **Pass the source's `Selector` to the list call, every time, and never list outside it.** The selector is the slice; the cutoff only moves that slice forward in time. A source whose record carries no selector and is not a personal one is an unregistered crawl — stop and hand off to `corp-os-connect` rather than listing the instance to find out how big it is.
 
 If a source has no cutoff, do not silently pull its entire history — ask for a window, because a first pull that dumps two years into `raw/` buries the material that mattered. **For a shared system, default to no backfill at all**: start from today and let the slice fill forward. What is already in a wiki has been findable there the whole time; the value of capturing it starts when someone cites it.

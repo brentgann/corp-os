@@ -42,6 +42,18 @@ Per source, all seven fields. Skipping any of them produces a registry that look
 - **Scope** — what the credential can do. **Read-only unless something genuinely requires otherwise**, because this suite only ever reads from a source. Ask for the narrower token; in a shared workspace it is the difference between a tool that stays installed and one an administrator removes.
 - **Limits and ceiling** — the source's published rate limit if it has one, and a local per-run ceiling well under it. Ask what the system is, who else hits it, and whether anyone would notice this traffic. For a shared system like an issue tracker or a wiki, the honest ceiling is small: a knowledge base is not a crawler.
 
+## Step 1.3 — is this a source you pull from, or one you ask?
+
+Before the rest of the fields, settle which shape it is, because the answer changes most of them.
+
+**A queried source** — a warehouse, a metrics store, session analytics — has no list worth walking and no meaningful cutoff. Register `Access: query` with a query interface and a read-only role, `Cadence: on demand`, and no selector: it is scoped per question rather than per slice. It is never pulled. Do not give it a schedule; a schedule against a warehouse is a standing bill for answers to questions nobody asked.
+
+Then say plainly what it is for: **it exists to test a hypothesis, and what lands in `raw/` is the question, the statement, the result and the run date** — a measurement, not the data. Ask whether the person's questions of it recur, because a question asked three times is a query worth storing and a candidate for a dashboard panel.
+
+**A listed source** — meetings, mail, a wiki space, a tracker — takes the seven fields below plus a selector and a cutoff.
+
+Registering a warehouse as a listed source is the mistake worth catching here. It reads as a connector like any other and produces a run that asks for everything since Tuesday.
+
 ## Step 1.4 — for a source that already exists, look at what it produced
 
 Before adjusting a registered source, run it:

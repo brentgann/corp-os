@@ -101,6 +101,18 @@ End with a plain assessment: how many claims were checked, how many held, how ma
 
 Then set the next sweep. Recurring is better than heroic — offer to schedule a small regular pass over the past-decay bucket, per `${CLAUDE_PLUGIN_ROOT}/reference/scheduling.md`. A sweep that happens monthly and resolves ten items keeps an OS honest; one that happens once a year and resolves two hundred is an event nobody repeats.
 
+## A decayed metric from a queried source is re-run, not chased
+
+Most overdue claims need a person: find the source, read it again, decide whether it still holds. A claim whose source is `Access: query` needs no one. The statement is stored in its raw file and re-running it settles the question exactly.
+
+Re-run it. Then:
+
+- **Same number** — move `Verified` to today and say nothing else. This is the cheapest confidence in the whole model and the only kind that costs no judgment.
+- **Different number** — this is not a stale claim to retire. **It is a finding.** The thing changed, and because two runs bracket it, when it changed is now bounded. Propose the new measurement as a claim, keep the old one with its own run date, and say what moved between them. A metric that quietly gets overwritten loses the only evidence that anything happened.
+- **Query no longer runs** — the schema moved under it. That is a finding too, and a more urgent one: every claim resting on that statement is now unverifiable, and the raw file records a question that can no longer be asked.
+
+Do not batch these into the overdue bucket with claims that need a person. They are the one bucket that can be cleared without asking anyone, and mixing them is how a sweep that could have been half automatic becomes one nobody runs.
+
 ## The promotion backlog, and the arguments resting on one source
 
 Both are generated into `usage/health.md` by `build_index.py`, alongside `INDEX.md` and uncapped. That file is this skill's working input: the index carries what the OS holds, `health.md` carries what is wrong with it, and nothing truncates it because a finding visible only when it is one of the first thirty is not visible.

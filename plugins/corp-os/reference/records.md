@@ -139,6 +139,56 @@ processed: false         # flipped true once the derived layer has taken from it
 - **Verbatim fetch**: yes
 - **Blind spots**: only captures calls I actually joined; nothing from Alex's own calls.
 
+**A queried source is a third shape, and it is not pulled.**
+
+Two shapes were assumed everywhere: a source you *list and fetch from* (meetings, mail, a wiki space), and a source you *export from*. A warehouse is neither. Redshift, a session-analytics tool, a metrics store — the data is generated faster than anyone could capture it, there is no list worth walking, and no cutoff means anything. `Access: query` says so:
+
+```
+### Product analytics — Redshift
+- **Category**: warehouse
+- **Access**: query        # list+fetch | export | query
+- **Query interface**: `run_sql(statement)` — read-only role `corpos_ro`
+- **Scope**: read-only
+- **Cadence**: on demand — a hypothesis, not a schedule
+- **Serves jobs**: job-002
+- **Selector**: n/a — scoped per question, not per slice
+- **Blind spots**: events only; nothing about why anyone did them
+- **Limits**: 1 concurrent, and every statement carries a LIMIT
+```
+
+**A queried source is never pulled.** `corp-os-pull` walks sources with a cutoff; this has none, and a run that tried would be asking a warehouse to hand over everything since Tuesday. It is reached when there is a question, and the question is the trigger.
+
+**What lands in `raw/` is a measurement, not the data.** One file per question asked:
+
+```yaml
+---
+source: redshift
+type: measurement
+date: 2026-09-10
+question: Did activation change after the March onboarding rewrite?
+external_id: q-2026-09-10-activation
+processed: false
+---
+
+## Query
+
+```sql
+SELECT date_trunc('week', created_at) AS wk, count(*) ...
+```
+
+## Result
+
+| wk | activated | signups | rate |
+|---|---|---|---|
+...
+
+Run 2026-09-10 against `corpos_ro`. 41s.
+```
+
+**The query is the citation, and it is a better one than a quote.** A verbatim sentence can only be re-read; a statement can be re-run and either reproduces the number or does not. That makes `Verbatim fetch: yes` true in the strongest sense the model has, and it is what makes the next part possible.
+
+**Design against the failure this shape actually has.** It is not over-capture — it is an OS where numbers go to get stale. A metric captured once and never re-run looks exactly like a sourced claim and is quietly wrong the following quarter. Metrics decay fast for that reason, and a decayed metric from a queried source is **re-run, not chased**: `corp-os-reality-check` re-executes the stored statement and compares. Same number, and `Verified` moves. Different number, and that is not a stale claim to retire but a **finding** — the thing changed, and when it changed is now bounded by two run dates.
+
 **A shared system is not a source. A slice of it is.**
 
 `Selector` is the query that says which slice, in the system's own terms — a CQL query, a JQL filter, a board, a label, a segment id. It is `n/a` only where the source is already scoped to one person: my meetings, my mail, my notes. For anything an organisation shares, it is required, and a registration without one is a registration of the whole instance.
