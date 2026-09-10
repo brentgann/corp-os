@@ -6,15 +6,19 @@ Items leave this list by being done or by being declined in §8, never by being 
 
 ---
 
-## Done in 0.19.x
+## Done in 0.19.x — the pre-flight floor, measured on a real 852-claim OS
 
-- **Root index split.** Findings moved to `usage/health.md`, uncapped, owned by `corp-os-reality-check`. At 800 claims: INDEX.md 1,440 → 468, pre-flight floor 2,513 → 1,541.
-- **Layer index fires on entries as well as files.** 800 claims in 25 topic files had no entry point; `claims/INDEX.md` now generates.
-- **Filing moved into `scripts/file_raw.py`.** Dedupe, naming, frontmatter, cutoff — one call instead of one turn per item.
-- **Fixture script drift fixed and checked.** All three carried a 414-line `build_index.py` against a shipped 888.
-- **`scripts/corpus_load.py`** and **`scripts/make_fixture.py`** — both free to run.
-- **`model: sonnet` on `corp-os-upgrade`**, the one skill of 23 that is genuinely mechanical.
-- **`docs/COST.md`** — session guidance and what does not save money.
+**9,508 → 6,743 tokens**, paid by every skill on every run. No model tokens spent finding or fixing any of it.
+
+- **Root index split** — findings to `usage/health.md`, uncapped, owned by `corp-os-reality-check`.
+- **Layer index fires on entries as well as files** — 852 claims in topic files had no entry point.
+- **A layer with its own index is no longer listed in the root too** — that was 1,424 duplicated tokens.
+- **`note` fields move to the OS README** (`prune_config_notes.py`), per-path, with a peer-entry warning: a note beside identical peers may be the distinction itself.
+- **A path that is the slug of its own name is no longer written out** — 47 of 82 entry lines.
+- **Filing moved to `scripts/file_raw.py`** — one call, not one turn per item.
+- **Fixture script drift fixed and checked** — all three carried a 414-line `build_index.py` against a shipped 888.
+- **`corpus_load.py`** and **`make_fixture.py`** — both free to run.
+- **`model: sonnet` on `corp-os-upgrade`**; **`docs/COST.md`**.
 
 ## Open
 

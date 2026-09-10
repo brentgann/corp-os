@@ -73,7 +73,22 @@ python3 scripts/make_fixture.py /tmp/big --claims 800 --files 25
 
 A deterministic corpus of any size. The 800-claim version found three defects in an afternoon that had survived sixteen releases, all of them invisible at four entries: two uncapped index sections, a layer threshold counting files instead of entries, and three fixtures running a script half the size of the shipped one.
 
-For reference, at 800 claims the pre-flight floor every skill pays on every run is **1,541 tokens**, down from 2,513 before 0.19.0.
+### What this found on a real 852-claim OS
+
+Every step below was a script run, no model, and each number is the one the previous step made visible.
+
+| | tokens | what changed |
+|---|---|---|
+| start | **9,508** | 3,846 config + 5,662 index |
+| 0.19.3 | 8,084 | a layer with its own index was listed in the root too |
+| note prune | 7,345 | 783 tokens of rationale moved to the OS README |
+| 0.19.7 | **6,743** | 47 of 82 entry paths were the slug of their own name |
+
+**29% off what every skill pays before it does any work.** The synthetic 800-claim fixture put the same floor at 1,541, which is why none of this was visible before someone ran it against a real corpus: the difference is eleven layers instead of five, prose in config, and long entry names.
+
+Three of the four fixes came from a measurement that had already been read wrong. The per-entry cost was blamed on `index_line` templates three times, including once against a layer whose template is `{name} — {gist}` — two fields, nothing to remove. Splitting the line into label, path and rendered content found the actual answer in a minute. **Read the mechanism, not the number.**
+
+Where it stops paying: what remains is `decisions` carrying five fields, and entry names in `topics` and `insights` that are long because they are descriptive. Both are judgment calls about someone's own data, with a ceiling of a few hundred tokens.
 
 ## Know where you are running
 
