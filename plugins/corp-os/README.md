@@ -192,6 +192,18 @@ The model itself is specified in `reference/data-model.md`. Improvement packets 
 
 ## Version history
 
+**0.21.1** — what a source produced, against how much of it became anything.
+
+A `Selector` narrows a shared system to a slice. Inside the slice, most of what a wiki or a tracker holds still will not earn a claim, and nothing measured which sources those were.
+
+**Triage decides per item on metadata, which is the weakest evidence available.** The strongest — what the last two hundred items from that source actually turned into — was already on disk and uncounted. A raw file carries `source:`; a claim carries `Source: raw/…`. That is a join, and `scripts/source_yield.py` performs it: per source, raw files captured, how many any derived entry cites, how many of those serve a job.
+
+`corp-os-connect` runs it before adjusting a registered source. `corp-os-improve` runs it alongside the usage log, because **the friction column says what was hard and yield says what was pointless, and the two rarely name the same thing.** A source at 200 files and 4 claims generates no friction at all — nobody complains, and it costs a pull a day to stay that way.
+
+Three answers when a slice yields almost nothing: narrow the `Selector`, lengthen the `Cadence`, or decline the source. There is never a reason to delete what was captured. `raw/` is append-only and the fix is to stop capturing, not to remove.
+
+Read it as a ratio, not a score. Three claims per hundred files may be a narrow and precious source. It is asking whether the selector still describes what you wanted.
+
 **0.21.0** — a shared system is not a source; a slice of it is.
 
 The suite scoped by **time** (the cutoff) and by **triage** (per item, after listing) and had no notion of scoping by **subject**. For Granola or a mail account that is enough, because the source is already only one person's. In Confluence, *"everything since Tuesday"* is every page anyone in the company touched since Tuesday — the cutoff narrowed nothing, and the list call alone walked the instance before triage got a chance to decline anything.

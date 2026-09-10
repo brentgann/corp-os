@@ -126,6 +126,7 @@ processed: false         # flipped true once the derived layer has taken from it
 - **Auth**: OAuth via connector, no local credentials
 - **Feeds**: raw/ as `source: granola`, `type: meeting`
 - **Selector**: n/a — this source is already only my own meetings
+- **Yield**: 41 files → 22 cited (54%) — 2026-09-10, from `source_yield.py`
 - **Serves jobs**: job-001, job-004
 - **Cadence**: daily
 - **Last pull**: 2026-09-03 — cursor `granola:abc123`

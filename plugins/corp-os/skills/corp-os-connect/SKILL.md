@@ -42,6 +42,20 @@ Per source, all seven fields. Skipping any of them produces a registry that look
 - **Scope** — what the credential can do. **Read-only unless something genuinely requires otherwise**, because this suite only ever reads from a source. Ask for the narrower token; in a shared workspace it is the difference between a tool that stays installed and one an administrator removes.
 - **Limits and ceiling** — the source's published rate limit if it has one, and a local per-run ceiling well under it. Ask what the system is, who else hits it, and whether anyone would notice this traffic. For a shared system like an issue tracker or a wiki, the honest ceiling is small: a knowledge base is not a crawler.
 
+## Step 1.4 — for a source that already exists, look at what it produced
+
+Before adjusting a registered source, run it:
+
+```bash
+python3 scripts/source_yield.py --root <the OS>
+```
+
+Per source: raw files captured, how many any derived entry cites, how many of those serve a job. **Triage decides per item on metadata, which is the weakest evidence available. This is the strongest — what the last two hundred items from that source actually turned into — and it was already on disk.**
+
+Read it as a ratio and not a score. Three claims per hundred files is not a failing source; it may be narrow and precious. It is asking one question: does the `Selector` still describe what you wanted? A slice that yields almost nothing is usually a slice chosen by what was easy to query rather than by what anyone needed.
+
+Three answers, and the last is a real one: **narrow the selector**, **lengthen the cadence**, or **decline the source**. What there is never a reason to do is delete what was captured — `raw/` is append-only, and the fix is to stop capturing, not to remove.
+
 ## Step 1.5 — find the cheap call, not just the connection
 
 A source almost always has two reads: one that **enumerates** and one that **returns a body**. They differ in cost by roughly two orders of magnitude, and a registry that records only the protocol tells a skill it can reach the source and nothing about how to reach it cheaply — so the skill fetches everything, which is exactly how one intake run cost more than the connector it pulled from.

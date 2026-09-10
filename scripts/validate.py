@@ -385,6 +385,16 @@ def main():
     # leaves the person believing they are covered. The two states have to
     # stay distinguishable in the text or the distinction is not enforced
     # anywhere.
+    # A selector narrows to a slice; nothing measured whether the slice was
+    # worth it. Triage decides per item on metadata, the weakest evidence
+    # available, while the strongest -- what the last two hundred items from
+    # that source became -- was already on disk and uncounted.
+    if "source_yield.py" not in open(
+            "skills/corp-os-connect/SKILL.md", encoding="utf-8").read():
+        err("corp-os-connect no longer checks what a registered source "
+            "produced before adjusting it. A slice that yields nothing costs a "
+            "pull a day to stay that way, and no one complains about it")
+
     # Scoping by time is not scoping by subject. The cutoff narrows a personal
     # source because it is already narrow; in a shared system "everything
     # since Tuesday" is every page anyone touched, and the list call alone

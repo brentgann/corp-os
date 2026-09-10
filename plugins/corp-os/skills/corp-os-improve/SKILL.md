@@ -32,6 +32,8 @@ Read `config.json` first — it is the authority on this OS's layers, vocabulary
 
 Read `usage/log.md`, `usage/proposals.md`, `meta.json` history, and the OS structure.
 
+Then run `python3 scripts/source_yield.py --root <the OS>`. The friction column says what was hard; yield says what was pointless, and the two rarely name the same thing. A source at 200 files and 4 claims is not friction — nobody complained, and it costs a pull every day to stay that way. Propose narrowing its `Selector` or lengthening its `Cadence`, with the ratio as the count.
+
 Under roughly twenty logged runs, say so. Report what is visible, note that the sample is thin, and suggest running again after more real use. Restructuring an OS on five data points is how it gets worse. The exception is a single loud friction — a person who says "this is annoying" has real evidence even at run three; take that seriously and scope the proposal narrowly.
 
 ## Step 1 — mine the friction field
