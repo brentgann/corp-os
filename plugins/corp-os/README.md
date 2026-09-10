@@ -192,6 +192,12 @@ The model itself is specified in `reference/data-model.md`. Improvement packets 
 
 ## Version history
 
+**0.19.6** — a note on a list entry may be the only thing telling it from its peers.
+
+In a real OS two `confidence_ceilings` entries were *"the original source text no longer exists"* and *"a deliberate downgrade from how the source system treated it."* One is permanent and one is elective. As data they are identical, and the note is the whole distinction — while the run deciding which claims can ever be promoted reads the ceiling, not the README.
+
+`prune_config_notes.py` now marks any note whose path ends in a list index and says what to check. Flagged rather than blocked: once that distinction is a field, the note is genuinely redundant.
+
 **0.19.5** — `prune_config_notes.py` takes `--only` and `--except`, because a note is not automatically documentation.
 
 Run against a real OS, the fifteen notes were not fifteen explanations. Some were: *"Tuned to what actually rots in this work rather than left at the shipped default."* Others were rules wearing a reason's clothes — *"A readable view over claims, not an independent source of truth"* changes how a skill treats that layer, and *"Mirrored here from `sensitive.md` because `sensitive.md` sits outside the scan path"* is provenance on a load-bearing instruction.

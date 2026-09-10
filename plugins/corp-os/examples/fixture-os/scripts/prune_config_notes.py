@@ -101,8 +101,23 @@ def main():
     tok = sum(round(len(v) / 4) for _, v in notes)
     print(f"{len(notes)} note field(s), about {tok} tokens, "
           f"{tok * 100 // max(1, round(len(raw) / 4))}% of config.json.\n")
+    # A note on a LIST entry sits beside peers of the same shape, so it may be
+    # the only thing telling them apart. Two confidence ceilings in one real
+    # OS were "the original source text no longer exists" (permanent) and "a
+    # deliberate downgrade" (elective) -- identical as data, and the run that
+    # has to decide which entries can ever be promoted reads the ceiling, not
+    # the README. Flagged, not blocked: once the distinction is a field the
+    # note is genuinely redundant.
     for p, v in notes:
-        print(f"  {p}\n      {v[:96]}{'…' if len(v) > 96 else ''}")
+        peer = p.rsplit(".", 1)[-1].isdigit()
+        print(f"  {p}{'   [peer entry — see below]' if peer else ''}"
+              f"\n      {v[:96]}{'…' if len(v) > 96 else ''}")
+    if any(p.rsplit(".", 1)[-1].isdigit() for p, _ in notes):
+        print("\n  One or more of these sits in a LIST, beside entries of the "
+              "same shape.\n  Check whether the note is the only thing "
+              "distinguishing it from its\n  peers. If it is, it is carrying "
+              "a value the schema should carry, and\n  moving it makes the "
+              "distinction invisible to every skill that reads\n  that list.")
 
     rp = os.path.join(root, "README.md")
     existing = open(rp, encoding="utf-8").read() if os.path.exists(rp) else \
