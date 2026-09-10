@@ -192,6 +192,17 @@ The model itself is specified in `reference/data-model.md`. Improvement packets 
 
 ## Version history
 
+**0.20.1** — a throttled source is not a broken one, and a knowledge base is not a crawler.
+
+Nothing in twenty-three skills and fourteen reference files mentioned a rate limit, a 429, backoff, concurrency or a credential scope. Meanwhile `corp-os-pull` Step 3 said to mark anything *"missing, unauthorized, or erroring"* as `broken` — so a rate-limited Jira was recorded dead, the next run skipped it, and the person believed they were covered on a source returning nothing. Wrong twice, and it becomes likely the moment anyone points this at a shared system.
+
+Four things, and they matter most for a team:
+
+- **`Scope: read-only`** on the connector record, and `corp-os-connect` asks for it. This suite never writes to a source. A write-scoped token carries risk the OS has no use for, and in a shared workspace it is the difference between a tool that stays installed and one an administrator removes.
+- **`Limits` and `Ceiling` are two numbers.** The limit is the source's; the ceiling is yours and should be well under it. A system permitting 100 calls a minute is not asking for 100 from one person's notes.
+- **`throttled` is its own status.** Back off, leave the cutoff where it is, carry on with the other sources, try next run.
+- **Fetch sequentially** unless the record says otherwise. Concurrency is how a personal knowledge base becomes noticeable traffic on someone else's system, and nothing here is urgent.
+
 **0.20.0** — the gate stops being a rule and becomes a command.
 
 Four skills wrote to derived layers with no proposal on disk in one conformance run, and two of them had already had a prose fix applied — 0.18.7 moved `corp-os-jobs`' write gate above every section that writes, and it still did not fire.

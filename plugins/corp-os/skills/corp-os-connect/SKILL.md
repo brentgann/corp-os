@@ -36,6 +36,8 @@ Per source, all seven fields. Skipping any of them produces a registry that look
 - **Serves jobs** — job IDs. A source serving no job is a source worth declining; say so.
 - **Cadence** — daily, weekly, on demand, or event-driven. Match the person's honest upkeep budget from setup, not their aspirational one.
 - **Blind spots** — what this source structurally cannot see.
+- **Scope** — what the credential can do. **Read-only unless something genuinely requires otherwise**, because this suite only ever reads from a source. Ask for the narrower token; in a shared workspace it is the difference between a tool that stays installed and one an administrator removes.
+- **Limits and ceiling** — the source's published rate limit if it has one, and a local per-run ceiling well under it. Ask what the system is, who else hits it, and whether anyone would notice this traffic. For a shared system like an issue tracker or a wiki, the honest ceiling is small: a knowledge base is not a crawler.
 
 ## Step 1.5 — find the cheap call, not just the connection
 

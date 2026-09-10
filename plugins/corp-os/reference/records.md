@@ -128,11 +128,20 @@ processed: false         # flipped true once the derived layer has taken from it
 - **Serves jobs**: job-001, job-004
 - **Cadence**: daily
 - **Last pull**: 2026-09-03 — cursor `granola:abc123`
-- **Status**: healthy       # healthy | stale | broken | not-connected | manual-only
+- **Status**: healthy       # healthy | stale | throttled | broken | not-connected | manual-only
+- **Scope**: read-only     # what the credential can do, not what it is
+- **Limits**: 100 calls/min, 1 concurrent — from the vendor's published limit, or observed
+- **Ceiling**: 40 calls per run — a local cap, lower than the limit, chosen by the person
 - **List call**: `list_meetings(since, limit)` — id, title, date, participants. No bodies.
 - **Fetch call**: `get_transcript(id)` — the body, verbatim
 - **Verbatim fetch**: yes
 - **Blind spots**: only captures calls I actually joined; nothing from Alex's own calls.
+
+**`Scope` is read-only unless something genuinely requires otherwise.** This suite never writes to a source — it captures from them. A connector registered with write scope carries a risk the OS has no use for, and in a shared workspace it is the difference between a tool people install and a tool their administrator removes. Where the protocol has no scope concept, say so: `Scope: n/a — export file`.
+
+**`Limits` and `Ceiling` are different numbers and both belong here.** The limit is the source's; the ceiling is yours, and it should be well under. A system that permits 100 calls a minute is not asking for 100 calls a minute from one person's knowledge base, and the first time an OS is noticed by the team running Jira should not be because of its traffic.
+
+**`throttled` is not `broken`.** A 429, a `Retry-After`, a quota message: the source is healthy and is asking to be left alone. Marking it broken is wrong twice — the next run skips a working source, and the person believes they are covered on something that has quietly returned nothing. Record `throttled` with the time, back off, and try the next run.
 ```
 
 **`List call` and `Fetch call` are what make triage possible at all.** Almost every source has two shapes of read — one that enumerates and one that returns a body — and they differ in cost by two orders of magnitude. A registry that records only *"Protocol: MCP"* tells a skill it can reach the source and nothing about how to reach it cheaply, so the skill does the only thing it knows how to do and fetches everything.

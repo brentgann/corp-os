@@ -42,7 +42,17 @@ Say the consequence out loud the first time triage runs on a source: under `tria
 
 **Never exceed `batch` in one pass.** Report what remains and offer the next. The first run after a holiday is the worst case and the one nobody sizes.
 
-For each in-scope source, retrieve what triage kept, since its cutoff. Handle each source's failure honestly: if a connector is missing, unauthorized, or erroring, mark it `broken` in `connectors.md` with the specific failure and **carry on with the other sources**. One dead connector must not abort the run.
+For each in-scope source, retrieve what triage kept, since its cutoff.
+
+**Fetch sequentially, one source at a time, unless its record says otherwise.** Concurrency is how a personal knowledge base becomes noticeable traffic on someone else's system, and nothing here is urgent enough to need it. Respect the record's `Ceiling`: when a run would exceed it, stop at the ceiling, report what remains, and **do not advance the cutoff past what was not fetched**.
+
+**Read the failure before recording it.** Three different things are not one thing:
+
+- **Throttled** — a 429, a `Retry-After`, a quota message. The source is healthy and asking to be left alone. Mark it `throttled` with the time, stop fetching from it this run, leave its cutoff where it is, and carry on with the others. **Never mark a throttled source `broken`**: the next run would skip a working source and the person would believe they were covered on something returning nothing.
+- **Broken** — missing, unauthorized, or erroring in a way that will not fix itself. Mark it `broken` with the specific failure.
+- **Empty** — reachable and had nothing. That is a normal result and it is not a failure. Advance the cutoff.
+
+**Carry on with the other sources** in every case. One dead connector must not abort the run.
 
 Never work around a blocked or unavailable source by other means. Record it as broken and move on.
 

@@ -378,6 +378,27 @@ def main():
                        "synced, shared and audited")):
         if term not in open("reference/records.md", encoding="utf-8").read():
             err(f"reference/records.md does not document `{term}` — {why}")
+    # Nothing in twenty-three skills mentioned a rate limit, a 429, backoff
+    # or a credential scope, while Step 3 told pull to mark anything
+    # "erroring" as broken. A throttled source is healthy and asking to be
+    # left alone; marking it broken skips a working source on the next run and
+    # leaves the person believing they are covered. The two states have to
+    # stay distinguishable in the text or the distinction is not enforced
+    # anywhere.
+    for term, why in (("throttled", "the state a rate-limited source is in, "
+                       "which is not broken"),
+                      ("Ceiling", "the per-run cap that keeps a knowledge base "
+                       "from reading like a crawler"),
+                      ("Scope", "read-only unless something requires "
+                       "otherwise — this suite never writes to a source")):
+        if term not in open("reference/records.md", encoding="utf-8").read():
+            err(f"reference/records.md no longer documents `{term}` — {why}")
+    if "Never mark a throttled source `broken`" not in open(
+            "skills/corp-os-pull/SKILL.md", encoding="utf-8").read():
+        err("corp-os-pull no longer separates a throttled source from a broken "
+            "one. A 429 recorded as broken means the next run skips a healthy "
+            "source and the silence reads as absence")
+
     cn = open("skills/corp-os-connect/SKILL.md", encoding="utf-8").read()
     if "List call" not in cn:
         err("corp-os-connect no longer asks for the list call. It is the single "
