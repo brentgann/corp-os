@@ -369,9 +369,29 @@ def main():
                       else "" if c["fixture"] == "empty"
                       else os.path.join(PLUGIN, c["fixture"]))
                 futs[ex.submit(run, c, a.model, a.timeout, a.keep, fx)] = c
+        # A run that could not START is not a run that failed. Every check
+        # here reads the filesystem, so a case whose `claude` invocation never
+        # executed scores whatever the fixture already contained, and the
+        # summary adds those up into a number that looks like a result.
+        # Observed: a restricted `claude` shim accepting only
+        # `claude -p "<prompt>"` rejected all 25 cases in 0s, and the report
+        # came back "83/160 checks passed" with a full per-case breakdown.
+        # §4.27 is the same failure a layer down -- a harness reporting
+        # confidently on something it never ran.
         for f in as_completed(futs):
             res = f.result()
             out.append(res)
+            if res["error"] and "only `claude -p" in str(res["error"]):
+                for g in futs:
+                    g.cancel()
+                print("\nABORTED: this environment's `claude` accepts only "
+                      "`claude -p \"<prompt>\"` and rejects the flags every "
+                      "case needs\n(--model, --add-dir, --permission-mode). "
+                      "Nothing executed.\n\nNo report written: these checks "
+                      "read the filesystem, so untouched fixtures would\nhave "
+                      "scored as a result. Run this where the full CLI is "
+                      "available.", flush=True)
+                return 2
             n = sum(1 for x in res["results"] if x["passed"])
             print(f"  {res['id']}: {n}/{len(res['results'])}"
                   f"  {res.get('seconds', 0):.0f}s"
