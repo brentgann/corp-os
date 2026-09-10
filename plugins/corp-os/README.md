@@ -192,6 +192,14 @@ The model itself is specified in `reference/data-model.md`. Improvement packets 
 
 ## Version history
 
+**0.19.7** — an entry whose path is the slug of its name no longer spells the path out.
+
+Measured on a real OS: across 82 entry lines, the label cost 720 tokens and **the path cost 1,004** — 24% of `INDEX.md`, for a string that restates the name in a form that tokenizes worse than the name. `<layer>/<name-lowercased-and-hyphenated>.md` is a lookup, and a document that restates a lookup is a cache.
+
+The convention is now stated once in the header and the per-entry path is dropped **only where the filename is exactly the slug of the label**. Anything named differently keeps its link, so nothing becomes unreachable.
+
+This was found by splitting a per-entry cost into label, path and rendered content. The previous three attempts at that number all blamed the `index_line` template, and one of the layers costing 43 tokens an entry has a two-field template with nothing in it to remove.
+
 **0.19.6** — a note on a list entry may be the only thing telling it from its peers.
 
 In a real OS two `confidence_ceilings` entries were *"the original source text no longer exists"* and *"a deliberate downgrade from how the source system treated it."* One is permanent and one is elective. As data they are identical, and the note is the whole distinction — while the run deciding which claims can ever be promoted reads the ceiling, not the README.

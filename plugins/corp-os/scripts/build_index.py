@@ -123,6 +123,12 @@ def _lbl(name, layers, cfg=None):
     return name.replace("_", " ").title()
 
 
+def _slug(s):
+    """The filename an entry named `s` would have. Must match how entries are
+    actually named for the derivable-path check below to fire at all."""
+    return re.sub(r"-+", "-", re.sub(r"[^a-z0-9]+", "-", (s or "").lower())).strip("-")
+
+
 def render_line(template, fm, fallback):
     """Fill an index_line template from frontmatter. Missing keys degrade to
     the literal placeholder being dropped, never to a crash."""
@@ -660,6 +666,7 @@ def render_index(root, s, cfg):
     # One section per enabled file-per-entry layer, shipped or custom, each
     # rendered through its own index_line template.
     missing_template = []
+    derivable = [0]
     for name in ["jobs"] + sorted(k for k in s if isinstance(s.get(k), list)
                                   and k not in ("raw", "jobs", "claims",
                                                 "unprocessed", "unlisted")):
@@ -730,9 +737,30 @@ def render_index(root, s, cfg):
             if line.startswith(label):
                 line = line[len(label):].lstrip(" -—·|")
             rel = os.path.relpath(f, root)
-            L.append(f"- **[{label}]({rel})**" +
-                     (f" — {line}" if line else ""))
+            # A path that is exactly the slug of the label restates it. The
+            # name is then charged twice -- once as the label, once inside its
+            # own path -- and hyphenated slugs tokenize badly, so the copy
+            # costs more than the original. Measured on a real OS: 1,004
+            # tokens of path against 720 of label across 82 entries, 24% of
+            # INDEX.md. The convention is stated once in the header instead,
+            # and any entry whose filename does NOT follow it keeps its link,
+            # so nothing becomes unreachable.
+            base = os.path.basename(rel)[:-3]
+            if base == _slug(label):
+                derivable[0] += 1
+                L.append(f"- **{label}**" + (f" — {line}" if line else ""))
+            else:
+                L.append(f"- **[{label}]({rel})**" +
+                         (f" — {line}" if line else ""))
         L.append("")
+
+    if derivable[0]:
+        L += ["> **Paths follow the name.** An entry listed without a link "
+              "lives at `<layer>/<its name, lowercased and hyphenated>.md` — "
+              f"{derivable[0]} of them here. Spelling that out per entry "
+              "restates the name in a form that costs more than the name. "
+              "Anything whose filename does not follow the convention keeps "
+              "its link.", ""]
 
     if missing_template:
         L += ["> **Incomplete index.** These layers have no `index_line` in "

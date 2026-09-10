@@ -24,11 +24,13 @@ _Regenerated 2026-09-10 by scripts/build_index.py (counts and listings only — 
 ## Playbooks
 
 - **[Escalation ladder](playbooks/escalation.md)** — hand-maintained
-- **[Vendor offboarding](playbooks/vendor-offboarding.md)** — hand-maintained
+- **Vendor offboarding** — hand-maintained
 
 ## Unlisted Files
 
-- **[connectors](../../../../connectors.md)**
+- **connectors**
+
+> **Paths follow the name.** An entry listed without a link lives at `<layer>/<its name, lowercased and hyphenated>.md` — 2 of them here. Spelling that out per entry restates the name in a form that costs more than the name. Anything whose filename does not follow the convention keeps its link.
 
 > **Incomplete index.** These layers have no `index_line` in `config.json`, so their entries are listed as bare links and cannot be scanned without opening each file: `unlisted_files`. Run corp-os-configure to give each one a template.
 

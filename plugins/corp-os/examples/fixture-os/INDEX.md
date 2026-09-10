@@ -23,13 +23,15 @@ _Regenerated 2026-09-10 by scripts/build_index.py (counts and listings only — 
 
 ## Arguments
 
-- **[renewal math](arguments/renewal-math.md)**
-- **[support surface](arguments/support-surface.md)**
+- **renewal math**
+- **support surface**
 
 ## Decisions
 
 - **[dec-001](decisions/midmarket-pricing.md)** — Per-seat or usage pricing for the mid-market tier? · Priya Raman · by 2026-11-01
 - **[dec-002](decisions/support-tooling.md)** — Keep the current helpdesk through renewal, or migrate before Q4? · Wren Adeyemi · by 2026-09-01
+
+> **Paths follow the name.** An entry listed without a link lives at `<layer>/<its name, lowercased and hyphenated>.md` — 2 of them here. Spelling that out per entry restates the name in a form that costs more than the name. Anything whose filename does not follow the convention keeps its link.
 
 ## Unprocessed queue
 
