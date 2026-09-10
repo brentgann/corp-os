@@ -22,6 +22,17 @@ Items leave this list by being done or by being declined in §8, never by being 
 
 ## Open
 
+### 0b. Coverage closed: 23 of 23 skills have a case (0.26.0)
+
+`audit`, `company` and `contribute` had never been measured. Each was a fixture problem and each turned out to be a different one.
+
+- **`company-no-source`.** A conformance run has `--allowedTools Bash` and no search tool, and this skill's Step 2 says search for every one of the nine areas and never answer from recalled knowledge. Named a company the fixture holds nothing about, so harvesting returns nothing and research has no tool — which leaves saying so as the only honest output. Asserts no claim, no invented raw to cite, and nothing named in `INDEX.md`.
+- **`contribute-applies-nothing`.** This one needed a harness change before it was safe to write. The plugin's own source is readable from inside a run, the harness runs with `acceptEdits` and Bash allowed, and this skill's subject is diffs against that source — so a run that *applies* one edits the repo rather than the throwaway copy, where the `work/` digest would never see it. **The plugin is now snapshotted around every run**, as a cross-cutting check on all 28 cases. "Never modify the plugin's own files, even when they're technically reachable" was prose and untestable for as long as the skill has existed.
+- **`audit-foreign-system`.** Needed a third fixture shape: a system that is not a Corp-OS and was never meant to be. 528 tokens, no index, no config, filename-as-index, one folder capitalized and one not. It carries a convention the shipped model has no equivalent for — every entry ends with a `How I'd be wrong` falsifier — and a deliberate omission stated with its reason, which Step 5 calls the most valuable category to find and which the case tests from the other side with `forbid_output`.
+
+**The cross-cutting OS checks are now conditional on the target being an OS**, inferred from `config.json` rather than declared per case. Asserting a `usage/log.md` row against a folder of somebody's notes measured nothing and would have failed every run of the one skill built to work outside the model.
+
+
 ### 0a. Where the four failing checks ended up (0.25.3, `--repeats 3`)
 
 **17/18.** The four things carried into this round, and what each turned out to be:

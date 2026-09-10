@@ -192,6 +192,8 @@ The model itself is specified in `reference/data-model.md`. Improvement packets 
 
 ## Version history
 
+**0.26.0** — every skill has a conformance case, and the harness watches its own plugin.
+
 **0.25.4** — a source layer's index is the shape of the archive, not a listing of it: 14,943 tokens to 244.
 
 **0.25.3** — a conditional check divided by the wrong denominator, and a release chased the number it produced.

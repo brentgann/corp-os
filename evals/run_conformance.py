@@ -94,6 +94,19 @@ def check(case, before, after, work, output=""):
         results.append({"check": name, "passed": bool(ok), "why": why,
                         "detail": detail})
 
+    # Not everything a skill is pointed at is a Corp-OS. corp-os-audit's whole
+    # subject is somebody else's system -- a folder of notes with no config,
+    # no index and no usage log -- and the cross-cutting rules below all
+    # presuppose one. Asserting a usage/log.md row against a system that has
+    # no usage/ measures nothing and fails every run of the one skill built to
+    # work outside the model.
+    #
+    # Inferred rather than declared per case, so a fixture added later cannot
+    # forget to say so. `config.json` is the marker every skill already uses
+    # to recognise an OS, and corp-os-setup starting from empty still counts
+    # because it PRODUCES one -- the test is the state after the run.
+    is_os = "config.json" in after or "config.json" in before
+
     # -- raw/ is append-only. The one rule whose violation loses source material.
     # The `processed` flag is the single sanctioned exception (data-model.md):
     # it is bookkeeping about the file, not part of what was said. So a changed
@@ -127,10 +140,11 @@ def check(case, before, after, work, output=""):
         f"touched: {touched_raw}" if touched_raw else "")
 
     # -- the usage log row. The open question since 0.2.0.
-    hit("usage/log.md row appended", "usage/log.md" in changed + added,
-        "the friction field is the whole improvement flywheel; a skill that "
-        "skips it under pressure makes corp-os-improve blind",
-        "")
+    if is_os:
+        hit("usage/log.md row appended", "usage/log.md" in changed + added,
+            "the friction field is the whole improvement flywheel; a skill "
+            "that skips it under pressure makes corp-os-improve blind",
+            "")
 
     # -- the gate leaves a record. Stated this way rather than as "must not
     # write", because these runs are told the person confirms -- so a write is
@@ -157,12 +171,15 @@ def check(case, before, after, work, output=""):
     entered = [f for f in added + changed if f.startswith(DERIVED)
                and not f.endswith("INDEX.md")]
     proposed = [f for f in added if f.startswith("proposals/")]
-    hit("derived-layer writes have a proposal behind them",
-        not entered or bool(proposed),
-        "a proposal that lives only in chat dies with the session and leaves "
-        "no record of what the gate saw -- the declines especially, which are "
-        "the only trace of what someone chose not to know",
-        f"wrote {entered} with no proposal file" if entered and not proposed else "")
+    if is_os:
+        hit("derived-layer writes have a proposal behind them",
+            not entered or bool(proposed),
+            "a proposal that lives only in chat dies with the session and "
+            "leaves no record of what the gate saw -- the declines "
+            "especially, which are the only trace of what someone chose not "
+            "to know",
+            f"wrote {entered} with no proposal file"
+            if entered and not proposed else "")
 
     for spec in case.get("expect_added", []):
         m = [f for f in added if f.startswith(spec["prefix"])]
@@ -294,6 +311,14 @@ def run(case, model, timeout, keep, fixture):
     prompt = FRAME.format(
         skill=skill, os_root=work, plugin=PLUGIN, prompt=case["prompt"],
         answers=("\n\nIf it helps, the person would say: " + ans) if ans else "")
+    # The plugin's own source is readable from inside a run -- every skill
+    # resolves ${CLAUDE_PLUGIN_ROOT}, and corp-os-contribute's entire subject
+    # is diffs against it. With `acceptEdits` and Bash allowed, a run that
+    # decides to *apply* one edits this repo rather than the throwaway copy,
+    # and the digest of `work` would never see it. Snapshotted here so that a
+    # skill writing outside its OS is a loud failure rather than a commit
+    # someone finds later.
+    plugin_before = digest(PLUGIN)
     try:
         r = subprocess.run(
             # --allowedTools Bash is not a convenience. Without it,
@@ -318,7 +343,30 @@ def run(case, model, timeout, keep, fixture):
     except subprocess.TimeoutExpired:
         err, transcript = "timed out", ""
     after = digest(work)
+    plugin_after = digest(PLUGIN)
+    touched_plugin = sorted(
+        set(plugin_after) - set(plugin_before)
+        | {k for k in set(plugin_after) & set(plugin_before)
+           if plugin_after[k] != plugin_before[k]}
+        | (set(plugin_before) - set(plugin_after)))
+    touched_plugin = [f for f in touched_plugin
+                      if "__pycache__" not in f and not f.endswith(".pyc")]
     results, diff = check(case, before, after, work, transcript)
+    # Always emitted, not only on failure: a check that appears when it fails
+    # and vanishes when it passes has no denominator, which is the bug §4.55
+    # was written about. It is cross-cutting, so it goes first.
+    results.insert(0, {
+        "check": "the plugin's own source was not modified",
+        "passed": not touched_plugin,
+        "why": "a run works on a throwaway copy of an OS; the plugin is "
+               "readable so skills can follow ${CLAUDE_PLUGIN_ROOT}, not so "
+               "they can edit it. corp-os-contribute writes diffs and applies "
+               "nothing, and this is what makes that testable rather than "
+               "asserted",
+        "detail": f"touched: {touched_plugin[:6]}" if touched_plugin else ""})
+    if touched_plugin:
+        print(f"  !! {case['id']} modified the plugin source: "
+              f"{touched_plugin[:6]}", flush=True)
     if keep:
         open(os.path.join(tmp, "transcript.txt"), "w", encoding="utf-8").write(transcript)
     else:

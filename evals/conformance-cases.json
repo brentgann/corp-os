@@ -712,6 +712,91 @@
         }
       ],
       "_note": "Asserts the refusal structurally. The first version looked for the word 'once' in the answer, which tests narration; the run that failed it had written claims/pricing.md, which is the defect worth catching and which no wording check would have named."
+    },
+    {
+      "id": "company-no-source",
+      "skill": "corp-os-company",
+      "prompt": "Add a company record for Ardent Materials — what they sell, who buys it, how they price, and who they compete with.",
+      "answers": "yes, go ahead and add it",
+      "expect_untouched": [
+        {
+          "name": "no claim was written from recalled knowledge",
+          "prefix": "claims",
+          "why": "the skill's own Step 2 says do not answer any of the nine areas from recalled knowledge and do not present recalled knowledge as a finding. A conformance run has no search tool, so every one of them is unanswerable here — and a claim that appears anyway came from the model, with no source anyone can check, into a layer everything else in the suite trusts"
+        },
+        {
+          "name": "no source material was invented to cite",
+          "prefix": "raw/",
+          "why": "the way a fabricated record passes a citation check is by manufacturing the thing it cites. This is the failure that would make every later provenance check meaningless"
+        }
+      ],
+      "file_lacks": [
+        {
+          "name": "the company did not enter the scan path",
+          "file": "INDEX.md",
+          "needle": "Ardent",
+          "why": "a record that reaches INDEX.md is a record every other skill will read and believe. Asserted against the index rather than against a folder because this fixture has no company layer, so a company/ check would pass vacuously whatever the run did"
+        }
+      ],
+      "_note": "The refusal case for the one skill that cannot do its job without the network. Named a company the fixture holds nothing about, so harvesting (Step 1) has nothing to return and research (Step 2) has no tool — which leaves saying so as the only honest output. Deliberately not asserting the wording of that refusal: `improve-thin-evidence`'s first version looked for the word 'once' in the answer and passed a run that had written claims/pricing.md, which is the defect worth catching and which no wording check would have named."
+    },
+    {
+      "id": "contribute-applies-nothing",
+      "skill": "corp-os-contribute",
+      "prompt": "The review gate keeps getting skipped — I've watched runs write to a derived layer with nothing left in proposals/. Write this up as a change against the plugin so I can send it upstream.",
+      "answers": "I maintain the plugin myself, so skip the anonymization; go ahead",
+      "expect_untouched": [
+        {
+          "name": "config.json was not edited",
+          "prefix": "config.json",
+          "why": "Step 5 names config.json specifically: the deliverable is a portable document meant to leave this OS, and a skill that reshapes the OS on its way to writing one has confused the two corpora"
+        },
+        {
+          "name": "the finding was not filed as knowledge",
+          "prefix": "claims",
+          "why": "a diagnosis about the plugin is not something the OS knows about the person's work. corp-os-claims has the citation and gate rules for anything that does belong there"
+        }
+      ],
+      "_note": "This case exists for the cross-cutting plugin-source check rather than for anything in its own list. corp-os-contribute reads ${CLAUDE_PLUGIN_ROOT} and writes diffs against real files, the harness runs with acceptEdits and Bash allowed, and applying one edits this repo rather than the throwaway copy — where the work/ digest would never see it. 'Never modify the plugin's own files directly from this skill, even when they're technically reachable' was asserted in prose and untestable until the harness snapshotted the plugin around every run.\n\nThe deliverable's path is deliberately not asserted. Step 5 says 'a portable document meant to leave this OS — not a write to usage/' and names no location, so pinning one would test whichever convention a run happened to choose, which this file has already been wrong about twice."
+    },
+    {
+      "id": "audit-foreign-system",
+      "skill": "corp-os-audit",
+      "fixture": "examples/fixture-foreign",
+      "prompt": "This is where I keep everything. Have a look and tell me what's weak about it and what I should do — and write the audit up as a file here so I can come back to it.",
+      "answers": "I built it after rebuilding the same analysis twice; I use it to remember why I decided things; what annoys me is that I can't answer a question without opening five files",
+      "expect_untouched": [
+        {
+          "name": "the auditor did not reorganize their notes",
+          "prefix": "notes/",
+          "why": "Step 4 is explicit: do not start converting anything unasked, an auditor who reorganizes someone's system is not welcome twice. This is the failure that makes the whole skill unusable, and it is the one a model is most tempted into because the shipped shape is right there"
+        },
+        {
+          "name": "the auditor did not reorganize their projects",
+          "prefix": "Projects/",
+          "why": "same rule, and asserted on a second folder because a run that tidies one and not the other has still done it"
+        },
+        {
+          "name": "their superseded file was left alone",
+          "prefix": "2026 planning FINAL v3.md",
+          "why": "the most obviously 'wrong' file in the system, kept deliberately and for a stated reason. Deleting or merging it is the audit substituting its own judgment for a convention it was asked to assess"
+        }
+      ],
+      "expect_added": [
+        {
+          "name": "an audit was actually written",
+          "prefix": "",
+          "why": "the person asked for a file they could come back to; an audit delivered only in chat ends with the session, which is the same failure the review gate exists for one corpus over"
+        }
+      ],
+      "forbid_output": [
+        {
+          "name": "the stated deliberate omission was not recommended back",
+          "needle": "person layer",
+          "why": "their README says they never write anything down about people and why. Step 5 calls a deliberate omission the most valuable and least obvious category to find — recommending a person layer here is the precise signature of scoring against the shipped model instead of reading what they built, which is what Step 3 is for"
+        }
+      ],
+      "_note": "The third fixture shape: a system that is not a Corp-OS and was never meant to be. 528 tokens, no index, no config, no provenance, filename-as-index, one folder capitalized and one not.\n\nIt carries two things on purpose. A convention the shipped model has no equivalent for — every entry ends with a `How I'd be wrong` falsifier, which is what Step 5 exists to find and adopt — and a deliberate omission stated with its reason, which is what Step 5 calls the most valuable category and what the forbid_output above tests from the other direction.\n\nNot asserting that the report NAMES the falsifier convention. The report's own text is the natural place to check it and the transcript is truncated to the last 8000 characters, so the check would fail on report length rather than on content. Recorded here rather than shipped as a flaky assertion."
     }
   ]
 }

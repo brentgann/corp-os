@@ -565,7 +565,7 @@ footer{margin-top:40px; padding-top:18px; border-top:1px solid var(--line-soft);
   <p>The honest numbers behind the map above, read at build time from the committed run reports rather than typed in, and kept here rather than woven through, because an operator does not need them and a maintainer should not have to dig.</p>
   <ul>
     <li><b>Routing: <span class="num">100%</span></b> over 77 queries &times; 3 repeats at 23 skills, including near-miss pairs written to pull each new skill toward its nearest neighbours. The descriptions can be told apart from each other. Whether a skill fires in a live session competing with everything else installed is a different question, and unmeasured.</li>
-    <li><b>Conformance: <span class="num">114/122</span></b> across 19 cases, 15 skills and 3 fixtures &mdash; at one repeat, so a baseline rather than rates. 8 skills still have no case.</li>
+    <li><b>Conformance: <span class="num">114/122</span></b> across 19 cases, 15 skills and 4 fixtures &mdash; at one repeat, so a baseline rather than rates. 8 skills still have no case.</li>
     <li><b>Every conformance figure before v0.11.0 is void.</b> No shipped script had ever executed in a run: the harness ran with <span class="mono">acceptEdits</span>, which approves file edits and nothing else, so every <span class="mono">python3 scripts/&hellip;</span> was answered with <em>this command requires approval</em>. The file-level results were real; what produced them was never measured, because a model blocked from running a script writes the row by hand. It cost six runs and three instruction passes chasing a setup failure that was the instrument the whole time.</li>
     <li><b>One hand-off lands 2 times in 5.</b> When a dashboard needs a layer the OS has not declared, the skill should hand off to <span class="mono">corp-os-configure</span> rather than improvise one inline. Five runs, three behaviours. A wording pass making the requirement explicit measured 0/2 and was reverted &mdash; prose that does not move the number is churn. It is on the record at 2/5 rather than reworded a fourth time.</li>
     <li><b>The interrogation is untested by construction.</b> It needs a person who did not design it. The likeliest way setup fails is not a wrong answer but someone abandoning it halfway, and no check catches that &mdash; which is why the scaffolder runs first, so they still have a working OS when they do.</li>
@@ -575,7 +575,7 @@ footer{margin-top:40px; padding-top:18px; border-top:1px solid var(--line-soft);
 
 <footer>
   <span>corp-os v0.25.4</span>
-  <span>23 skills &middot; 8 commands &middot; 18 scripts &middot; 14 reference specs &middot; 3 fixtures</span>
+  <span>23 skills &middot; 8 commands &middot; 18 scripts &middot; 14 reference specs &middot; 4 fixtures</span>
   <span>5 invariants: An append-only source layer &middot; Provenance &middot; A review gate &middot; An index that can be scanned &middot; Something that removes things.</span>
 </footer>
 
