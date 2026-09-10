@@ -40,6 +40,8 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DOCS = {
     "overview":     ("README.md", "corp-os",
                      "What it is, what holds it together, and what is measured", False),
+    "quickstart":   ("docs/QUICKSTART.md", "corp-os — Quick start",
+                     "The first hour, and a map from what you want to the skill that does it", True),
     "handbook":     ("plugins/corp-os/README.md", "corp-os — Handbook",
                      "The plugin's own README: every skill, and the release history", True),
     "architecture": ("docs/ARCHITECTURE.md", "corp-os — Architecture",
@@ -175,7 +177,8 @@ def emit_data(ver, dist):
             return f'<h{lvl} id="{sid}">{inner}</h{lvl}>'
 
         body = re.sub(r"<h([23])>(.*?)</h\1>", add_id, body, flags=re.S)
-        short = {"overview": "Overview", "handbook": "Handbook",
+        short = {"overview": "Overview", "quickstart": "Quick start",
+                 "handbook": "Handbook",
                  "architecture": "Architecture", "cost": "Cost",
                  "backlog": "Backlog", "install": "Install"}
         data["docs"].append({"key": key, "label": short.get(key, key.title()),

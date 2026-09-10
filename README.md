@@ -31,6 +31,8 @@ One thing worth knowing before you publish anything here: the client caches an i
 
 ## Start
 
+**[`docs/QUICKSTART.md`](docs/QUICKSTART.md)** is the first hour and a map from what you want to the skill that does it — including the six pairs people reliably get wrong. Every phrasing in it comes from the routing eval, which is 77 queries against the full roster at 100%.
+
 Ask for corp-os setup. The interrogation covers your role and mandate, why you want this, what you are actually trying to accomplish, which data earns its keep, how information reaches you, what you can connect and how, your company and market, your design and output needs, and your sensitivity boundaries.
 
 It takes fifteen to twenty minutes and it is the deliverable as much as the folder is. A scaffold built without it produces a generic notebook that gets abandoned in a month.
