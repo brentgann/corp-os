@@ -147,6 +147,24 @@ def main():
               "is an\n    `index_line` template doing more than one line of "
               "work, paid once\n    per entry in the file every skill reads "
               "first.\n")
+        # The template is the fix, so print it next to what it costs. Nobody
+        # can shorten a line they have to go and look up, and this is the last
+        # large item that is a config question rather than a plugin one.
+        try:
+            layers = (json.loads(cfgtxt).get("layers") or {})
+            tmpl = [(k, v.get("index_line")) for k, v in layers.items()
+                    if isinstance(v, dict) and v.get("index_line")]
+            if tmpl:
+                print("  index_line templates:")
+                for k, v in sorted(tmpl, key=lambda x: -len(x[1] or "")):
+                    print(f"    {k:<14} {v}")
+                print("\n    Each field costs on every entry. A template "
+                      "carrying four fields and\n    three separators is four "
+                      "lookups the scan did not ask for; the one\n    that "
+                      "earns its place answers \"is this the entry I want\" "
+                      "and stops.\n")
+        except ValueError:
+            pass
 
     if not PLUGIN:
         print("  The OS numbers above are the ones that scale with a corpus "
