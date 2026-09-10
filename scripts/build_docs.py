@@ -65,6 +65,29 @@ FONTS = ["-V", "mainfont=DejaVu Serif",
          "-V", "toccolor=black"]
 
 
+
+# Tables in these docs carry code in both columns, and LaTeX sizes a longtable
+# from its source widths rather than the page — the three-`scripts/` table in
+# COST.md ran off the right margin and clipped `prune_config_notes.py` in half.
+# Shrinking the table body fixes every one of them without touching the prose,
+# and `\sloppy` stops long unbreakable paths overflowing a line.
+HEADER_TEX = r"""
+\usepackage{etoolbox}
+\AtBeginEnvironment{longtable}{\footnotesize}
+\AtBeginEnvironment{tabular}{\footnotesize}
+\setlength{\emergencystretch}{3em}
+\sloppy
+"""
+
+
+def header_file(dist):
+    os.makedirs(dist, exist_ok=True)
+    path = os.path.join(dist, ".header.tex")
+    with open(path, "w", encoding="utf-8") as fh:
+        fh.write(HEADER_TEX)
+    return path
+
+
 def version():
     with open(os.path.join(ROOT, "plugins", "corp-os",
                            ".claude-plugin", "plugin.json"), encoding="utf-8") as fh:
@@ -78,7 +101,7 @@ def engine():
     return None
 
 
-def build(label, out_dir, ver, eng, html_only):
+def build(label, out_dir, ver, eng, html_only, header=None):
     src, title, subtitle, toc = DOCS[label]
     src_path = os.path.join(ROOT, src)
     if not os.path.exists(src_path):
@@ -91,7 +114,8 @@ def build(label, out_dir, ver, eng, html_only):
         return None
     out = os.path.join(out_dir, stem + ".pdf")
     cmd = (["pandoc", src_path, "-o", out, "--pdf-engine=" + eng,
-            "--from", "gfm+smart", "--standalone"] + FONTS + meta
+            "--from", "gfm+smart", "--standalone"]
+           + (["-H", header] if header else []) + FONTS + meta
            + (["--toc", "--toc-depth=2"] if toc else []))
     r = subprocess.run(cmd, capture_output=True, text=True)
     if r.returncode != 0:
@@ -193,8 +217,11 @@ def main():
 
     print(f"corp-os v{ver} → {os.path.relpath(a.out, ROOT)}"
           + (f" ({eng})" if eng else "") + "\n")
+    hdr = header_file(a.out) if eng and not a.html_only else None
     made = [p for l in labels
-            if (p := build(l, a.out, ver, eng, a.html_only))]
+            if (p := build(l, a.out, ver, eng, a.html_only, hdr))]
+    if hdr and os.path.exists(hdr):
+        os.remove(hdr)
     print(f"\n{len(made)} document(s).")
     if a.data:
         out = emit_data(ver, os.path.dirname(a.out.rstrip("/")) or a.out)
