@@ -35,10 +35,19 @@ The `capture` block (`reference/capture.md`) is what decides a run's cost:
 Two scripts answer most cost questions with no model and no tokens:
 
 ```bash
+# from a clone of this repo, pointed at any OS
 python3 scripts/corpus_load.py /path/to/an-os --sections
 ```
 
 What every skill reads on pre-flight against a real OS, and the token cost of each `INDEX.md` section. Run it against a copy of a real corpus; it is the only way to see anything that scales with corpus size.
+
+**This is repo tooling, not an OS script.** It is not in `scaffold.py`'s `SHIPPED` list, so no OS carries a copy — run it from a clone and point it at the OS, never the other way round. It needs the plugin's `skills/` and `reference/` for the per-skill table; pass `--plugin` or set `CLAUDE_PLUGIN_ROOT` if you are running against an installed copy rather than a clone. Without it the OS-side numbers still print, and those are the ones that scale.
+
+`build_index.py` is the opposite: every OS carries its own copy, and that copy is the one to run.
+
+```bash
+python3 /path/to/an-os/scripts/build_index.py /path/to/an-os
+```
 
 ```bash
 python3 scripts/make_fixture.py /tmp/big --claims 800 --files 25

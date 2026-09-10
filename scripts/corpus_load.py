@@ -20,8 +20,23 @@ import re
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-PLUGIN = os.path.join(ROOT, "plugins", "corp-os")
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, HERE)
+
+
+def find_plugin(explicit=None):
+    """Where the skills and reference/ live.
+
+    This is repo tooling, not an OS script: it is not in scaffold.py's SHIPPED
+    list and no OS carries a copy. It still has to run against an OS that
+    lives anywhere, and against an installed plugin rather than a clone, so
+    the location is a flag with two fallbacks and never an assumption.
+    """
+    for c in (explicit, os.environ.get("CLAUDE_PLUGIN_ROOT"),
+              os.path.join(ROOT, "plugins", "corp-os")):
+        if c and os.path.isdir(os.path.join(c, "skills")):
+            return c
+    return None
 
 
 def tok(s):
@@ -52,7 +67,11 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("os_root")
     ap.add_argument("--sections", action="store_true")
+    ap.add_argument("--plugin", help="path to plugins/corp-os, or an installed "
+                                     "copy. Defaults to $CLAUDE_PLUGIN_ROOT, "
+                                     "then this repo's own")
     a = ap.parse_args()
+    PLUGIN = find_plugin(a.plugin)
     r = a.os_root
 
     if not os.path.isdir(os.path.join(r, "raw")):
@@ -84,6 +103,11 @@ def main():
                 print(f"    {n[:44]:<46} {c:>7}")
         print()
 
+    if not PLUGIN:
+        print("  The OS numbers above are the ones that scale with a corpus "
+              "and they are complete.\n  For the per-skill table, pass "
+              "--plugin <path to plugins/corp-os>.")
+        return 0
     try:
         from ref_load import scan, tok as _t          # noqa: F401
         sizes = {os.path.basename(f): tok(read(f))
