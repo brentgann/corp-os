@@ -192,6 +192,14 @@ The model itself is specified in `reference/data-model.md`. Improvement packets 
 
 ## Version history
 
+**0.19.4** — `note` fields move out of the file every skill reads first.
+
+A note is written once by a person to explain why the config is shaped the way it is, and then re-read by a model on every run of every skill forever. In a real OS they totalled **1,627 tokens: 42% of `config.json` and 17% of the whole pre-flight floor.**
+
+`reference/configuration.md` already says where they go. Its precedence list is `config.json`, then *"the OS's own README.md — for anything config does not cover, and for the human-readable explanation of why the config is shaped the way it is."* That is a note, in the wrong file.
+
+`scripts/prune_config_notes.py` moves each one to the OS README labelled with the config path it came from, losing nothing. Dry run by default. `build_index.py` warns above 400 tokens of notes rather than enforcing anything — it is the person's config.
+
 **0.19.3** — a layer with its own index is no longer listed twice.
 
 `raw` and `claims` were exempted from the root index's per-entry listing **by name**, which reads as a size rule and is not one. Every other layer was rendered in full however large it grew. Measured against a real 852-claim OS: a `people` layer of 54 was listed in the root *and* in the `people/INDEX.md` that 0.19.0 started generating for it — 1,424 tokens duplicated into the file every skill reads on every run.

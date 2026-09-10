@@ -31,7 +31,7 @@ from datetime import date
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 PLUGIN_ROOT = os.path.dirname(HERE)
-SHIPPED = ("build_index.py", "file_raw.py", "write_export.py", "log_run.py",
+SHIPPED = ("build_index.py", "prune_config_notes.py", "file_raw.py", "write_export.py", "log_run.py",
            "delete_source.py", "check_citations.py", "stagger_decay.py",
            "bind_pattern.py", "check_shield.py", "migrate_schema.py",
            "find.py")

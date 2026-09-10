@@ -598,6 +598,30 @@ def render_index(root, s, cfg):
                      "per_layer_index_threshold"):
             print(f"WARNING: config scan.{k} is not a key this script knows — "
                   "check reference/configuration.md; it is being ignored.")
+    # Notes in config.json are read by every skill on every run. In a real OS
+    # they were 1,627 tokens -- 42% of the file, 17% of the pre-flight floor --
+    # and configuration.md's own precedence list already puts "the
+    # human-readable explanation of why the config is shaped the way it is" in
+    # the OS README, not here. Warned rather than enforced: it is the person's
+    # config, and prune_config_notes.py moves them without losing any.
+    def _notes(o):
+        if isinstance(o, dict):
+            for k, v in o.items():
+                if k == "note" and isinstance(v, str):
+                    yield v
+                else:
+                    yield from _notes(v)
+        elif isinstance(o, list):
+            for v in o:
+                yield from _notes(v)
+
+    ntok = sum(round(len(v) / 4) for v in _notes(cfg))
+    if ntok > 400:
+        print(f"NOTE: config.json carries ~{ntok} tokens of prose `note` "
+              "fields, read by every skill on every run. "
+              "`python3 scripts/prune_config_notes.py --root .` moves them to "
+              "this OS's README without losing any.")
+
     excluded = scan.get("excluded_from_scan", ["sensitive.md", "raw/_archive/"])
     L = [
         "# corp-os — Index",
