@@ -111,9 +111,13 @@ def load_config(root):
     # quarantine, output, reference -- each one reading as a considered
     # decision and none of them doing anything.
     ROLES = ("source", "derived", "record")
+    # Only layers that are on. A disabled layer's role changes nothing, and
+    # fixture-register turns jobs off without one -- a warning that fires when
+    # nothing is wrong is what teaches people to skip the one that matters.
     unknown = sorted({(n, s.get("role")) for n, s in
                       (cfg.get("layers") or {}).items()
-                      if isinstance(s, dict) and s.get("role") not in ROLES})
+                      if isinstance(s, dict) and s.get("enabled")
+                      and s.get("role") not in ROLES})
     for n, r in unknown:
         print(f"WARNING: layer `{n}` declares role {r!r}, which nothing reads. "
               f"Only {', '.join(ROLES)} change behaviour — this layer is "

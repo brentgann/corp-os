@@ -192,6 +192,10 @@ The model itself is specified in `reference/data-model.md`. Improvement packets 
 
 ## Version history
 
+**0.19.11** — the unknown-role warning only looks at enabled layers.
+
+`fixture-register` turns `jobs` off and gives it no role, which is fine and which 0.19.9 warned about on every run. A disabled layer's role changes nothing, and a warning that fires when nothing is wrong is what teaches people to skip the one that matters — the reason the `scan.*` warning was scoped the same way two releases earlier.
+
 **0.19.10** — most of what is left in a `note` field is not a note.
 
 `prune_config_notes.py` now also catches keys like `profile_note`, which escaped the check by not being called one, and its guidance separates the two things that live in these fields:
