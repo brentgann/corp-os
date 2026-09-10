@@ -53,7 +53,7 @@ Every skill has a conformance case, and each case runs the real skill against a 
 
 **203 of 208 checks, 28 cases, 23 of 23 skills** — Opus 5, one run each, 2026-09-10. Run it yourself with `python3 evals/run_conformance.py --workers 3 --timeout 900`; the report lands in `evals/runs/`, and a `--case` run writes beside it rather than over it, so a targeted question cannot quietly replace the suite figure.
 
-Three failures are open and named:
+Five checks failed in that run. One was the harness asserting the wrong thing — it read the OS's own capture rule as a fabricated source — and that assertion has been replaced. Four are real, in two skills:
 
 - `corp-os-guide` opens a decision itself instead of handing off, and does not route the fork to `corp-os-decide`. Both passed at 0.18.6 and regressed since; undiagnosed.
 - `corp-os-recall` dropped a load-bearing sensitive fact in this run. It has scored 1-in-4, then 7/7, then this — a rate rather than a state, and the highest-stakes check in the suite.

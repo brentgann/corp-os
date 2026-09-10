@@ -20,8 +20,12 @@ roster read from the plugin's own frontmatter, and the version — which is what
 the single-page tabbed build consumes. It is one file so that page cannot
 quote a figure the repo does not hold.
 
-Needs pandoc and a LaTeX engine for the PDFs. Without one it still writes the
-HTML and says which step it skipped, rather than failing the whole run.
+Needs pandoc and a LaTeX engine for the PDFs. This is the path that runs
+anywhere; `scripts/render_docs.py` is the designed one — the same six
+documents in the five-phase system, with covers, contents and a real type
+scale — and it needs a browser, so it renders where one exists and says so
+where one does not. Both read the same `--data` output, so neither can
+quote a figure the other does not have.
 """
 import argparse
 import json
@@ -171,7 +175,10 @@ def emit_data(ver, dist):
             return f'<h{lvl} id="{sid}">{inner}</h{lvl}>'
 
         body = re.sub(r"<h([23])>(.*?)</h\1>", add_id, body, flags=re.S)
-        data["docs"].append({"key": key, "label": label.split("— ")[-1],
+        short = {"overview": "Overview", "handbook": "Handbook",
+                 "architecture": "Architecture", "cost": "Cost",
+                 "backlog": "Backlog", "install": "Install"}
+        data["docs"].append({"key": key, "label": short.get(key, key.title()),
                              "blurb": blurb, "source": src, "html": body,
                              "toc": toc, "words": len(raw.split())})
 
