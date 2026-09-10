@@ -192,6 +192,18 @@ The model itself is specified in `reference/data-model.md`. Improvement packets 
 
 ## Version history
 
+**0.21.0** — a shared system is not a source; a slice of it is.
+
+The suite scoped by **time** (the cutoff) and by **triage** (per item, after listing) and had no notion of scoping by **subject**. For Granola or a mail account that is enough, because the source is already only one person's. In Confluence, *"everything since Tuesday"* is every page anyone in the company touched since Tuesday — the cutoff narrowed nothing, and the list call alone walked the instance before triage got a chance to decline anything.
+
+`Selector` is now a connector-record field: the query naming the slice in the system's own terms — a CQL query, a JQL filter, a board, a label, a segment. It is `n/a` only where the source is already personal.
+
+So register `Confluence — Product Decisions space`, not `Confluence`. Three spaces are three sources, each with its own cutoff, cadence, blind spots and jobs, which is the right shape: they answer different questions, go stale at different rates, and one being useless is no reason to stop reading the others.
+
+This sharpens a test the registry already had. **A source serving no job is worth declining** — and a whole shared system serves every job and therefore none, which is the tell that nobody has chosen a slice yet.
+
+`corp-os-pull` passes the selector to every list call and refuses to list outside it. And for a shared system the first pull defaults to **no backfill at all**: start from today and let the slice fill forward. What is already in a wiki has been findable there the whole time; the value of capturing it starts when someone cites it.
+
 **0.20.1** — a throttled source is not a broken one, and a knowledge base is not a crawler.
 
 Nothing in twenty-three skills and fourteen reference files mentioned a rate limit, a 429, backoff, concurrency or a credential scope. Meanwhile `corp-os-pull` Step 3 said to mark anything *"missing, unauthorized, or erroring"* as `broken` — so a rate-limited Jira was recorded dead, the next run skipped it, and the person believed they were covered on a source returning nothing. Wrong twice, and it becomes likely the moment anyone points this at a shared system.

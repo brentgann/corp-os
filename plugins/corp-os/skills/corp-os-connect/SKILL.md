@@ -33,6 +33,9 @@ Per source, all seven fields. Skipping any of them produces a registry that look
 - **Protocol** — MCP connector, direct API with a token, browser session, periodic export, or manual. Be specific; "it's connected" is not a protocol.
 - **Auth** — where credentials live. Never copy a token into the OS folder. Record the mechanism, not the secret.
 - **Feeds** — which `source` and `type` values this lands as in `raw/`. This is what makes dedupe and rebuild work.
+- **Selector** — which slice of the system this is, in the system's own terms: a CQL query, a JQL filter, a board, a label, a segment. `n/a` only when the source is already scoped to one person. **For anything an organisation shares, a source with no selector is the whole instance, and registering it is registering a crawl.** Do not accept "Confluence" as a source; ask which space, and register that. Three spaces are three sources, each with its own cutoff, cadence, blind spots and jobs.
+
+  If the person cannot name the slice yet, that is the finding, and the right move is to stop and work it out rather than register the system and sort it later. Nothing about a wholesale registration gets narrower on its own — the cutoff only moves it forward in time.
 - **Serves jobs** — job IDs. A source serving no job is a source worth declining; say so.
 - **Cadence** — daily, weekly, on demand, or event-driven. Match the person's honest upkeep budget from setup, not their aspirational one.
 - **Blind spots** — what this source structurally cannot see.

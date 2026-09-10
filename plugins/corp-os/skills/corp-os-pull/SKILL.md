@@ -23,7 +23,11 @@ Read `config.json` first — it is the authority on this OS's layers, vocabulary
 
 Read `INDEX.md`, `jobs/INDEX.md`, `connectors.md`, and `meta.json` (for the `cutoff` map).
 
-Then decide scope with the person if it is not obvious: all sources, or one? Since when? Default to everything since each source's recorded cutoff. If a source has no cutoff, do not silently pull its entire history — ask for a window, because a first pull that dumps two years of meetings into `raw/` buries the material that mattered.
+Then decide scope with the person if it is not obvious: all sources, or one? Since when? Default to everything since each source's recorded cutoff.
+
+**Pass the source's `Selector` to the list call, every time, and never list outside it.** The selector is the slice; the cutoff only moves that slice forward in time. A source whose record carries no selector and is not a personal one is an unregistered crawl — stop and hand off to `corp-os-connect` rather than listing the instance to find out how big it is.
+
+If a source has no cutoff, do not silently pull its entire history — ask for a window, because a first pull that dumps two years into `raw/` buries the material that mattered. **For a shared system, default to no backfill at all**: start from today and let the slice fill forward. What is already in a wiki has been findable there the whole time; the value of capturing it starts when someone cites it.
 
 If nothing is registered, stop and point at `corp-os-connect`.
 

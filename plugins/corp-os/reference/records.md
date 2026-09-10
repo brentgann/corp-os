@@ -125,6 +125,7 @@ processed: false         # flipped true once the derived layer has taken from it
 - **Protocol**: MCP
 - **Auth**: OAuth via connector, no local credentials
 - **Feeds**: raw/ as `source: granola`, `type: meeting`
+- **Selector**: n/a — this source is already only my own meetings
 - **Serves jobs**: job-001, job-004
 - **Cadence**: daily
 - **Last pull**: 2026-09-03 — cursor `granola:abc123`
@@ -136,6 +137,16 @@ processed: false         # flipped true once the derived layer has taken from it
 - **Fetch call**: `get_transcript(id)` — the body, verbatim
 - **Verbatim fetch**: yes
 - **Blind spots**: only captures calls I actually joined; nothing from Alex's own calls.
+
+**A shared system is not a source. A slice of it is.**
+
+`Selector` is the query that says which slice, in the system's own terms — a CQL query, a JQL filter, a board, a label, a segment id. It is `n/a` only where the source is already scoped to one person: my meetings, my mail, my notes. For anything an organisation shares, it is required, and a registration without one is a registration of the whole instance.
+
+This matters more than the cutoff does. A cutoff narrows by time, and for a personal source that is enough because the source is already narrow. In Confluence, "everything since Tuesday" is every page anyone in the company touched since Tuesday — the cutoff narrowed nothing, and the list call alone walked the instance. In Jira it is every issue in every project. In a session-analytics tool it is every session.
+
+So register the slice, not the system. Not `Confluence` but **`Confluence — Product Decisions space`**, with its own cutoff, its own cadence, its own blind spots and its own jobs. Three slices of one system are three sources, and that is the right shape: they answer different questions, go stale at different rates, and one of them being useless is not a reason to stop reading the others.
+
+The registration test is already in the record and this sharpens it: **a source serving no job is worth declining.** A whole shared system serves every job and therefore none, which is the tell that a slice has not been chosen yet.
 
 **`Scope` is read-only unless something genuinely requires otherwise.** This suite never writes to a source — it captures from them. A connector registered with write scope carries a risk the OS has no use for, and in a shared workspace it is the difference between a tool people install and a tool their administrator removes. Where the protocol has no scope concept, say so: `Scope: n/a — export file`.
 

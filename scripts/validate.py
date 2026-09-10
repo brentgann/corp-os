@@ -385,6 +385,21 @@ def main():
     # leaves the person believing they are covered. The two states have to
     # stay distinguishable in the text or the distinction is not enforced
     # anywhere.
+    # Scoping by time is not scoping by subject. The cutoff narrows a personal
+    # source because it is already narrow; in a shared system "everything
+    # since Tuesday" is every page anyone touched, and the list call alone
+    # walks the instance. Nothing in the suite had a notion of a subset.
+    if "A shared system is not a source" not in open(
+            "reference/records.md", encoding="utf-8").read():
+        err("reference/records.md no longer says a shared system is registered "
+            "by slice. Without a selector the cutoff only moves the whole "
+            "instance forward in time")
+    if "never list outside it" not in open(
+            "skills/corp-os-pull/SKILL.md", encoding="utf-8").read():
+        err("corp-os-pull no longer passes the source's Selector to the list "
+            "call. Triage decides per item and cannot narrow a list that "
+            "already enumerated an organisation")
+
     for term, why in (("throttled", "the state a rate-limited source is in, "
                        "which is not broken"),
                       ("Ceiling", "the per-run cap that keeps a knowledge base "
