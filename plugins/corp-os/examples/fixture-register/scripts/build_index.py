@@ -645,6 +645,25 @@ def render_index(root, s, cfg):
         spec = layers.get(name, {})
         if spec.get("role") == "record":
             continue
+        # A layer big enough to get its own INDEX.md gets a count and a
+        # pointer here, not its entries. `raw` and `claims` were exempted by
+        # NAME, which reads as a size rule and is not one: in a real OS a
+        # people layer of 54 was rendered in full in the root AND in its own
+        # generated index -- 1,424 tokens duplicated into the file every skill
+        # reads on every run. The rule is the same one write_layer_index uses,
+        # so the two cannot disagree.
+        thr = ((cfg.get("scan") or {}).get("per_layer_index_threshold") or 40)
+        n_entries = sum(count_headers(f, spec.get("entry_marker", "### "))
+                        for f in files)
+        if len(files) >= thr or n_entries >= thr:
+            rel = os.path.join((spec.get("path") or name).rstrip("/"),
+                               "INDEX.md")
+            L += [f"## {_lbl(name, layers, cfg)}", "",
+                  f"**{n_entries}** entr{'y' if n_entries == 1 else 'ies'} "
+                  f"across {len(files)} file{'' if len(files) == 1 else 's'} — "
+                  f"listed in [{rel}]({rel}). Too many to scan here without "
+                  "swamping every other layer.", ""]
+            continue
         template = spec.get("index_line")
         if not template:
             missing_template.append(name)

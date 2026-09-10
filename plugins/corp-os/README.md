@@ -192,6 +192,14 @@ The model itself is specified in `reference/data-model.md`. Improvement packets 
 
 ## Version history
 
+**0.19.3** — a layer with its own index is no longer listed twice.
+
+`raw` and `claims` were exempted from the root index's per-entry listing **by name**, which reads as a size rule and is not one. Every other layer was rendered in full however large it grew. Measured against a real 852-claim OS: a `people` layer of 54 was listed in the root *and* in the `people/INDEX.md` that 0.19.0 started generating for it — 1,424 tokens duplicated into the file every skill reads on every run.
+
+The root now uses the same threshold `write_layer_index` uses, so the two cannot disagree: over it, a count and a pointer; under it, the entries.
+
+`corpus_load.py --sections` also reports entries and tokens-per-entry per section. A scannable line is roughly 15-20 tokens; well above that is an `index_line` template doing more than one line of work, paid once per entry. In the same real OS, sections were running 43-57 tokens an entry, which is a config question the tooling could not previously show anyone.
+
 **0.19.2** — `corp-os-upgrade` declares `model: sonnet`.
 
 The one skill of twenty-three that survived 0.18.2's reclassification as genuinely mechanical: comparing files and copying the ones that differ, with migrations explicitly excluded. Roughly 60% cheaper per token.

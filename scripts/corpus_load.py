@@ -61,7 +61,9 @@ def index_sections(text):
         else:
             cur.append(line)
     parts.append((name, "\n".join(cur)))
-    return sorted(((n, tok(b)) for n, b in parts), key=lambda x: -x[1])
+    return sorted(((n, tok(b), sum(1 for x in b.split("\n")
+                                   if x.startswith("- ")))
+                   for n, b in parts), key=lambda x: -x[1])
 
 
 def _notes(o):
@@ -137,10 +139,14 @@ def main():
             print("  (config.json did not parse)\n")
 
         print("  INDEX.md by section:")
-        for n, c in index_sections(root_index):
+        for n, c, e in index_sections(root_index):
             if c:
-                print(f"    {n[:44]:<46} {c:>7}")
-        print()
+                per = f"{c // e:>4}/entry" if e else ""
+                print(f"    {n[:36]:<38} {c:>7} {e:>5} entries {per}")
+        print("\n    A scannable line is roughly 15-20 tokens. Well above that "
+              "is an\n    `index_line` template doing more than one line of "
+              "work, paid once\n    per entry in the file every skill reads "
+              "first.\n")
 
     if not PLUGIN:
         print("  The OS numbers above are the ones that scale with a corpus "
