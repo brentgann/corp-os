@@ -37,25 +37,9 @@ Say so if that is the finding, and say what to do instead — usually splitting 
 
 `jobs/INDEX.md` and `meta.json` counts get updated in the same pass as any confirmed write. A job record that exists without its one-line index entry breaks the scan contract for every other skill.
 
-## The gate is a file, and a script writes it
+## The gate is a file
 
-`jobs` is a derived layer, so nothing enters it until a proposal exists **on disk**. Do not do this by hand and do not treat "I proposed it and they said yes" as having done it — a proposal that lived only in the conversation dies with the session and leaves no record of what the gate saw.
-
-```bash
-python3 scripts/propose.py --root <the OS> --layer jobs --slug <batch> \
-  --headline "<the one thing in this batch that matters>" \
-  --item "<create|enrich|flag|decline> · <id> · <what>" \
-  --not-proposing "<what is being held back, and why>"
-```
-
-Present it, wait, then close it out — the declines are the half that matters:
-
-```bash
-python3 scripts/propose.py --root <the OS> --record <the file it wrote> \
-  --outcome "<item>: confirmed" --outcome "<item>: declined"
-```
-
-Only then write the entries themselves.
+Every creation, edit, split, merge and retirement below runs `scripts/propose.py` first. It is a numbered step inside each procedure rather than a rule stated near them, because a rule beside an enumerated list loses to the list — a run executes the steps and reads the prose.
 
 ## Adding a job
 
@@ -67,7 +51,23 @@ Only then write the entries themselves.
 
    Give every evidence item an **answer-status**, not just an open/closed state: `open` (nothing yet), `signal exists` (something points at an answer without establishing it), `partial` (answered in part — name what is missing), `in motion` (being answered by work already underway rather than by research), `answered` (with the claim ID that resolved it). Binary open/closed hides the most useful category: an item where signal exists needs a different next action than one with nothing on it, and collapsing them means the person re-discovers the difference every time they look.
 4. Check for overlap with existing jobs before creating. Enriching an existing job usually beats a new one, and two jobs with overlapping evidence lists is the most common way this layer rots.
-5. Assign the next `job-NNN` from `meta.json`, write the record, add the one-line `jobs/INDEX.md` entry, recount.
+5. **Write the proposal to disk before anything is written to `jobs/`.** Not a proposal made in the conversation — a file, because the conversation ends and the file is what the gate leaves behind:
+
+   ```bash
+   python3 scripts/propose.py --root <the OS> --layer jobs --slug <batch> \
+     --headline "<the one thing here that matters>" \
+     --item "<create|enrich|flag|decline> · <id> · <what>" \
+     --not-proposing "<what is being held back, and why>"
+   ```
+
+   Present it, wait, then record the answer per item — the declines are the half that matters:
+
+   ```bash
+   python3 scripts/propose.py --root <the OS> --record <the file it wrote> \
+     --outcome "<item>: confirmed" --outcome "<item>: declined"
+   ```
+
+6. Only then: assign the next `job-NNN` from `meta.json`, write the record, add the one-line `jobs/INDEX.md` entry, recount.
 
 ## Sharpening an existing job
 

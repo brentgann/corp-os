@@ -709,6 +709,25 @@ A third and fourth version were needed before the number stopped moving, and the
 The general form: **a metric built to rank work will rank the work, including work that does not exist.** The first target on the list was the strongest evidence the list was right, and it was an artifact of the regex. What caught it was reading the skill before editing it, which is the step a confident ranking makes feel unnecessary.
 
 
+### 4.52 The enumerated procedure is the executable part of a skill; everything beside it is context
+
+**Found (0.24.0) after three failed attempts at the same defect.** Four skills wrote to derived layers with no proposal on disk. The gate is the third invariant, so this is not a cosmetic failure.
+
+The attempts, in order, each aimed at a plausible cause:
+
+- **0.18.7 — position.** `corp-os-jobs` had a correct write gate forty lines below "Adding a job", so the run met the action first. Moved above all four sections that write. **Result at `--repeats 3`: 0/3.**
+- **0.20.0 — operationalisation.** Counting the roster showed every passing skill names `proposals/` and every failing one says "propose" and never says it is a file. A model satisfies *"propose and wait for confirmation"* in the conversation. So `scripts/propose.py` was written and each skill told to run it, in a section above everything that writes. **Result: still 0/3.**
+- **0.24.0 — placement inside the list.** `corp-os-jobs`' "Adding a job" is a numbered procedure of five items whose step 5 is *"assign the next `job-NNN`, write the record, add the index entry, recount."* The gate was a `##` section above that list. `corp-os-claims` — which passes this check 6/6 — puts the proposal at **Step 5 of its own numbered sequence.**
+
+That is the whole difference, and it survived two rounds of looking because both earlier fixes were *true*. The gate was in the wrong place, and it was under-operationalised. Neither was what decided the outcome.
+
+**A run executes the enumerated steps and reads the prose around them.** Not as a rule about models but as an observation with a rate attached: a proposal step inside the list passes, the identical instruction beside the list fails 0/3 twice over. `corp-os-glossary` is the confirming case in the other direction — it *had* a numbered proposal step, at **Step 4, after "Step 3 — write the entry."** A skill contradicting its own sequence scored 1/3, better than the two that never enumerated it and worse than the one that ordered it correctly.
+
+The check is now structural rather than lexical: a skill in `GATE_WRITERS` must match `^\s*\d+\.\s+\*\*Write the proposal` — the gate as a numbered item, not a mention. It caught `corp-os-company` on its first run, which had been "fixed" the same wrong way an hour earlier.
+
+The general form, and it is the third time this repo has paid for a version of it: **§4.48 said a refactor can remove a capability without touching the skill; §4.51 said a metric built to rank work will rank work that does not exist; this says an instruction's position in a document is part of the instruction.** Prose near a procedure is documentation. Prose inside it is code.
+
+
 
 ## 5. The skills
 

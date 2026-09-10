@@ -37,26 +37,6 @@ Most of what people call a decision is one of these, and filing it wrong means i
 
 What is left is the real thing: **a choice between named options that is currently open, that someone is or should be responsible for, and that something else is waiting on.** If nothing is waiting on it, it is a preference, not a decision — record it as a `preference` claim and move on.
 
-## The gate is a file, and a script writes it
-
-`decisions` is a derived layer, so nothing enters it until a proposal exists **on disk**. Do not do this by hand and do not treat "I proposed it and they said yes" as having done it — a proposal that lived only in the conversation dies with the session and leaves no record of what the gate saw.
-
-```bash
-python3 scripts/propose.py --root <the OS> --layer decisions --slug <batch> \
-  --headline "<the one thing in this batch that matters>" \
-  --item "<create|enrich|flag|decline> · <id> · <what>" \
-  --not-proposing "<what is being held back, and why>"
-```
-
-Present it, wait, then close it out — the declines are the half that matters:
-
-```bash
-python3 scripts/propose.py --root <the OS> --record <the file it wrote> \
-  --outcome "<item>: confirmed" --outcome "<item>: declined"
-```
-
-Only then write the entries themselves.
-
 ## Step 2 — get the fields, and push on the three that get skipped
 
 - **Statement** — the fork as a question with its options visible. "Per-seat or usage pricing for the mid-market tier," not "pricing."
@@ -67,6 +47,26 @@ Only then write the entries themselves.
 - **What would settle it** — the specific evidence that would make the answer obvious. Write this as an evidence item on the owning job, so intake and recall start working on it. A fork whose settling evidence is never named is one that gets re-argued from the same position every time it comes up.
 - **Reversibility** — `reversible`, `costly`, or `one-way`. This is what sets how much evidence is worth gathering before deciding: a reversible call made quickly and corrected beats a one-way call made slowly on the same information, and treating both the same way is how a team spends a month on something they could have tried in an afternoon.
 - **Status** — `open`, `blocked`, `decided`, `lapsed`, `moot`.
+
+## Step 2.5 — write the proposal before the record
+
+1. **Write the proposal to disk before anything is written to `decisions/`.** Not a proposal made in the conversation — a file, because the conversation ends and the file is what the gate leaves behind:
+
+```bash
+python3 scripts/propose.py --root <the OS> --layer decisions --slug <batch> \
+  --headline "<the one thing here that matters>" \
+  --item "<create|enrich|flag|decline> · <id> · <what>" \
+  --not-proposing "<what is being held back, and why>"
+```
+
+Present it, wait, then record the answer per item — the declines are the half that matters:
+
+```bash
+python3 scripts/propose.py --root <the OS> --record <the file it wrote> \
+  --outcome "<item>: confirmed" --outcome "<item>: declined"
+```
+
+2. Only then write the decision record itself.
 
 ## Step 3 — check it against what is already there
 

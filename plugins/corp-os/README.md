@@ -192,6 +192,16 @@ The model itself is specified in `reference/data-model.md`. Improvement packets 
 
 ## Version history
 
+**0.24.0** — the gate becomes a numbered step, because a rule beside a list loses to the list.
+
+Third attempt at one defect, and the first two were both true and both irrelevant. `--repeats 3` measured it: `corp-os-jobs` **0/3**, `corp-os-decide` **0/3**, after 0.18.7 moved the gate above everything that writes and 0.20.0 turned it into a script call.
+
+`corp-os-jobs`' "Adding a job" is a numbered procedure whose step 5 is *"write the record."* The gate sat in a section above the list. `corp-os-claims`, which passes this check 6/6, puts the proposal at **Step 5 of its own sequence.** A run executes the enumerated steps and reads the prose around them.
+
+`corp-os-glossary` confirms it from the other side: it *had* a numbered proposal step — at Step 4, after *"Step 3 — write the entry."* A skill contradicting its own order scored 1/3.
+
+The proposal is now item *n* in the list that writes, in `jobs`, `glossary`, `decide` and `company`, with the write renumbered after it. The validator checks for the numbered form rather than a mention, and caught `corp-os-company` immediately — fixed the same wrong way an hour before. §4.52.
+
 **0.23.0** — registering an unfamiliar system, checked rather than remembered.
 
 Asked how the OS walks someone through a connection it has never seen, the answer exposed drift I created in a day. `corp-os-connect` Step 1 still said *"all seven fields"* while listing ten, six more had been added since morning, and the question that decides which fields even apply — is this a source you pull from, or one you ask? — was asked at Step 1.3, **after** the field list. A rule read after the step it governs is a rule the run has already passed, which 0.18.7 recorded and this repeated within the week.

@@ -596,6 +596,18 @@ def main():
             err(f"{d} is in GATE_WRITERS and has no SKILL.md")
             continue
         b = open(sp, encoding="utf-8").read()
+        # Naming the script is not enough: three prose attempts proved that.
+        # The gate has to sit INSIDE the enumerated procedure, because a run
+        # executes numbered steps and reads the prose around them.
+        # corp-os-claims puts it at Step 5 and passes 6/6; corp-os-jobs had it
+        # as a section above a numbered list whose step 5 was "write the
+        # record" and scored 0/3 across three attempts. §4.52.
+        if re.search(r"^\s*\d+\.\s+\*\*Write the proposal", b, re.M) is None \
+                and "## Step 5 — write the proposal to disk" not in b:
+            err(f"{d}: the proposal is not a numbered step in the procedure "
+                "that writes. A rule beside an enumerated list loses to the "
+                "list — three prose attempts moved corp-os-jobs from 0/3 to "
+                "0/3")
         if "propose.py" not in b and "proposals/" not in b:
             err(f"{d}: writes to a derived layer and never names "
                 "scripts/propose.py or proposals/. \"Propose\" alone reads as "
