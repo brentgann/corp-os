@@ -192,6 +192,18 @@ The model itself is specified in `reference/data-model.md`. Improvement packets 
 
 ## Version history
 
+**0.20.0** — the gate stops being a rule and becomes a command.
+
+Four skills wrote to derived layers with no proposal on disk in one conformance run, and two of them had already had a prose fix applied — 0.18.7 moved `corp-os-jobs`' write gate above every section that writes, and it still did not fire.
+
+Counting the roster settled it in a minute. **Every skill that passes that check names `proposals/`. Every skill that fails says "propose" and never says it is a file.** `corp-os-claims` has an entire step called *"write the proposal to disk, then present it"* with the literal path, and passes 6/6. The other four say "propose" between two and seven times each. A model satisfies *"propose and wait for confirmation"* by proposing in the conversation, which is a fair reading of the words and leaves nothing behind.
+
+So it stops being a rule to remember. `scripts/propose.py` writes the proposal file and, in a second call, records the outcome per item — and says so when a batch has no declines, because a gate that confirms everything is a formality. `corp-os-jobs`, `corp-os-glossary`, `corp-os-decide` and `corp-os-company` now run it, in a section placed above everything that writes.
+
+`corp-os-improve` failed differently and gets a different fix: it wrote a claim while reading the usage log, and proposed from a single friction row. Both are things a *helpful* run does, so they are now named as the shape of the temptation rather than forbidden in a line.
+
+The validator checks an explicit set rather than pattern-matching the prose. The first version guessed at "write … `<layer>/`" and missed `corp-os-glossary`, whose layer is a file — a regex standing in for reading, which §4.51 already records four times.
+
 **0.19.12** — a gated read cost `corp-os-dashboard` a rule it had for five releases.
 
 The first full conformance run since 0.18.5 came back **152/163**, and one of the eleven failures was caused by this repo's own cost work. `dashboard-hub-and-registry` had passed at 7/7 for months; it now rebuilds `dashboards/` as a directory — the shape whose removal was the point of the layout fix, because a registry-as-directory made the index report `1` however many dashboards were in it.

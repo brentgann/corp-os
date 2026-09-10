@@ -37,6 +37,26 @@ Most of what people call a decision is one of these, and filing it wrong means i
 
 What is left is the real thing: **a choice between named options that is currently open, that someone is or should be responsible for, and that something else is waiting on.** If nothing is waiting on it, it is a preference, not a decision — record it as a `preference` claim and move on.
 
+## The gate is a file, and a script writes it
+
+`decisions` is a derived layer, so nothing enters it until a proposal exists **on disk**. Do not do this by hand and do not treat "I proposed it and they said yes" as having done it — a proposal that lived only in the conversation dies with the session and leaves no record of what the gate saw.
+
+```bash
+python3 scripts/propose.py --root <the OS> --layer decisions --slug <batch> \
+  --headline "<the one thing in this batch that matters>" \
+  --item "<create|enrich|flag|decline> · <id> · <what>" \
+  --not-proposing "<what is being held back, and why>"
+```
+
+Present it, wait, then close it out — the declines are the half that matters:
+
+```bash
+python3 scripts/propose.py --root <the OS> --record <the file it wrote> \
+  --outcome "<item>: confirmed" --outcome "<item>: declined"
+```
+
+Only then write the entries themselves.
+
 ## Step 2 — get the fields, and push on the three that get skipped
 
 - **Statement** — the fork as a question with its options visible. "Per-seat or usage pricing for the mid-market tier," not "pricing."

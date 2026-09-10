@@ -33,9 +33,29 @@ Say so if that is the finding, and say what to do instead — usually splitting 
 
 ## The write gate
 
-`jobs/` is derived-layer. Propose every job creation, edit, split, merge, and retirement, and wait for confirmation before writing — including changes that look purely mechanical.
+`jobs/` is derived-layer. Every creation, edit, split, merge and retirement goes through the proposal file below — including changes that look purely mechanical.
 
 `jobs/INDEX.md` and `meta.json` counts get updated in the same pass as any confirmed write. A job record that exists without its one-line index entry breaks the scan contract for every other skill.
+
+## The gate is a file, and a script writes it
+
+`jobs` is a derived layer, so nothing enters it until a proposal exists **on disk**. Do not do this by hand and do not treat "I proposed it and they said yes" as having done it — a proposal that lived only in the conversation dies with the session and leaves no record of what the gate saw.
+
+```bash
+python3 scripts/propose.py --root <the OS> --layer jobs --slug <batch> \
+  --headline "<the one thing in this batch that matters>" \
+  --item "<create|enrich|flag|decline> · <id> · <what>" \
+  --not-proposing "<what is being held back, and why>"
+```
+
+Present it, wait, then close it out — the declines are the half that matters:
+
+```bash
+python3 scripts/propose.py --root <the OS> --record <the file it wrote> \
+  --outcome "<item>: confirmed" --outcome "<item>: declined"
+```
+
+Only then write the entries themselves.
 
 ## Adding a job
 

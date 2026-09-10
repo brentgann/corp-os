@@ -472,6 +472,11 @@ def main():
             "retirement is proposed first — a rule read after the step is a "
             "rule the run has already passed")
     im = open("skills/corp-os-improve/SKILL.md", encoding="utf-8").read()
+    if "a cluster of one is not a finding" not in im:
+        err("corp-os-improve no longer states that one occurrence is not a "
+            "finding. It proposed from a single friction row in a conformance "
+            "run, which is the failure it is most prone to because a person "
+            "who asks for changes wants changes")
     if "writes only under `usage/`" not in im:
         err("corp-os-improve no longer says where it may write. Asked to "
             "study the usage log it wrote a claim, which arrives with no "
@@ -489,6 +494,34 @@ def main():
         err("corp-os-dashboard no longer says `dashboards` is a registry file "
             "rather than a folder. A run that recreates the directory brings "
             "back a layer that counts 1 no matter what is in it")
+
+    # The gate is the third invariant and it is a FILE. A conformance run had
+    # four skills writing to derived layers with no proposal on disk, two of
+    # them after a prose fix had already been applied. Counting settled it in
+    # a minute: every skill that PASSES that check names `proposals/`; every
+    # one that fails says "propose" and never says it is a file. A model
+    # satisfies "propose and wait for confirmation" in the conversation, which
+    # is a fair reading of the words and leaves nothing behind.
+    #
+    # An explicit set rather than a guess at the prose: the first version
+    # pattern-matched "write ... <layer>/" and missed corp-os-glossary,
+    # because its layer is `glossary.md` and not a directory. Same class of
+    # error as the four detectors in §4.51 -- a regex standing in for reading.
+    # corp-os-migrate is absent deliberately: it mints a batch and its gate
+    # language is batch-shaped, and it passes the check at 10/10.
+    GATE_WRITERS = ("corp-os-claims", "corp-os-jobs", "corp-os-glossary",
+                    "corp-os-decide", "corp-os-company")
+    for d in GATE_WRITERS:
+        sp = f"skills/{d}/SKILL.md"
+        if not os.path.exists(sp):
+            err(f"{d} is in GATE_WRITERS and has no SKILL.md")
+            continue
+        b = open(sp, encoding="utf-8").read()
+        if "propose.py" not in b and "proposals/" not in b:
+            err(f"{d}: writes to a derived layer and never names "
+                "scripts/propose.py or proposals/. \"Propose\" alone reads as "
+                "a conversational act and leaves nothing on disk — which is "
+                "what four skills did in one conformance run")
 
     PASSES = ("Mechanical pass", "Mixed pass", "Judgment pass")
     for d in sorted(names):

@@ -59,6 +59,26 @@ Never assert headcount, revenue, or valuation from a data aggregator as fact. At
 
 When sources conflict, record `disputed` with both citations. Do not average them, and do not pick the more recent one without saying why the more recent one is better.
 
+## The gate is a file, and a script writes it
+
+`company` is a derived layer, so nothing enters it until a proposal exists **on disk**. Do not do this by hand and do not treat "I proposed it and they said yes" as having done it — a proposal that lived only in the conversation dies with the session and leaves no record of what the gate saw.
+
+```bash
+python3 scripts/propose.py --root <the OS> --layer company --slug <batch> \
+  --headline "<the one thing in this batch that matters>" \
+  --item "<create|enrich|flag|decline> · <id> · <what>" \
+  --not-proposing "<what is being held back, and why>"
+```
+
+Present it, wait, then close it out — the declines are the half that matters:
+
+```bash
+python3 scripts/propose.py --root <the OS> --record <the file it wrote> \
+  --outcome "<item>: confirmed" --outcome "<item>: declined"
+```
+
+Only then write the entries themselves.
+
 ## Step 4 — write the record and the claims
 
 Write `company/<slug>.md` with the frontmatter from the reference — `relationship`, `serves_jobs`, `researched`, `next_review` — and the nine areas as sections.

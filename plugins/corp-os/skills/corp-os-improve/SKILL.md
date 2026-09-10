@@ -11,7 +11,12 @@ The OS watches how it gets used and reshapes itself from evidence. This is what 
 
 The discipline that makes this skill worth running: **every proposal carries a count.** A hunch about what would be nicer is worth less than one line of the usage log, because a hunch is how the previous system got over-built.
 
-**This skill writes only under `usage/`.** It studies how the OS is used and proposes changes to the OS; it does not add to what the OS knows. Material worth capturing that surfaces while reading the log goes to `corp-os-intake` or `corp-os-claims`, which carry the citation and gate rules for it. A claim written from here arrives with no proposal behind it and no source anyone can check.
+**This skill writes only under `usage/`, and a cluster of one is not a finding.**
+
+Two things go wrong here and a conformance run caught both in the same pass. Read them as the shape of the temptation, because both are things a helpful run does:
+
+- **Reading the log surfaces material worth capturing.** It is not this skill's to capture. Name it and hand off to `corp-os-intake` or `corp-os-claims`, which carry the citation and gate rules. A claim written from here arrives with no proposal behind it and no source anyone can check — and it is the kind of thing that looks like initiative until someone tries to cite it.
+- **A person who asks for changes wants changes.** One friction row is one occurrence, and the bar is more than one. When the evidence is thin, say so, write nothing to `usage/proposals.md`, and name what a second occurrence would look like so the next run can recognise it. An empty pass is the correct output of a thin log, and it is the output this skill is least likely to produce unprompted. It studies how the OS is used and proposes changes to the OS; it does not add to what the OS knows. Material worth capturing that surfaces while reading the log goes to `corp-os-intake` or `corp-os-claims`, which carry the citation and gate rules for it. A claim written from here arrives with no proposal behind it and no source anyone can check.
 
 Read `${CLAUDE_PLUGIN_ROOT}/reference/improvement-packet.md` and `${CLAUDE_PLUGIN_ROOT}/reference/data-model.md`.
 

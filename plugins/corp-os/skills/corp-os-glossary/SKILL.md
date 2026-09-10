@@ -51,6 +51,26 @@ Metrics get more questions than other terms, because a metric is a definition pl
 
 That last question is the one worth asking every time. When the answer is yes, record **both** definitions with who uses which. A glossary that flattens a real disagreement into one authoritative-looking entry makes things worse — it gives two teams the same word and the confidence that they agree.
 
+## The gate is a file, and a script writes it
+
+`glossary` is a derived layer, so nothing enters it until a proposal exists **on disk**. Do not do this by hand and do not treat "I proposed it and they said yes" as having done it — a proposal that lived only in the conversation dies with the session and leaves no record of what the gate saw.
+
+```bash
+python3 scripts/propose.py --root <the OS> --layer glossary --slug <batch> \
+  --headline "<the one thing in this batch that matters>" \
+  --item "<create|enrich|flag|decline> · <id> · <what>" \
+  --not-proposing "<what is being held back, and why>"
+```
+
+Present it, wait, then close it out — the declines are the half that matters:
+
+```bash
+python3 scripts/propose.py --root <the OS> --record <the file it wrote> \
+  --outcome "<item>: confirmed" --outcome "<item>: declined"
+```
+
+Only then write the entries themselves.
+
 ## Step 3 — write the entry
 
 ```markdown
