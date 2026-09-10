@@ -147,6 +147,35 @@ def main():
               "is an\n    `index_line` template doing more than one line of "
               "work, paid once\n    per entry in the file every skill reads "
               "first.\n")
+        # Where an entry line's tokens actually go. A template of two fields
+        # still cost 43 tokens an entry in one real OS, which means the
+        # template was not the lever and reading the number without the
+        # mechanism would have sent someone to edit the wrong thing. Every
+        # line is `- **[label](path)** — rest`, and label and path are a
+        # fixed cost paid before any content: a long entry name is charged
+        # twice, once as the label and once inside its own slugified path.
+        rows = []
+        for line in root_index.split("\n"):
+            m = re.match(r"^- \*\*\[(.+?)\]\((.+?)\)\*\*\s*(?:—\s*(.*))?$", line)
+            if m:
+                rows.append((tok(m.group(1)), tok(m.group(2)),
+                             tok(m.group(3) or "")))
+        if rows:
+            n = len(rows)
+            lab = sum(r[0] for r in rows)
+            pth = sum(r[1] for r in rows)
+            rest = sum(r[2] for r in rows)
+            print(f"  where {n} entry lines go:")
+            print(f"    label (the entry's name)        {lab:>7} {lab // n:>5}/entry")
+            print(f"    path (a link to the file)       {pth:>7} {pth // n:>5}/entry")
+            print(f"    everything the template renders {rest:>7} {rest // n:>5}/entry")
+            over = lab + pth
+            print(f"\n    {over * 100 // max(1, lab + pth + rest)}% of an entry "
+                  f"line is its name and its path.\n    Shortening a template "
+                  "cannot touch that; shortening entry NAMES can,\n    because "
+                  "the name is charged twice — once as the label, once inside\n"
+                  "    the slug of its own path.\n")
+
         # The template is the fix, so print it next to what it costs. Nobody
         # can shorten a line they have to go and look up, and this is the last
         # large item that is a config question rather than a plugin one.
