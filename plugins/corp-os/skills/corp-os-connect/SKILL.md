@@ -25,9 +25,23 @@ Before asking the person anything, check what connectors, MCP servers, and tools
 
 Read the existing `connectors.md` if there is one.
 
-## Step 1 — establish the contract for each source
+## Step 1 — which shape is this?
 
-Per source, all seven fields. Skipping any of them produces a registry that looks complete and is not:
+Before the rest of the fields, settle which shape it is, because the answer changes most of them.
+
+**A queried source** — a warehouse, a metrics store, session analytics — has no list worth walking and no meaningful cutoff. Register `Access: query` with a query interface and a read-only role, `Cadence: on demand`, and no selector: it is scoped per question rather than per slice. It is never pulled. Do not give it a schedule; a schedule against a warehouse is a standing bill for answers to questions nobody asked.
+
+Then say plainly what it is for: **it exists to test a hypothesis, and what lands in `raw/` is the question, the statement, the result and the run date** — a measurement, not the data. Ask whether the person's questions of it recur, because a question asked three times is a query worth storing and a candidate for a dashboard panel.
+
+**A listed source** — meetings, mail, a wiki space, a tracker — takes the seven fields below plus a selector and a cutoff.
+
+Registering a warehouse as a listed source is the mistake worth catching here. It reads as a connector like any other and produces a run that asks for everything since Tuesday.
+
+## Step 2 — the fields, which depend on the shape
+
+Every source needs **Category, Protocol, Auth, Scope, Feeds, Serves jobs, Cadence, Blind spots**. A **listed** source also needs **Selector, List call, Fetch call, Verbatim fetch, Limits, Ceiling**. A **queried** one needs **Query interface** instead, and no selector or cutoff.
+
+Skipping any of them produces a registry that looks complete and is not — and the count has grown, so do not go from memory. Step 5 checks the record against its own shape:
 
 - **Category** — the generic kind: meeting notes, chat, email, documents, issue tracker, CRM, warehouse, calendar, web. Category matters more than product, because a Corp-OS built around "Granola" breaks when the person switches tools, and one built around "meeting notes" does not.
 - **Protocol** — MCP connector, direct API with a token, browser session, periodic export, or manual. Be specific; "it's connected" is not a protocol.
@@ -42,33 +56,7 @@ Per source, all seven fields. Skipping any of them produces a registry that look
 - **Scope** — what the credential can do. **Read-only unless something genuinely requires otherwise**, because this suite only ever reads from a source. Ask for the narrower token; in a shared workspace it is the difference between a tool that stays installed and one an administrator removes.
 - **Limits and ceiling** — the source's published rate limit if it has one, and a local per-run ceiling well under it. Ask what the system is, who else hits it, and whether anyone would notice this traffic. For a shared system like an issue tracker or a wiki, the honest ceiling is small: a knowledge base is not a crawler.
 
-## Step 1.3 — is this a source you pull from, or one you ask?
-
-Before the rest of the fields, settle which shape it is, because the answer changes most of them.
-
-**A queried source** — a warehouse, a metrics store, session analytics — has no list worth walking and no meaningful cutoff. Register `Access: query` with a query interface and a read-only role, `Cadence: on demand`, and no selector: it is scoped per question rather than per slice. It is never pulled. Do not give it a schedule; a schedule against a warehouse is a standing bill for answers to questions nobody asked.
-
-Then say plainly what it is for: **it exists to test a hypothesis, and what lands in `raw/` is the question, the statement, the result and the run date** — a measurement, not the data. Ask whether the person's questions of it recur, because a question asked three times is a query worth storing and a candidate for a dashboard panel.
-
-**A listed source** — meetings, mail, a wiki space, a tracker — takes the seven fields below plus a selector and a cutoff.
-
-Registering a warehouse as a listed source is the mistake worth catching here. It reads as a connector like any other and produces a run that asks for everything since Tuesday.
-
-## Step 1.4 — for a source that already exists, look at what it produced
-
-Before adjusting a registered source, run it:
-
-```bash
-python3 scripts/source_yield.py --root <the OS>
-```
-
-Per source: raw files captured, how many any derived entry cites, how many of those serve a job. **Triage decides per item on metadata, which is the weakest evidence available. This is the strongest — what the last two hundred items from that source actually turned into — and it was already on disk.**
-
-Read it as a ratio and not a score. Three claims per hundred files is not a failing source; it may be narrow and precious. It is asking one question: does the `Selector` still describe what you wanted? A slice that yields almost nothing is usually a slice chosen by what was easy to query rather than by what anyone needed.
-
-Three answers, and the last is a real one: **narrow the selector**, **lengthen the cadence**, or **decline the source**. What there is never a reason to do is delete what was captured — `raw/` is append-only, and the fix is to stop capturing, not to remove.
-
-## Step 1.5 — find the cheap call, not just the connection
+## Step 3 — find the cheap call, not just the connection
 
 A source almost always has two reads: one that **enumerates** and one that **returns a body**. They differ in cost by roughly two orders of magnitude, and a registry that records only the protocol tells a skill it can reach the source and nothing about how to reach it cheaply — so the skill fetches everything, which is exactly how one intake run cost more than the connector it pulled from.
 
@@ -84,7 +72,28 @@ If the source can be reached by a **script** rather than through a model — an 
 
 If the person does not know whether a list call exists, that is worth two minutes of looking. It is the single highest-value fact in the record.
 
-## Step 2 — the blind-spots question, asked properly
+## Step 4 — probe it once, bounded, before trusting any of it
+
+A registration is a set of claims about a system, and every one of them can be wrong in a way that reads fine on the page. The selector can name a space that exists and is not the one they meant. The list call can return a different shape than its documentation. The credential can have more scope than anyone intended.
+
+So run it once, deliberately small:
+
+- **Listed source** — one list call, with the selector, capped at ten. Show what came back: titles, dates, who wrote them. Then ask the only question that matters: **is this the slice you meant?** A wrong selector is obvious in ten rows and invisible in a registry entry.
+- **Queried source** — one statement with a `LIMIT`, against the read-only role. It either runs or it does not, and if it does not, that is better found now than inside a hypothesis.
+
+Fetch nothing. Write nothing to `raw/`. The probe exists to check the contract, not to capture, and a first pull is a separate decision made with `corp-os-pull`.
+
+If the probe returns a great deal more than expected, that is the finding, and the answer is a narrower selector rather than a bigger ceiling.
+
+## Step 5 — check the record against its own shape
+
+```bash
+python3 scripts/check_connector.py --root <the OS>
+```
+
+Shape-aware: it knows a queried source needs a query interface and must not carry a cutoff, that a listed one needs its call pair and a selector unless it is personal, and that a credential is named by reference and never written. Fix what it names before moving on — a registry that looks complete and is not is the specific failure this whole step exists for.
+
+## Step 6 — the blind-spots question, asked properly
 
 Ask it directly for every source: *what would this source never tell you?*
 
@@ -92,11 +101,25 @@ Meeting notes only capture calls the person joined. Chat search only reaches cha
 
 This field is the difference between an OS that knows its own edges and one that treats silence as absence. It is also the field that later explains why an evidence item never got answered — which is why it belongs in the registry rather than in someone's head.
 
-## Step 3 — decline sources deliberately
+## Step 7 — decline sources deliberately
 
 Not every available source belongs in the OS. Write a `status: not-connected` entry with the reason for anything considered and declined. A declined source with a recorded reason is a real artifact: it stops the question being reopened every month, and it tells a future rebuild that the absence was a choice.
 
-## Step 4 — auditing an existing registry
+## Step 8 — for a source that already exists, look at what it produced
+
+Before adjusting a registered source, run it:
+
+```bash
+python3 scripts/source_yield.py --root <the OS>
+```
+
+Per source: raw files captured, how many any derived entry cites, how many of those serve a job. **Triage decides per item on metadata, which is the weakest evidence available. This is the strongest — what the last two hundred items from that source actually turned into — and it was already on disk.**
+
+Read it as a ratio and not a score. Three claims per hundred files is not a failing source; it may be narrow and precious. It is asking one question: does the `Selector` still describe what you wanted? A slice that yields almost nothing is usually a slice chosen by what was easy to query rather than by what anyone needed.
+
+Three answers, and the last is a real one: **narrow the selector**, **lengthen the cadence**, or **decline the source**. What there is never a reason to do is delete what was captured — `raw/` is append-only, and the fix is to stop capturing, not to remove.
+
+## Step 9 — auditing an existing registry
 
 When asked "what's feeding my OS" or "why isn't this working," check each entry against reality rather than reporting the registry back:
 
@@ -105,7 +128,7 @@ When asked "what's feeding my OS" or "why isn't this working," check each entry 
 - Did the protocol change under it — a connector replaced, a token expired, an export format changed? Mark `broken` with what specifically failed.
 - Are there jobs whose evidence lists nothing in the registry can serve? That is the most useful finding an audit produces: a known gap, rather than a vague sense of missing information.
 
-## Step 5 — cadence and scheduling
+## Step 10 — cadence and scheduling
 
 If a source has a recurring cadence, offer to set up a scheduled run of `corp-os-pull` for it. Recurring pulls plus a scheduled brief are what keep a low-upkeep OS alive, and they are the specific fix for the person whose last system died of neglect.
 

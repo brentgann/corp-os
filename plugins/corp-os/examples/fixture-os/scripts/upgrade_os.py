@@ -39,7 +39,7 @@ PLUGIN_ROOT = os.path.dirname(HERE)
 # SHIPPED by a validator check -- these two lists drifting apart is exactly the
 # defect this script exists to clean up after, and it would be absurd to
 # reintroduce it here.
-SHIPPED = ("build_index.py", "source_yield.py", "propose.py", "prune_config_notes.py", "file_raw.py", "write_export.py", "log_run.py",
+SHIPPED = ("build_index.py", "check_connector.py", "source_yield.py", "propose.py", "prune_config_notes.py", "file_raw.py", "write_export.py", "log_run.py",
            "delete_source.py", "check_citations.py", "stagger_decay.py",
            "bind_pattern.py", "check_shield.py", "migrate_schema.py",
            "find.py")

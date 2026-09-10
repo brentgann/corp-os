@@ -192,6 +192,20 @@ The model itself is specified in `reference/data-model.md`. Improvement packets 
 
 ## Version history
 
+**0.23.0** — registering an unfamiliar system, checked rather than remembered.
+
+Asked how the OS walks someone through a connection it has never seen, the answer exposed drift I created in a day. `corp-os-connect` Step 1 still said *"all seven fields"* while listing ten, six more had been added since morning, and the question that decides which fields even apply — is this a source you pull from, or one you ask? — was asked at Step 1.3, **after** the field list. A rule read after the step it governs is a rule the run has already passed, which 0.18.7 recorded and this repeated within the week.
+
+Restructured: shape first, then the fields that shape implies, then a clean sequence through Step 10.
+
+Two new steps do the work that memory was doing:
+
+**Probe it once, bounded, before trusting any of it.** One list call with the selector, capped at ten — or one statement with a `LIMIT`. Show what came back and ask whether it is the slice they meant. **A wrong selector is obvious in ten rows and invisible in a registry entry.** Fetch nothing, write nothing; the probe checks the contract, not the material.
+
+**`scripts/check_connector.py`** checks each record against the shape it declares. Three shapes: a queried source needs a query interface and must not carry a cutoff or selector; a listed one needs its call pair, limits and a ceiling; a manual one has no system to call and is exempt from both — holding a hallway conversation to the listed checklist produces six findings about a correctly configured source. It also refuses a credential value in a file that gets synced, shared and handed to audits.
+
+The shipped fixture registry was rewritten to satisfy it, which it did not.
+
 **0.22.0** — a warehouse is a third source shape, and it is never pulled.
 
 Two shapes were assumed everywhere: a source you *list and fetch from*, and a source you *export from*. Redshift, session analytics, a metrics store are neither — the data is generated faster than anyone could capture it, there is no list worth walking, and no cutoff means anything. Registered as a listed source it reads like any other connector and produces a run that asks a warehouse for everything since Tuesday.

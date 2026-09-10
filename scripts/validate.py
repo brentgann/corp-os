@@ -385,6 +385,24 @@ def main():
     # leaves the person believing they are covered. The two states have to
     # stay distinguishable in the text or the distinction is not enforced
     # anywhere.
+    # Registering a system nobody has seen before is now eight fields plus
+    # six or one, depending on a shape question asked first. That is past
+    # what anyone checks from memory, and "a registry that looks complete and
+    # is not" is the failure corp-os-connect exists to prevent. So the check
+    # is a script, and connect runs it before the registration is trusted.
+    cn0 = open("skills/corp-os-connect/SKILL.md", encoding="utf-8").read()
+    for term, why in (("check_connector.py", "the shape-aware completeness "
+                       "check; the field count has outgrown memory"),
+                      ("probe it once", "a bounded first call. A wrong "
+                       "selector is obvious in ten rows and invisible in a "
+                       "registry entry")):
+        if term not in cn0:
+            err(f"corp-os-connect no longer does `{term}` — {why}")
+    if cn0.index("## Step 1 — which shape") > cn0.index("## Step 2 — the fields"):
+        err("corp-os-connect asks for the fields before asking which shape "
+            "the source is. The shape decides which fields apply, and a rule "
+            "read after the step is a rule the run has already passed")
+
     # A warehouse is a third source shape. It has no list and no cutoff, so a
     # pull that includes it asks for everything since Tuesday from a system
     # that will try. And it is the only shape where a decayed claim can be
