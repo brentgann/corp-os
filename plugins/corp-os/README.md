@@ -192,6 +192,8 @@ The model itself is specified in `reference/data-model.md`. Improvement packets 
 
 ## Version history
 
+**0.26.4** — the shareable documents get a generator, and the handbook stops saying nine scripts.
+
 **0.26.3** — a new case asserted against the OS's own capture discipline; measuring it is what said so.
 
 **0.26.2** — provenance is the second invariant and nothing enforced it; a derived entry now says where it came from or the run does not close.
