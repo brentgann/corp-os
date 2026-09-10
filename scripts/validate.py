@@ -342,7 +342,15 @@ def main():
                 warn(f"{ref} carries no readable plugin manifest, so the "
                      "published version is unknown.")
             elif local_v and pub_v and local_v > pub_v:
-                err(f"version {cur} is not on {ref}, which still serves "
+                # On a branch or a pull request, "not yet on main" is the
+                # expected state rather than a defect, and a check that fails
+                # every version-bumping PR is a check people learn to ignore
+                # — the same reasoning that scoped the scan warning and the
+                # unknown-role warning. --allow-unpushed downgrades exactly
+                # this one; on main it stays an error, because there the
+                # release really has reached nobody.
+                (warn if "--allow-unpushed" in sys.argv else err)(
+                    f"version {cur} is not on {ref}, which still serves "
                     f"{pub}. A marketplace install resolves against the "
                     "pushed branch, so this release reaches nobody until it "
                     "is pushed.")
