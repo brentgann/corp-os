@@ -8,7 +8,7 @@ Items leave this list by being done or by being declined in §8, never by being 
 
 ## Done in 0.19.x — the pre-flight floor, measured on a real 852-claim OS
 
-**9,508 → 6,743 tokens**, paid by every skill on every run. No model tokens spent finding or fixing any of it.
+**9,508 → 5,501 tokens**, paid by every skill on every run. 42% off, and no model tokens spent finding or fixing any of it. Full table in `COST.md`.
 
 - **Root index split** — findings to `usage/health.md`, uncapped, owned by `corp-os-reality-check`.
 - **Layer index fires on entries as well as files** — 852 claims in topic files had no entry point.

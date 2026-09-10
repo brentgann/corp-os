@@ -1,0 +1,157 @@
+{
+  "corpos_version": "0.19.10",
+  "profile": "relationship",
+  "vocabulary": {
+    "confidence": ["confirmed", "needs_review", "reconstructed", "disputed", "retired"],
+    "sensitivity": ["public", "internal", "sensitive"],
+    "bearing": ["incidental", "load_bearing"],
+    "tags": ["Product", "Strategy", "Tech", "Process", "UX", "Team", "Research"]
+  },
+  "layers": {
+    "raw": { "enabled": true, "role": "source", "path": "raw/" },
+    "proposals": { "enabled": true, "role": "record", "path": "proposals/" },
+    "claims": {
+      "enabled": true, "role": "derived", "path": "claims/", "grouping": "topic",
+      "index_line": "{id} — {statement} · {kind} · {confidence}"
+    },
+    "jobs": {
+      "enabled": true, "role": "derived", "path": "jobs/",
+      "index_line": "{id} — {statement} · {status}"
+    },
+    "decisions": {
+      "enabled": true, "role": "derived", "path": "decisions/", "decay": "none",
+      "entry_schema": {
+        "id": { "required": true },
+        "statement": { "required": true },
+        "owner": { "required": true },
+        "decide_by": { "type": "date", "required": true },
+        "status": { "type": "enum", "values": ["open", "blocked", "decided", "lapsed", "moot"] },
+        "reversibility": { "type": "enum", "values": ["reversible", "costly", "one-way"] },
+        "blocks": { "type": "list" }
+      },
+      "index_line": "{id} — {statement} · {status}"
+    },
+    "people": {
+      "enabled": true, "role": "derived", "path": "people/", "decay": "365d",
+      "entry_schema": {
+        "name": { "required": true },
+        "role": { "required": true },
+        "org": {},
+        "tier": { "type": "enum", "values": ["C-suite", "Product", "Design & UX", "Engineering & AI", "Ops & Sales", "External", "Unknown"] },
+        "status": { "type": "enum", "values": ["active", "dormant", "departed", "not-met"] },
+        "aliases": { "type": "list" },
+        "sensitivity": { "type": "enum", "values": ["public", "internal", "sensitive"] }
+      },
+      "index_line": "{name} — {role} · {tier}",
+      "note": "`sensitivity: sensitive` only when the person's role or status is itself the protected fact (an unannounced hire, a departure not yet public). A sensitive claim about someone does not make their record sensitive. scripts/build_dashboards.py reads this field. `aliases` is load-bearing: the connector renders one name up to four ways."
+    },
+    "insights": {
+      "enabled": true, "role": "derived", "path": "insights/", "decay": "none",
+      "entry_schema": {
+        "title": { "required": true },
+        "timing": { "required": true },
+        "source": { "required": true },
+        "status": { "type": "enum", "values": ["live", "spent", "stale"] },
+        "confidence": { "type": "enum", "values": ["confirmed", "needs_review", "reconstructed", "disputed", "retired"] },
+        "sensitivity": { "type": "enum", "values": ["public", "internal", "sensitive"] },
+        "bearing": { "type": "enum", "values": ["incidental", "load_bearing"] },
+        "connections": { "type": "list" },
+        "rests_on": { "type": "list" },
+        "jobs": { "type": "list" },
+        "migrated": { "type": "date" }
+      },
+      "index_line": "{title} — {timing}"
+    },
+    "topics": {
+      "enabled": true, "role": "derived", "path": "topics/",
+      "index_line": "{name} — {gist}",
+      "note": "A view over claims, not a source of truth. Anything asserted here exists as a claim with its own citation, or corp-os-reality-check cannot see it and it rots unnoticed."
+    },
+    "glossary": {
+      "enabled": true, "role": "derived", "path": "glossary.md",
+      "index_line": "{term} — {definition}",
+      "note": "Jargon, product terms, acronyms, role names, and metric definitions. Metric definitions are the half that matters."
+    },
+    "company": {
+      "enabled": true, "role": "derived", "path": "company/",
+      "index_line": "{name} — {relationship} · {status}"
+    },
+    "sensitive": {
+      "enabled": true, "role": "record", "path": "sensitive.md",
+      "in_scan_path": false, "entry_marker": "### ",
+      "index_line": "{id} — {statement} · {sensitivity} · {bearing}"
+    },
+    "connector_registry": {
+      "enabled": true, "role": "record", "path": "connectors.md", "entry_marker": "### "
+    },
+    "dashboard_registry": {
+      "enabled": true, "role": "record", "path": "dashboards.md"
+    },
+    "dashboards": {
+      "enabled": true, "role": "record", "path": "dashboards/",
+      "index_line": "{name} — built {built}",
+      "note": "Regenerable. A dashboard is never a source of truth."
+    },
+    "docs": {
+      "enabled": true, "role": "record", "path": "docs/",
+      "index_line": "{name} — {gist}"
+    }
+  },
+  "decay": {
+    "enabled": true,
+    "default": "180d",
+    "applies_to": "sourced",
+    "by_kind": {
+      "decision": "none", "constraint": "none", "identity": "none", "definition": "none",
+      "theme": "365d", "preference": "365d", "fact": "180d", "assumption": "90d", "metric": "60d"
+    }
+  },
+  "retention": { "raw": { "policy": "keep", "measure_from": "frontmatter_date" } },
+  "gate": { "mode": "propose" },
+  "confidence_ceilings": [
+    {
+      "cohort": "2026-07-08 GannOS widget migration",
+      "ceiling": "reconstructed",
+      "raw_marker": "reconstructed: true in frontmatter, or a 0000-00-00-- filename prefix",
+      "count": 31,
+      "promotable": false,
+      "note": "Original source text no longer exists. Citation is the literal `no source`. Cannot reach confirmed without new material."
+    },
+    {
+      "cohort": "Granola AI meeting summaries (2026-04 onward)",
+      "ceiling": "needs_review",
+      "raw_marker": "granola_id in frontmatter; body opens '> Source: Granola AI meeting summary. Not a verbatim transcript.'",
+      "count": 170,
+      "promotable": true,
+      "note": "Summaries, not verbatim, so one cannot satisfy the Citation requirement. Reaches confirmed via get_meeting_transcript on the Granola connector — cheap, per claim, worth it for one that gates a decision."
+    }
+  ],
+  "placement_instructions": [
+    {
+      "date": "2026-07-30",
+      "governs": "people/emilie-jackson.md",
+      "instruction": "The personal departure account lives in sensitive.md only. That record carries none of it and NO pointer or 'context exists elsewhere' note — the breadcrumb is the signal being avoided. The operational fact of the departure and the coverage it triggered is separate, load-bearing, and lives in the scan path as claims.",
+      "outranks": "the bearing rule and the entry schema, even if a later pass judges the material load_bearing",
+      "applies_to_rebuild": true,
+      "note": "TODO: nothing in the plugin reads this array. The mechanism corp-os-rebuild actually honours is `placement: sensitive` in the frontmatter of the raw file(s) holding this material. Add it there; keep this as the human-readable copy."
+    }
+  ],
+  "export": {
+    "enabled": true,
+    "targets": {
+      "product-brain": {
+        "kind": "structured-claim-feed",
+        "path": "usage/exports/",
+        "emitter": "scripts/emit_claim_feed.py",
+        "include_sensitivity": ["public", "internal"],
+        "load_bearing_sensitive": "redact-in-place",
+        "note": "Claim IDs are stable across the boundary. `sensitive` never crosses; `sensitive` + `load_bearing` crosses as a redacted stub carrying id, kind, jobs and decay but not body, so the far side knows a fact is withheld rather than computing without it."
+      },
+      "human": {
+        "kind": "redacted-markdown",
+        "emitter": "scripts/write_export.py"
+      }
+    }
+  },
+  "scan": { "excluded_from_scan": ["usage/", "sensitive.md"] }
+}
