@@ -192,6 +192,14 @@ The model itself is specified in `reference/data-model.md`. Improvement packets 
 
 ## Version history
 
+**0.19.9** — two things `config.json` could be wrong about while looking right.
+
+**A duplicate key.** JSON keeps the last of two identical keys and reports nothing. A real OS declared `dashboards` twice — an existing layer for the rendered directory, and a new one added to declare the registry file — and the second silently replaced the first. The file the edit was made to declare stayed undeclared, the edit looked correct, and nothing anywhere would have said so.
+
+**A role nothing reads.** Every rule in this suite branches on `source`, `derived` or `record`. A layer declaring anything else falls through the review gate, through the write-freely exemption and through the rebuild protection, all three. The same OS carried four — `view`, `quarantine`, `output`, `reference` — each reading as a considered decision and none of them doing anything. `gated: true` is in the same category: it appears in the shipped defaults and the documentation and no code reads it.
+
+Both warn on every `build_index.py` run, alongside the existing warning for an unknown `scan.*` key.
+
 **0.19.8** — the schema rule states its exemption.
 
 *"A layer may only be enabled if it declares an `entry_schema` and an `index_line`. This applies to shipped layers and custom ones alike."* The shipped fixture declares `connectors` and `dashboards` with neither, and `build_index.py` skips `record` layers when rendering entries, so an `index_line` there is never read.

@@ -79,11 +79,46 @@ def load_config(root):
     path = os.path.join(root, "config.json")
     cfg = {}
     if os.path.exists(path):
+        # JSON keeps the LAST of two identical keys and reports nothing. A
+        # real OS declared "dashboards" twice -- an existing layer for the
+        # rendered directory, and a new one for the registry file -- and the
+        # second silently replaced the first, so the file it was added to
+        # declare stayed undeclared and the run that added it looked correct.
+        # Nothing anywhere would have said so.
+        def _dupes(pairs):
+            seen, dup = {}, []
+            for k, v in pairs:
+                if k in seen:
+                    dup.append(k)
+                seen[k] = v
+            if dup:
+                print(f"WARNING: config.json declares {', '.join(sorted(set(dup)))} "
+                      "more than once. JSON keeps the last and discards the "
+                      "rest, so an earlier declaration is being ignored.")
+            return seen
+
         try:
-            cfg = json.load(open(path, encoding="utf-8"))
+            cfg = json.load(open(path, encoding="utf-8"),
+                            object_pairs_hook=_dupes)
         except (OSError, ValueError) as e:
             print(f"WARNING: config.json unreadable ({e}) — using defaults.")
             cfg = {}
+    # Every rule in this suite branches on three roles. A layer declaring
+    # anything else is not gated, not skipped and not protected: it falls
+    # through the review gate (role == "derived"), through the write-freely
+    # exemption (role == "record") and through the rebuild protection
+    # (role == "source"). One real OS carried four of them -- view,
+    # quarantine, output, reference -- each one reading as a considered
+    # decision and none of them doing anything.
+    ROLES = ("source", "derived", "record")
+    unknown = sorted({(n, s.get("role")) for n, s in
+                      (cfg.get("layers") or {}).items()
+                      if isinstance(s, dict) and s.get("role") not in ROLES})
+    for n, r in unknown:
+        print(f"WARNING: layer `{n}` declares role {r!r}, which nothing reads. "
+              f"Only {', '.join(ROLES)} change behaviour — this layer is "
+              "ungated, unskipped and unprotected.")
+
     layers = dict(DEFAULT_LAYERS)
     for name, spec in (cfg.get("layers") or {}).items():
         merged = dict(layers.get(name, {}))
