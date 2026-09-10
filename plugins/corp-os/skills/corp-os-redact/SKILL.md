@@ -147,10 +147,13 @@ Close the run with `scripts/log_run.py` in the OS rather than editing the files 
 ```bash
 python3 scripts/log_run.py --skill corp-os-redact --scope "<what this run covered>" \
     --friction "<where it hurt, or 'none'>" \
-    --event "<what changed>"
+    --event "<what changed>" \
+    --gate-note "redaction pass — removing material, not proposing it"
 ```
 
 These are the two writes measurement says get dropped, because they sit after the interesting work is done. A step that has to happen every time and that nothing else will catch belongs in code, not in a reminder.
+
+It also refuses to close a run that put something in a derived layer with no proposal file behind it, and names the files and the `propose.py` call that repairs the record. The gate is checked here because this is the step that never gets skipped — three attempts at stating it nearer the write got it to one run in three.
 
 - **Both files on disk**, as the script reports them. If it errored, nothing was written — fix the spec and call it again rather than writing either file by hand.
 - A `usage/log.md` row noting a redaction ran and for what audience — never the removed content itself.

@@ -125,6 +125,8 @@ python3 scripts/log_run.py --skill corp-os-jobs --scope "<what this run covered>
 
 These are the two writes measurement says get dropped, because they sit after the interesting work is done. A step that has to happen every time and that nothing else will catch belongs in code, not in a reminder.
 
+It also refuses to close a run that put something in a derived layer with no proposal file behind it, and names the files and the `propose.py` call that repairs the record. The gate is checked here because this is the step that never gets skipped — three attempts at stating it nearer the write got it to one run in three.
+
 - Recounted `meta.json` (`jobs`, `next_job_id`) verified against an actual file count.
 - One row appended to `usage/log.md`. Put the real friction in the friction field — "person could not state a definition of done for two of three jobs" is exactly the signal `corp-os-improve` needs.
 - A concrete next action: what to capture for the job's top evidence item, and which source is most likely to have it.

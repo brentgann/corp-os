@@ -142,5 +142,7 @@ python3 scripts/log_run.py --skill corp-os-pull --scope "<what this run covered>
 
 These are the two writes measurement says get dropped, because they sit after the interesting work is done. A step that has to happen every time and that nothing else will catch belongs in code, not in a reminder.
 
+It also refuses to close a run that put something in a derived layer with no proposal file behind it, and names the files and the `propose.py` call that repairs the record. The gate is checked here because this is the step that never gets skipped — three attempts at stating it nearer the write got it to one run in three.
+
 - One row in `usage/log.md`. Real friction in the friction field: "four files could not be assigned to any job" or "two of five claims were proposed from a single unverified mention" is the signal `corp-os-improve` mines.
 - A short report: what was pulled per source, what was skipped and why, which connectors failed, which jobs moved, and what is still sitting unprocessed.

@@ -192,6 +192,8 @@ The model itself is specified in `reference/data-model.md`. Improvement packets 
 
 ## Version history
 
+**0.25.0** — the gate is checked by `log_run.py`, the one step measurement says never gets skipped.
+
 **0.24.0** — the gate becomes a numbered step, because a rule beside a list loses to the list.
 
 Third attempt at one defect, and the first two were both true and both irrelevant. `--repeats 3` measured it: `corp-os-jobs` **0/3**, `corp-os-decide` **0/3**, after 0.18.7 moved the gate above everything that writes and 0.20.0 turned it into a script call.

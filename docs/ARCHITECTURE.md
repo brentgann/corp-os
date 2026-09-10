@@ -729,6 +729,25 @@ The general form, and it is the third time this repo has paid for a version of i
 
 
 
+### 4.53 Enforce an invariant at the step that already happens, not the step it belongs to
+
+**Found (0.25.0) by re-measuring §4.52's fix rather than believing it.** The numbered-step change worked, and the numbers say how much: `corp-os-decide` 0/3 → **2/3**, `corp-os-jobs` 0/3 → **1/3**, `corp-os-glossary` 1/3 → **1/3** after its Step 3/Step 4 reordering. Real movement, in the predicted direction, on the predicted skills — and not one of them reached a rate anybody would call a gate. Four attempts had now been spent on where the instruction sits.
+
+The failures name the mechanism if you read what the step actually asks for. `propose.py` is **two commands with a human turn between them**: write the file, present it, wait, record the answer. A conformance case hands the run the person's answer up front — *"yes go ahead once you've shown me the entry"* — and so does most real use, where someone says "add it" before there is anything to add. **With consent already in hand the procedure reads as satisfied**, the two commands collapse into the write, and the file is never created. The model's model of the step is *consent*. The invariant's is *record*. Every placement fix restated the step; none of them touched that gap.
+
+So the check moved to a step that has no such gap. `usage/log.md row appended` is measured **3/3 in every case, every skill, every run** — one command, unconditional, at the end, nothing to wait for. `scripts/log_run.py` now refuses to close a run that put something in a derived layer with no proposal behind it, naming the files and printing the `propose.py` call that repairs the record. The log row is written first: that invariant is not traded for this one.
+
+Three details decide whether it holds:
+
+- **"Modified during this run" is stored, not inferred.** The first version compared derived-file mtimes against `usage/log.md`'s — and this call stamps that file, so a bare re-run saw nothing new and passed. A check a retry defeats is not a check. `meta.json` now carries `gate_closed_at`, advanced only by a run that closed clean.
+- **A fresh copy of an OS has every file at one mtime**, so nothing in it reads as new and the check is silent on a run that wrote nothing. That is why the reference is a stored timestamp with a file mtime behind it rather than a fixed window.
+- **The legitimate bypasses ship with their escape hatch.** A rebuild restores entries the gate already passed; a redaction removes rather than adds; a migration gated at the cohort. Each of those three skills carries `--gate-note` in its own closing example, and the validator fails the build if one loses it — otherwise every run of them ends in an error the model cannot resolve, and the first thing anyone learns is how to ignore the gate.
+
+The same move fixed the other half of the run. `corp-os-improve` states its evidence bar twice in prose — *"a cluster of one is not a finding"* — and wrote a packet from a single friction row in two runs of three. `scripts/friction_scan.py` makes the arithmetic floor a command that exits non-zero (a log with fewer real friction rows than the bar cannot support a finding, no clustering required), and makes every candidate above the floor **cite the dated rows behind it** — the rule claims already live under, applied to the skill that proposes changes to the OS itself.
+
+The general form: **§4.52 said an instruction inside the procedure beats one beside it. This says an instruction anywhere still loses to a command that must run.** When an invariant keeps getting skipped, stop asking where to say it and find the step in the run that never gets skipped — the enforcement belongs there, even when the invariant does not.
+
+
 ## 5. The skills
 
 | Skill | Job |

@@ -138,5 +138,7 @@ python3 scripts/log_run.py --skill corp-os-configure --scope "<what this run cov
 
 These are the two writes measurement says get dropped, because they sit after the interesting work is done. A step that has to happen every time and that nothing else will catch belongs in code, not in a reminder.
 
+It also refuses to close a run that put something in a derived layer with no proposal file behind it, and names the files and the `propose.py` call that repairs the record. The gate is checked here because this is the step that never gets skipped — three attempts at stating it nearer the write got it to one run in three.
+
 - A `usage/log.md` row.
 - A plain statement of what changed, what it will do the next time each affected skill runs, and — for a migration — exactly how many entries were touched.

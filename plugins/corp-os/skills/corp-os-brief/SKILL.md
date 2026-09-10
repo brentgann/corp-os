@@ -83,5 +83,7 @@ python3 scripts/log_run.py --skill corp-os-brief --scope "<what this run covered
 
 These are the two writes measurement says get dropped, because they sit after the interesting work is done. A step that has to happen every time and that nothing else will catch belongs in code, not in a reminder.
 
+It also refuses to close a run that put something in a derived layer with no proposal file behind it, and names the files and the `propose.py` call that repairs the record. The gate is checked here because this is the step that never gets skipped — three attempts at stating it nearer the write got it to one run in three.
+
 - A dated `history` entry in `meta.json` marking the brief and its window. Write it even though nothing else about a brief changes the OS — **this is the one write a brief makes, and skipping it is silent**: the next brief has no prior date, so it either asks for a window again or covers the whole corpus, and a brief covering four months is a report nobody reads. A run that produced a good brief and no history entry has not finished.
 - A `usage/log.md` row.

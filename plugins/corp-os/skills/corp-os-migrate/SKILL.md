@@ -116,7 +116,8 @@ Close the run with `scripts/log_run.py` in the OS rather than editing the files 
 ```bash
 python3 scripts/log_run.py --skill corp-os-migrate --scope "<what came across>" \
     --friction "<where it hurt, or 'none'>" \
-    --event "migrated <n> items; <n> not carried; ceilings set"
+    --event "migrated <n> items; <n> not carried; ceilings set" \
+    --gate-note "migration — entries came across from the old OS; the gate ran at the cohort level, not per entry"
 ```
 
 A migration is the single most informative run an OS ever has, and it is the one where the friction field is most likely to be left blank because everyone is tired. Write it anyway — the next person migrating is reading it.

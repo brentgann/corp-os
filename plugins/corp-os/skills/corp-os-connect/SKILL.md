@@ -165,5 +165,7 @@ python3 scripts/log_run.py --skill corp-os-connect --scope "<what this run cover
 
 These are the two writes measurement says get dropped, because they sit after the interesting work is done. A step that has to happen every time and that nothing else will catch belongs in code, not in a reminder.
 
+It also refuses to close a run that put something in a derived layer with no proposal file behind it, and names the files and the `propose.py` call that repairs the record. The gate is checked here because this is the step that never gets skipped — three attempts at stating it nearer the write got it to one run in three.
+
 - A row in `usage/log.md`.
 - A plain statement of what is now connected, what is deliberately not, and — if anything is `broken` or `stale` — the one specific thing to fix first.

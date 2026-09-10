@@ -88,7 +88,26 @@ Four specific checks, because these are the parts that fail quietly:
 - **Do the indexes match reality?** Count and compare. Drifted counts mean something is skipping its recount step, which is a bug to name specifically.
 - **Is `raw/` still append-only?** Check for edited raw files. If the discipline has broken, that is the most important finding in the run.
 
-## Step 6 — propose, ranked by evidence
+## Step 6 — clear the bar before writing anything
+
+1. **Count what the log supports.** Not a judgment made while reading it — a call, because a run invoked by someone who has just asked for changes finds changes:
+
+   ```bash
+   python3 scripts/friction_scan.py --root <the OS>
+   ```
+
+   It exits non-zero when the whole log carries fewer friction rows than the bar. That is not a failure to work around: it means nothing in this OS can support a finding yet, and the correct output of the run is to say so, write nothing to `usage/proposals.md`, write no packet, and name what a second occurrence would look like so the next run recognises it.
+
+2. **Cite each candidate.** Grouping rows into a theme is yours; the count behind it is checked:
+
+   ```bash
+   python3 scripts/friction_scan.py --root <the OS> \
+     --candidate "<theme>" --row <date> --row <date>
+   ```
+
+   A candidate it rejects goes into `usage/proposals.md` as considered-and-rejected with its count — that record is what stops the same idea coming back every quarter — and never into the packet.
+
+3. **Then write the proposals.** Only what cleared.
 
 Write proposals into `usage/proposals.md`, each with: what to change, the count supporting it, the diagnosis, and the cost of the change.
 
@@ -103,6 +122,8 @@ Distinguish three kinds explicitly, because they have different owners:
 That last boundary has a clean test: **if a proposal could have been a config setting, it is not a model change.** Wanting a field the model lacks is a config finding. Needing a *concept* the model lacks — something no field, layer, or vocabulary could express — is a model finding. Conflating the two sends noise to whoever maintains the plugin while leaving fixable friction sitting in the person's own OS.
 
 ## Step 7 — write the improvement packet
+
+Only for candidates `friction_scan.py` cleared in Step 6. A packet is the most expensive thing anyone can act on — it sends someone to edit the plugin — and it is the output this skill is most likely to produce from an n of 1.
 
 For anything in the model-change bucket, plus any structure the person invented that the shipped model lacks, write `usage/improvement-packet-<date>.md` per the reference format — unless the person maintains the corp-os plugin themselves, or is handing this straight to someone who does. In that case, don't write prose here at all: hand off to `corp-os-contribute`, which reads the plugin's actual source and produces apply-ready diffs instead of an anonymized note. Ask, if it isn't already clear from context, rather than assuming either way.
 
@@ -139,6 +160,8 @@ python3 scripts/log_run.py --skill corp-os-improve --scope "<what this run cover
 ```
 
 These are the two writes measurement says get dropped, because they sit after the interesting work is done. A step that has to happen every time and that nothing else will catch belongs in code, not in a reminder.
+
+It also refuses to close a run that put something in a derived layer with no proposal file behind it, and names the files and the `propose.py` call that repairs the record. The gate is checked here because this is the step that never gets skipped — three attempts at stating it nearer the write got it to one run in three.
 
 - `usage/proposals.md` updated with everything considered, including what was rejected and why — that record stops the same idea being re-proposed every quarter.
 - A dated `history` entry in `meta.json`.

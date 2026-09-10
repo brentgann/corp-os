@@ -99,6 +99,8 @@ python3 scripts/log_run.py --skill corp-os-dashboard --scope "<what this run cov
 
 These are the two writes measurement says get dropped, because they sit after the interesting work is done. A step that has to happen every time and that nothing else will catch belongs in code, not in a reminder.
 
+It also refuses to close a run that put something in a derived layer with no proposal file behind it, and names the files and the `propose.py` call that repairs the record. The gate is checked here because this is the step that never gets skipped — three attempts at stating it nearer the write got it to one run in three.
+
 - Registry updated.
 - A `usage/log.md` row.
 - One or two sentences on what the dashboard shows, and specifically the worst number on it. Do not narrate the panels; the person can look. Tell them the thing they would have missed.

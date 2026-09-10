@@ -148,5 +148,7 @@ python3 scripts/log_run.py --skill corp-os-reality-check --scope "<what this run
 
 These are the two writes measurement says get dropped, because they sit after the interesting work is done. A step that has to happen every time and that nothing else will catch belongs in code, not in a reminder.
 
+It also refuses to close a run that put something in a derived layer with no proposal file behind it, and names the files and the `propose.py` call that repairs the record. The gate is checked here because this is the step that never gets skipped — three attempts at stating it nearer the write got it to one run in three.
+
 - Recounted `meta.json` and a dated `history` entry describing the sweep's outcome.
 - A `usage/log.md` row. If a whole category kept coming up — "every pricing claim was past decay" — that friction points at a decay window set wrong at capture time, which is a model problem worth handing to `corp-os-improve`.

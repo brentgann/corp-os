@@ -613,6 +613,31 @@ def main():
                 "scripts/propose.py or proposals/. \"Propose\" alone reads as "
                 "a conversational act and leaves nothing on disk — which is "
                 "what four skills did in one conformance run")
+        # 0.25.0: the enumerated step got jobs to 1/3, decide to 2/3 and
+        # glossary to 1/3 — real movement, still not a gate. The check moved
+        # to log_run.py, which is the one step measured 3/3 in every case, so
+        # every skill that can write derived material has to close its runs
+        # through it or the check never runs. §4.53.
+        if "log_run.py" not in b:
+            err(f"{d}: writes to a derived layer and never closes through "
+                "scripts/log_run.py, which is where the gate is checked. "
+                "A skill that ends some other way is not gated at all")
+
+    # Three skills rewrite derived entries without proposing them: a rebuild
+    # restores what the gate already passed, a redaction removes rather than
+    # adds, a migration gated at the cohort. Each has to say so in its own
+    # closing call, or its every run ends in a gate error it cannot resolve —
+    # the escape hatch has to be shipped as part of the example, not left for
+    # a person to discover from the failure.
+    for d in ("corp-os-rebuild", "corp-os-redact", "corp-os-migrate"):
+        sp = f"skills/{d}/SKILL.md"
+        if not os.path.exists(sp):
+            continue
+        b = open(sp, encoding="utf-8").read()
+        if "log_run.py" in b and "--gate-note" not in b:
+            err(f"{d}: rewrites derived entries outside the gate and its "
+                "log_run.py example carries no --gate-note. Every run of it "
+                "would exit 2 with nothing the model could do about it")
 
     PASSES = ("Mechanical pass", "Mixed pass", "Judgment pass")
     for d in sorted(names):
