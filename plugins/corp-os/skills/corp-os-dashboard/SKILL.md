@@ -29,9 +29,19 @@ Check the registry before building anything. If the requested dashboard already 
 
 ## Step 1 — pick from the person's jobs, not from the catalogue
 
-Read `patterns/` and offer from what this OS has adopted, matched to their active jobs — not from a catalogue in this file. Jobs blocked on missing information want an evidence-gaps view; jobs running on old entries want claim health; many jobs and unclear priorities want a job board. The OS's own `patterns/` says what is actually available here. If one of those files will not parse or carries a section this skill does not recognise, its format is specified in `${CLAUDE_PLUGIN_ROOT}/reference/patterns.md`.
+1. **Ask what this OS actually has a pattern for, in their own words.** Before deciding anything about panels:
 
-Build one well. Two half-built dashboards is worse than one, because neither gets trusted.
+   ```bash
+   python3 scripts/bind_pattern.py --root <the OS> --want "<what they asked for>"
+   ```
+
+   It refuses when nothing here serves the request, and a refusal has exactly two answers: author the pattern with `corp-os-pattern`, or record the gap as a proposal and build what the OS can actually support. **Building it by hand anyway is the failure this step exists for** — measured over five runs, three rendered the view from whichever layers happened to exist and named the gap only in the answer, where it died with the session. Nothing was wrong on disk afterwards, which is why nothing caught it and why two wording passes did not move it.
+
+   The hub is the one view exempt, and the script says so rather than leaving it to be remembered: it renders the registry rather than a layer, so there is nothing for it to be missing.
+
+2. **Offer from what this OS has adopted, matched to their active jobs** — not from a catalogue in this file. Jobs blocked on missing information want an evidence-gaps view; jobs running on old entries want claim health; many jobs and unclear priorities want a job board. If one of those files will not parse or carries a section this skill does not recognise, its format is specified in `${CLAUDE_PLUGIN_ROOT}/reference/patterns.md`.
+
+3. **Build one well.** Two half-built dashboards is worse than one, because neither gets trusted.
 
 **Once a second dashboard already exists**, offer a home/index view linking to all of them, plus the single most consequential thing across the OS right now. That does not compete with "build one well" — it is a thin hub, not another analytical view.
 

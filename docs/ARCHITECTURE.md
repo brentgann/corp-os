@@ -756,6 +756,21 @@ The last of the six failures is not a gate failure at all. `corp-os-improve` ope
 The general form: **§4.52 said an instruction inside the procedure beats one beside it. This says an instruction anywhere still loses to a command that must run.** When an invariant keeps getting skipped, stop asking where to say it and find the step in the run that never gets skipped — the enforcement belongs there, even when the invariant does not.
 
 
+### 4.54 A rule with no failing artifact needs one built, not restated
+
+**Found (0.25.2) in the three checks 0.25.1 left behind.** All three had a correct rule written down, all three failed intermittently, and the difference between them is what makes the entry worth having.
+
+**Two were wrong on disk and nobody looked.** `dashboards` is declared `dashboards.md`, and a run recreated `dashboards/` beside it in 1 of 3 — the exact shape that made the index report `1` however many dashboards were registered, reintroduced five releases after the layout fix removed it. Separately, `corp-os-glossary` wrote a raw file that reached no index in 2 of 3, which makes it invisible to every later scan while the queue goes on looking correct. Neither needed judgment to catch: **a layer is a file or a folder and never both, and a source file in the queue is in an index or it is lost.** Both are now checked at close, and both fire only on what the run itself did — an OS that arrived carrying either has a migration, not a run to block.
+
+**The third had nothing wrong on disk at all**, which is why it survived two attempts. `dashboard-missing-layer` asks for a stakeholder map; `fixture-os` has no person layer and no adopted pattern for one. In 3 runs of 5 the view got rendered from whichever layers happened to exist, with the gap named only in the answer, where it ended with the session. No dangling reference, no undeclared directory, nothing a filesystem check could see. A wording pass measured 0/2 and was reverted, and the case was recorded as deliberately failing.
+
+What changed is not another rule. **The branch was already in the skill — "if the OS has no pattern for what they want, that is `corp-os-pattern`'s job" — sitting in prose beside a numbered procedure**, which §4.52 says is the state `corp-os-jobs` was in when it scored 0/3 three times running. It is now `bind_pattern.py --want "<what they asked for>"`, a numbered step that refuses with two answers and no third: author the pattern, or record the gap as a proposal and build what the OS can support.
+
+The one thing that required care is the exemption. The hub renders the registry rather than a layer, so it can never be missing one, and a check that refused it would invent the exact failure it exists to stop. **The exemption lives in the script rather than in a sentence telling the model when to skip the step** — the step stays unconditional, and the two conditions the hub already has (the wording, and the two registered dashboards it is gated on anyway) decide it.
+
+The general form: **§4.53 said enforcement belongs at the step that always runs. This says what to do when there is no artifact to enforce against — build the branch a command, so the refusal itself becomes the artifact.** A rule whose violation leaves no trace is not being followed; it is being remembered, which is a different and much worse thing.
+
+
 ## 5. The skills
 
 | Skill | Job |

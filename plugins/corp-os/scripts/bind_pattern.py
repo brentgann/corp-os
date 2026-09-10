@@ -228,10 +228,123 @@ def report(r):
               "anyway is not.")
 
 
+
+
+def _registry_rows(root, cfg):
+    """Rows in the dashboard registry, however this OS spells it."""
+    spec = (cfg.get("layers") or {}).get("dashboards") or {}
+    path = (spec.get("path") or "dashboards.md").rstrip("/")
+    full = os.path.join(root, path)
+    if os.path.isdir(full):
+        for f in sorted(glob.glob(os.path.join(full, "*.md"))):
+            if os.path.basename(f) not in ("README.md", "INDEX.md"):
+                yield f
+        return
+    try:
+        body = open(full, encoding="utf-8").read()
+    except OSError:
+        return
+    # One dashboard is a heading with several bullets under it, so counting
+    # bullets says "two" for an OS that has one. Headings first, table rows
+    # only if the registry is written that way instead.
+    heads = [ln for ln in body.split("\n") if re.match(r"^#{2,4}\s+\S", ln)]
+    if heads:
+        for ln in heads:
+            yield ln
+        return
+    for ln in body.split("\n"):
+        if re.match(r"^\s*\|", ln) and "---" not in ln \
+                and not re.match(r"^\s*\|\s*(name|dashboard)\s*\|", ln, re.I):
+            yield ln
+
+
+def want(root, cfg, phrase):
+    """Is there an adopted pattern for what was asked for?
+
+    Measured over five runs, `dashboard-missing-layer` built the view three
+    times from layers that happened to exist and mentioned the gap only in
+    the answer, where it died with the session. Nothing on disk was wrong
+    afterwards, which is why no check caught it and why two wording passes
+    did not move it -- the second measured 0/2 and was reverted.
+
+    The branch it takes is real and it is already in the skill as prose: "if
+    the OS has no pattern for what they want, that is corp-os-pattern's job."
+    Here it is a command with an exit code instead. Matching is deliberately
+    loose and deliberately not clever: a shared word between the request and
+    an adopted pattern's name or declared `kind` is enough to offer it, and
+    the decision stays with whoever is reading.
+    """
+    spec = (cfg.get("layers") or {}).get("patterns") or {}
+    sub = (spec.get("path") or "patterns").rstrip("/")
+    paths = [p for p in sorted(glob.glob(os.path.join(root, sub, "*.md")))
+             if os.path.basename(p) not in ("README.md", "INDEX.md")]
+
+    # The hub is the one view that is this skill's own rather than an adopted
+    # pattern: it renders the registry, not a layer, so there is nothing for
+    # it to be missing. Refusing it would be this check inventing the exact
+    # failure it exists to stop. Both conditions are required -- the wording,
+    # and the two registered dashboards the hub is gated on anyway, so a
+    # single-dashboard OS asking for "one page" still gets the normal answer.
+    HUB = ("one page", "start from", "hub", "home page", "landing",
+           "every morning", "right link", "all of them", "index page")
+    if sum(1 for ln in _registry_rows(root, cfg)) >= 2 \
+            and any(h in phrase.lower() for h in HUB):
+        print("The hub is this skill's own view, built from the registry "
+              "rather than from a\nlayer, so it needs no adopted pattern. "
+              "Build it thin and thicken it later.")
+        return 0
+
+    words = {w for w in re.split(r"[^a-z0-9]+", phrase.lower()) if len(w) > 3}
+    hits = []
+    for p in paths:
+        try:
+            meta = parse_pattern(p)[0]
+        except SystemExit:
+            continue
+        name = str(meta.get("name") or os.path.basename(p)[:-3]).lower()
+        hay = set(re.split(r"[^a-z0-9]+", name)) | {str(meta.get("kind") or "")}
+        if words & hay:
+            hits.append((p, meta))
+
+    if hits:
+        print(f"{len(hits)} adopted pattern(s) match \"{phrase}\":\n")
+        for p, meta in hits:
+            print(f"  {os.path.relpath(p, root)}   {meta.get('name') or ''}")
+        print("\nBind one before building:\n\n  python3 scripts/"
+              f"bind_pattern.py --root {root} --pattern "
+              f"{os.path.relpath(hits[0][0], root)}")
+        return 0
+
+    have = ", ".join(os.path.basename(p)[:-3] for p in paths) or "none"
+    print(f"\nREFUSED: this OS has no adopted pattern for \"{phrase}\".",
+          file=sys.stderr)
+    print(f"It carries: {have}\n", file=sys.stderr)
+    print("Building it by hand here is the failure this refusal exists for. "
+          "A view rendered\nfrom whichever layers happened to exist, with "
+          "the gap named only in the answer,\nleaves nothing behind: the "
+          "session ends and so does the finding.\n", file=sys.stderr)
+    print("Two answers, and no third:\n", file=sys.stderr)
+    print("  1. Author the pattern — corp-os-pattern, so the second person "
+          "does not start\n     from nothing.\n", file=sys.stderr)
+    print("  2. Record the gap where it survives, then build what the OS "
+          "can actually\n     support:\n", file=sys.stderr)
+    print(f"     python3 scripts/propose.py --root {root} --layer patterns "
+          "--slug <slug> \\\n       --headline \"<what they asked for, and "
+          "what this OS would need>\" \\\n       --item \"<declare|author"
+          "|decline> · <id> · <what>\" \\\n       --not-proposing \"<the "
+          "panels being dropped, and why>\"\n", file=sys.stderr)
+    return 3
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--root", default=".", help="the OS root")
     ap.add_argument("--pattern", help="one pattern file")
+    ap.add_argument("--want",
+                    help="what the person asked for, in their words. Finds "
+                         "the adopted pattern that serves it, or refuses. A "
+                         "view this OS has no pattern for is not a view to "
+                         "build by hand")
     ap.add_argument("--all", action="store_true",
                     help="every pattern in the OS's patterns/ layer")
     ap.add_argument("--strict", action="store_true",
@@ -240,6 +353,9 @@ def main():
 
     root = os.path.expanduser(a.root)
     cfg = load_config(root)
+
+    if a.want:
+        return want(root, cfg, a.want)
 
     if a.pattern:
         paths = [a.pattern if os.path.isabs(a.pattern)

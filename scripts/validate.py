@@ -652,6 +652,24 @@ def main():
                 "nothing checks it. It wrote a claim in 1 run of 3 with the "
                 "declaration already in the body")
 
+    # 0.25.2: corp-os-dashboard's "no pattern for it" branch was prose for
+    # five releases and improvised the view in 3 runs of 5. It is a command
+    # now, and a numbered one — the two levers that took corp-os-jobs from
+    # 0/3 to 3/3, applied to the one skill still carrying the old shape.
+    dp = "skills/corp-os-dashboard/SKILL.md"
+    if os.path.exists(dp):
+        b = open(dp, encoding="utf-8").read()
+        if "--want" not in b:
+            err("corp-os-dashboard: does not run bind_pattern.py --want "
+                "before building. A view this OS has no pattern for is the "
+                "case it improvised in 3 runs of 5, and two wording passes "
+                "did not move it")
+        elif re.search(r"^\s*\d+\.\s+\*\*Ask what this OS actually has",
+                       b, re.M) is None:
+            err("corp-os-dashboard: bind_pattern.py --want is named but not "
+                "as a numbered step. §4.52 — prose beside a procedure is "
+                "documentation; inside it, it runs")
+
     PASSES = ("Mechanical pass", "Mixed pass", "Judgment pass")
     for d in sorted(names):
         path = f"skills/{d}/SKILL.md"

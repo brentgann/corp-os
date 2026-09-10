@@ -192,6 +192,8 @@ The model itself is specified in `reference/data-model.md`. Improvement packets 
 
 ## Version history
 
+**0.25.2** — three checks that were prose become three exit codes: layer shape, queue reachability, and a view the OS has no pattern for.
+
 **0.25.1** — a layer that is one file was invisible to the gate, which is the shape `glossary` has.
 
 **0.25.0** — the gate is checked by `log_run.py`, the one step measurement says never gets skipped.

@@ -176,6 +176,88 @@ def _changed_outside(root, scope, since):
     return sorted(out)
 
 
+
+def _layer_paths(cfg):
+    for name, spec in (cfg.get("layers") or {}).items():
+        if not isinstance(spec, dict) or not spec.get("enabled"):
+            continue
+        yield name, spec, (spec.get("path") or name).rstrip("/")
+
+
+def check_shape(root, cfg, since):
+    """A layer is a file or a folder, and never both.
+
+    `dashboards` was a directory holding one file for five releases, and that
+    shape made the index report 1 however many dashboards were registered.
+    The layout fix removed it and the rule went into prose; a run recreated
+    the directory in 1 of 3 afterwards. The collision is visible on disk, so
+    it does not need to be remembered.
+
+    Only fires on a collision this run created — an OS that already carries
+    one has a migration to do, not a run to block.
+    """
+    out = []
+    for name, spec, path in _layer_paths(cfg):
+        if path.endswith(".md"):
+            other = os.path.join(root, path[:-3])
+            kind = "a folder"
+        else:
+            other = os.path.join(root, path + ".md")
+            kind = "a file"
+        if not os.path.exists(other):
+            continue
+        stamps = [os.path.getmtime(other)]
+        if os.path.isdir(other):
+            stamps += [os.path.getmtime(f)
+                       for f in glob.glob(os.path.join(other, "*"))]
+        if max(stamps) > since + 1:
+            out.append((name, path, os.path.relpath(other, root), kind))
+    return out
+
+
+def check_queue(root, cfg, since):
+    """Raw written this run has to be reachable from an index.
+
+    A source file that exists and is in no index is invisible to every later
+    run's scan, and the person's queue silently under-reports. `processed`
+    material is out of the queue by definition and is not checked.
+
+    Both the root index and the layer's own are consulted: a small OS lists
+    raw entries at the root, and one over the file threshold replaces that
+    with a pointer to `raw/INDEX.md`. Checking only the root would fail every
+    large OS for doing the right thing.
+    """
+    idx = ""
+    for cand in [os.path.join(root, "INDEX.md")]:
+        try:
+            idx += open(cand, encoding="utf-8").read()
+        except OSError:
+            pass
+    missing = []
+    for name, spec, path in _layer_paths(cfg):
+        if spec.get("role") != "source" or path.endswith(".md"):
+            continue
+        sub = os.path.join(root, path, "INDEX.md")
+        try:
+            layer_idx = idx + open(sub, encoding="utf-8").read()
+        except OSError:
+            layer_idx = idx
+        for f in glob.glob(os.path.join(root, path, "*.md")):
+            base = os.path.basename(f)
+            if base in ("INDEX.md", "README.md"):
+                continue
+            try:
+                if os.path.getmtime(f) <= since + 1:
+                    continue
+                if "processed: true" in open(f, encoding="utf-8").read():
+                    continue
+            except OSError:
+                continue
+            if os.path.splitext(base)[0] not in layer_idx:
+                missing.append(os.path.relpath(f, root))
+    return sorted(missing)
+
+
 def check_gate(root, since):
     """Returns (ungated_files, layer_hint). Empty list means nothing to say."""
     if since is None:
@@ -342,6 +424,47 @@ def main():
                   "answered a question nobody asked.", file=sys.stderr)
             _pin_gate(root, gate_since)
             return 2
+
+    # -- two things that are wrong on disk rather than missing from it, and
+    # so are cheaper to catch here than to find later. Both fire only on what
+    # this run did; an OS that arrived carrying either has a migration.
+    if gate_since is not None:
+        try:
+            _cfg = json.load(open(os.path.join(root, "config.json"),
+                                  encoding="utf-8"))
+        except (OSError, ValueError):
+            _cfg = None
+        if _cfg:
+            clash = check_shape(root, _cfg, gate_since)
+            if clash:
+                print("\nERROR: a layer is a file or a folder, never both. "
+                      "This run created:\n", file=sys.stderr)
+                for name, path, other, kind in clash:
+                    print(f"  {other}   — `{name}` is declared as {path}, "
+                          f"so {kind} of that name is a second, competing "
+                          "copy of it", file=sys.stderr)
+                print("\nMove what is in it to the declared path and remove "
+                      "the duplicate. A registry\nsplit across both shapes "
+                      "reports the count of whichever one the index reads.",
+                      file=sys.stderr)
+                _pin_gate(root, gate_since)
+                return 2
+
+            orphans = check_queue(root, _cfg, gate_since)
+            if orphans:
+                print("\nERROR: this run wrote source material that no index "
+                      "reaches:\n", file=sys.stderr)
+                for f in orphans[:8]:
+                    print(f"  {f}", file=sys.stderr)
+                if len(orphans) > len(orphans[:8]):
+                    print(f"  … and {len(orphans) - 8} more", file=sys.stderr)
+                print("\nA file in the queue and in no index is invisible to "
+                      "every later scan, and the\nperson's queue "
+                      "under-reports without ever looking wrong. Recount:\n"
+                      "\n  python3 scripts/build_index.py --root "
+                      f"{a.os_root}\n", file=sys.stderr)
+                _pin_gate(root, gate_since)
+                return 2
 
     # -- the gate. Last, and after the row is on disk: the log row is 3/3 in
     # every measured case and it is not being traded for this.
