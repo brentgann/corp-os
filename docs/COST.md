@@ -30,6 +30,24 @@ The `capture` block (`reference/capture.md`) is what decides a run's cost:
 - **`batch: 10`** caps items per pass. Context accumulates *within* a pass, so cost is quadratic in items; splitting into passes resets it. This is not a linear saving.
 - **`body: excerpt`** writes what was cited plus a pointer instead of the whole item. It requires `Verbatim fetch` on the source, and the trade is real: **a rebuild can re-derive what was cited and cannot discover what was missed.**
 
+## Three directories called `scripts/`
+
+Get this wrong and a script looks missing when it is simply somewhere else. It has caused that twice.
+
+| directory | holds | how it gets there |
+|---|---|---|
+| `<clone>/scripts/` | repo tooling — `validate.py`, `corpus_load.py`, `ref_load.py`, `make_fixture.py` | clone only; never copied into an OS |
+| `<clone>/plugins/corp-os/scripts/` | the **shipped** scripts — `build_index.py`, `file_raw.py`, `prune_config_notes.py` and the rest | clone, or an installed plugin |
+| `<an-os>/scripts/` | that OS's own copies of the shipped ones | written by `corp-os-setup`, refreshed by `corp-os-upgrade` |
+
+Every shipped script takes `--root`, so any of them can be run straight from a clone against an OS that has not upgraded yet:
+
+```bash
+python3 <clone>/plugins/corp-os/scripts/prune_config_notes.py --root /path/to/an-os
+```
+
+Sixteen skills call the **OS's** copy, which is why `corp-os-upgrade` exists and why fixture script drift now fails the build: a stale copy means every skill measured something other than what ships.
+
 ## Measure before you optimise, and measure for free
 
 Two scripts answer most cost questions with no model and no tokens:

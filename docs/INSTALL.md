@@ -106,6 +106,16 @@ The first two answer *what am I running*. The last two answer *what has this fol
 
 ---
 
+## A new release can ship a script your OS does not have
+
+`corp-os-upgrade` refreshes the OS's copies of the shipped scripts, and it is also what **adds** ones that did not exist when the OS was built. 0.19.1 shipped `file_raw.py`; every OS created before it was missing the file outright, and any skill calling it failed against that OS until an upgrade ran. 0.19.4 shipped `prune_config_notes.py` the same way.
+
+So a release note naming a script is a release note that means *run the upgrade*. Until then the script exists in the plugin and not in your OS, which reads as missing.
+
+Each one takes `--root`, so you can run it from a clone against an un-upgraded OS in the meantime. See the three-directory table in `COST.md`.
+
+---
+
 ## Updating your OS
 
 Do this **after** the plugin update, not before. `corp-os-upgrade` faithfully brings an OS in line with whatever plugin is currently loaded, so running it against a stale plugin achieves an orderly nothing.
