@@ -156,7 +156,8 @@ Close the run with `scripts/log_run.py` in the OS rather than editing the files 
 ```bash
 python3 scripts/log_run.py --skill corp-os-improve --scope "<what this run covered>" \
     --friction "<where it hurt, or 'none'>" \
-    --event "<what changed>"
+    --event "<what changed>" \
+    --scope-under usage/
 ```
 
 These are the two writes measurement says get dropped, because they sit after the interesting work is done. A step that has to happen every time and that nothing else will catch belongs in code, not in a reminder.

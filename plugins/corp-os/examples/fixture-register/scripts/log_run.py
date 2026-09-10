@@ -96,20 +96,37 @@ def _gate_reference(root):
     return None
 
 
-def _close_gate(root):
-    """Advance the window — only ever called when the run closed clean."""
+def _write_gate_mark(root, value):
     mp = os.path.join(root, "meta.json")
     try:
         meta = json.load(open(mp, encoding="utf-8"))
     except (OSError, ValueError):
         return
-    meta["gate_closed_at"] = round(time.time(), 3)
+    meta["gate_closed_at"] = round(value, 3)
     try:
         with open(mp, "w", encoding="utf-8") as f:
             json.dump(meta, f, indent=2, ensure_ascii=False)
             f.write("\n")
     except OSError:
         pass
+
+
+def _close_gate(root):
+    """Advance the window — only ever called when a run closed clean."""
+    _write_gate_mark(root, time.time())
+
+
+def _pin_gate(root, since):
+    """Freeze the window on a failed close.
+
+    Without this the fallback reference — usage/log.md's mtime — is refreshed
+    by the row this very call wrote, so on an OS that has never closed a run
+    cleanly the second attempt saw nothing new and passed. Writing the window
+    we actually used makes the failure survive a bare retry on a fresh OS the
+    same way it already did on an established one.
+    """
+    _write_gate_mark(root, since)
+
 
 
 def _touched_since(root, cfg, since, role="derived"):
@@ -119,14 +136,41 @@ def _touched_since(root, cfg, since, role="derived"):
             continue
         path = (spec.get("path") or name).rstrip("/")
         full = os.path.join(root, path)
+        # A layer is a folder of entries or a single file, and a config that
+        # names neither -- `"glossary": {"role": "derived"}` -- is both until
+        # something writes. Checking only the folder is how corp-os-glossary
+        # stayed at 2/3 while the two skills beside it went to 3/3: the entries
+        # go in `glossary.md` at the root, the check globbed `glossary/*.md`,
+        # and the gate was silent on the one layer shaped that way.
         cands = ([full] if path.endswith(".md")
-                 else glob.glob(os.path.join(full, "*.md")))
+                 else glob.glob(os.path.join(full, "*.md")) + [full + ".md"])
         for f in cands:
             if os.path.basename(f) in ("INDEX.md", "README.md"):
                 continue
             try:
                 if os.path.getmtime(f) > since + 1:
                     out.append(os.path.relpath(f, root))
+            except OSError:
+                pass
+    return sorted(out)
+
+
+
+def _changed_outside(root, scope, since):
+    """Files changed since `since` that are not under `scope`."""
+    scope = scope.strip("/") + "/"
+    skip = {"usage/log.md", "meta.json", "INDEX.md"}
+    out = []
+    for dp, dns, fns in os.walk(root):
+        dns[:] = [d for d in dns if d not in (".git", "__pycache__", "scripts")]
+        for fn in fns:
+            full = os.path.join(dp, fn)
+            rel = os.path.relpath(full, root)
+            if rel.startswith(scope) or rel in skip:
+                continue
+            try:
+                if os.path.getmtime(full) > since + 1:
+                    out.append(rel)
             except OSError:
                 pass
     return sorted(out)
@@ -176,6 +220,11 @@ def main():
     ap.add_argument("--items", type=int, default=None,
                     help="how many source items the run processed")
     ap.add_argument("--os-root", default=".")
+    ap.add_argument("--scope-under", default=None,
+                    help="the one directory this skill writes in. Given, a "
+                         "run that changed anything outside it fails to close "
+                         "— corp-os-improve says it writes only under usage/ "
+                         "and wrote a claim in one run of three")
     ap.add_argument("--gate-note", default=None,
                     help="why derived-layer files changed during this run "
                          "without a proposal behind them — a hand edit by the "
@@ -273,6 +322,27 @@ def main():
           + (" and meta.json history" if wrote_event else
              " (no history entry — nothing changed on disk)"))
 
+    # -- the declared write scope, checked before the gate: a skill that wrote
+    # outside where it says it writes has a worse problem than an unrecorded
+    # proposal, and "write a proposal for claims/" is the wrong instruction to
+    # give a skill whose answer is that the claim should not exist.
+    if a.scope_under and gate_since is not None:
+        stray = _changed_outside(root, a.scope_under, gate_since)
+        if stray:
+            print(f"\nERROR: corp-os declares that {a.skill} writes only "
+                  f"under {a.scope_under.rstrip('/')}/, and this run "
+                  "changed:\n", file=sys.stderr)
+            for f in stray[:8]:
+                print(f"  {f}", file=sys.stderr)
+            if len(stray) > 8:
+                print(f"  … and {len(stray) - 8} more", file=sys.stderr)
+            print("\nThose belong to whichever skill owns that layer, with "
+                  "its citation and gate\nrules. Undo them and say what you "
+                  "found instead — a run that reaches outside\nits scope has "
+                  "answered a question nobody asked.", file=sys.stderr)
+            _pin_gate(root, gate_since)
+            return 2
+
     # -- the gate. Last, and after the row is on disk: the log row is 3/3 in
     # every measured case and it is not being traded for this.
     ungated, hint = check_gate(root, gate_since)
@@ -299,6 +369,7 @@ def main():
         print("If those files were not this run's doing — a hand edit, a "
               "migration, a repair —\nsay so and the run closes clean:  "
               "--gate-note \"<why>\"", file=sys.stderr)
+        _pin_gate(root, gate_since)
         return 2
 
     _close_gate(root)

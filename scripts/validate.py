@@ -639,6 +639,19 @@ def main():
                 "log_run.py example carries no --gate-note. Every run of it "
                 "would exit 2 with nothing the model could do about it")
 
+    # corp-os-improve is the one skill that states a write scope in its own
+    # first line — "writes only under usage/" — and it wrote a claim in one
+    # run of three with that sentence in place. The sentence is only worth
+    # anything if its closing call checks it. 0.25.1.
+    ip = "skills/corp-os-improve/SKILL.md"
+    if os.path.exists(ip):
+        b = open(ip, encoding="utf-8").read()
+        if "--scope-under" not in b:
+            err("corp-os-improve: declares that it writes only under usage/ "
+                "and its log_run.py example does not pass --scope-under, so "
+                "nothing checks it. It wrote a claim in 1 run of 3 with the "
+                "declaration already in the body")
+
     PASSES = ("Mechanical pass", "Mixed pass", "Judgment pass")
     for d in sorted(names):
         path = f"skills/{d}/SKILL.md"

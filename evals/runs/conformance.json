@@ -1,7 +1,7 @@
 {
   "model": "claude-opus-5",
-  "passed": 22,
-  "total": 29,
+  "passed": 17,
+  "total": 23,
   "runs": [
     {
       "id": "decide-open-fork",
@@ -11,7 +11,7 @@
       "tally": {
         "raw stays append-only": 3,
         "usage/log.md row appended": 3,
-        "derived-layer writes have a proposal behind them": 0,
+        "derived-layer writes have a proposal behind them": 3,
         "no raw material was written": 3,
         "the past-date decision was surfaced": 3
       },
@@ -23,12 +23,13 @@
         "the past-date decision was surfaced": "dec-002 is past its decide_by; leading with what is past its date is the whole point of the layer"
       },
       "diff": {
-        "added": [],
+        "added": [
+          "proposals/PROPOSAL-2026-09-09-open-fork-review.md"
+        ],
         "changed": [
           "INDEX.md",
-          "claims/support.md",
-          "decisions/INDEX.md",
           "decisions/midmarket-pricing.md",
+          "decisions/support-tooling.md",
           "meta.json",
           "usage/log.md"
         ],
@@ -51,10 +52,10 @@
         },
         {
           "check": "derived-layer writes have a proposal behind them",
-          "passed": false,
-          "rate": 0.0,
+          "passed": true,
+          "rate": 1.0,
           "why": "a proposal that lives only in chat dies with the session and leaves no record of what the gate saw -- the declines especially, which are the only trace of what someone chose not to know",
-          "detail": "0/3 runs"
+          "detail": ""
         },
         {
           "check": "no raw material was written",
@@ -80,20 +81,23 @@
       "tally": {
         "raw stays append-only": 3,
         "usage/log.md row appended": 3,
-        "derived-layer writes have a proposal behind them": 1,
-        "a proposal was filed before the entry was written": 1,
-        "both definitions survived": 3
+        "derived-layer writes have a proposal behind them": 2,
+        "a proposal was filed before the entry was written": 2,
+        "both definitions survived": 3,
+        "unprocessed raw files are reachable from INDEX.md": 1
       },
       "why": {
         "raw stays append-only": "an edited raw file destroys the only thing a rebuild can restore from; flipping `processed` is the one sanctioned edit, and deletion only under a declared retention obligation",
         "usage/log.md row appended": "the friction field is the whole improvement flywheel; a skill that skips it under pressure makes corp-os-improve blind",
         "derived-layer writes have a proposal behind them": "a proposal that lives only in chat dies with the session and leaves no record of what the gate saw -- the declines especially, which are the only trace of what someone chose not to know",
         "a proposal was filed before the entry was written": "glossary entries are derived-layer like anything else",
-        "both definitions survived": "a glossary that flattens a real disagreement into one authoritative-looking entry makes things worse than no entry: it gives two teams the same word and the confidence that they agree"
+        "both definitions survived": "a glossary that flattens a real disagreement into one authoritative-looking entry makes things worse than no entry: it gives two teams the same word and the confidence that they agree",
+        "unprocessed raw files are reachable from INDEX.md": "a file that exists but is missing from the queue is invisible to every later run's scan, and the person's queue silently under-reports"
       },
       "diff": {
         "added": [
-          "glossary.md"
+          "glossary.md",
+          "proposals/PROPOSAL-2026-09-09-active-seat.md"
         ],
         "changed": [
           "INDEX.md",
@@ -121,16 +125,16 @@
         {
           "check": "derived-layer writes have a proposal behind them",
           "passed": false,
-          "rate": 0.3333333333333333,
+          "rate": 0.6666666666666666,
           "why": "a proposal that lives only in chat dies with the session and leaves no record of what the gate saw -- the declines especially, which are the only trace of what someone chose not to know",
-          "detail": "1/3 runs"
+          "detail": "2/3 runs"
         },
         {
           "check": "a proposal was filed before the entry was written",
           "passed": false,
-          "rate": 0.3333333333333333,
+          "rate": 0.6666666666666666,
           "why": "glossary entries are derived-layer like anything else",
-          "detail": "1/3 runs"
+          "detail": "2/3 runs"
         },
         {
           "check": "both definitions survived",
@@ -138,6 +142,13 @@
           "rate": 1.0,
           "why": "a glossary that flattens a real disagreement into one authoritative-looking entry makes things worse than no entry: it gives two teams the same word and the confidence that they agree",
           "detail": ""
+        },
+        {
+          "check": "unprocessed raw files are reachable from INDEX.md",
+          "passed": false,
+          "rate": 0.3333333333333333,
+          "why": "a file that exists but is missing from the queue is invisible to every later run's scan, and the person's queue silently under-reports",
+          "detail": "1/3 runs"
         }
       ]
     },
@@ -151,7 +162,7 @@
         "usage/log.md row appended": 3,
         "derived-layer writes have a proposal behind them": 2,
         "no improvement packet written from one occurrence": 3,
-        "no proposals written from one occurrence": 1,
+        "no proposals written from one occurrence": 2,
         "improve wrote no claims": 2
       },
       "why": {
@@ -165,10 +176,8 @@
       "diff": {
         "added": [],
         "changed": [
-          "claims/pricing.md",
           "meta.json",
-          "usage/log.md",
-          "usage/proposals.md"
+          "usage/log.md"
         ],
         "removed": []
       },
@@ -204,9 +213,9 @@
         {
           "check": "no proposals written from one occurrence",
           "passed": false,
-          "rate": 0.3333333333333333,
+          "rate": 0.6666666666666666,
           "why": "the bar is more than one real occurrence. Proposing from a single one is manufacturing findings from noise, and this skill is the most prone to it because a person who asked for changes wants changes",
-          "detail": "1/3 runs"
+          "detail": "2/3 runs"
         },
         {
           "check": "improve wrote no claims",
@@ -225,7 +234,7 @@
       "tally": {
         "raw stays append-only": 3,
         "usage/log.md row appended": 3,
-        "derived-layer writes have a proposal behind them": 0,
+        "derived-layer writes have a proposal behind them": 3,
         "a job file was written": 3,
         "the dashboard they asked for was not built": 3,
         "the job written carries an outcome clause": 3
@@ -240,11 +249,13 @@
       },
       "diff": {
         "added": [
-          "jobs/renewal-early-warning.md"
+          "jobs/renewal-early-warning.md",
+          "proposals/PROPOSAL-2026-09-09-renewal-early-warning.md"
         ],
         "changed": [
           "INDEX.md",
           "jobs/INDEX.md",
+          "jobs/renewal-risk.md",
           "meta.json",
           "usage/health.md",
           "usage/log.md"
@@ -268,10 +279,10 @@
         },
         {
           "check": "derived-layer writes have a proposal behind them",
-          "passed": false,
-          "rate": 0.0,
+          "passed": true,
+          "rate": 1.0,
           "why": "a proposal that lives only in chat dies with the session and leaves no record of what the gate saw -- the declines especially, which are the only trace of what someone chose not to know",
-          "detail": "0/3 runs"
+          "detail": ""
         },
         {
           "check": "a job file was written",
@@ -292,88 +303,6 @@
           "passed": true,
           "rate": 1.0,
           "why": "artifact-as-motivation is the most common malformation: 'I want a dashboard' names a thing, not a motivation, and a job with no outcome cannot be closed. The required form is `When <situation>, I want to <motivation>, so I can <outcome>`, so the clause is schema rather than phrasing \u2014 checked in the file the run wrote, not in what it said about it",
-          "detail": ""
-        }
-      ]
-    },
-    {
-      "id": "recall-jobs-off",
-      "skill": "corp-os-recall",
-      "error": null,
-      "runs": 3,
-      "tally": {
-        "raw stays append-only": 3,
-        "usage/log.md row appended": 3,
-        "derived-layer writes have a proposal behind them": 3,
-        "nothing entered the derived layer": 3,
-        "the hand-maintained source layer was not touched": 3,
-        "no raw material was written": 3,
-        "the run completed against an OS with no jobs layer": 3
-      },
-      "why": {
-        "raw stays append-only": "an edited raw file destroys the only thing a rebuild can restore from; flipping `processed` is the one sanctioned edit, and deletion only under a declared retention obligation",
-        "usage/log.md row appended": "the friction field is the whole improvement flywheel; a skill that skips it under pressure makes corp-os-improve blind",
-        "derived-layer writes have a proposal behind them": "a proposal that lives only in chat dies with the session and leaves no record of what the gate saw -- the declines especially, which are the only trace of what someone chose not to know",
-        "nothing entered the derived layer": "recall answers and proposes; writing entries is the gate being skipped",
-        "the hand-maintained source layer was not touched": "recall reads; it has no business writing to a source layer",
-        "no raw material was written": "answering a question is not capture",
-        "the run completed against an OS with no jobs layer": "jobs is disabled here and an urgency-tiered open-items layer carries the priority signal instead. A skill that treats a missing jobs/ as a broken OS fails on this fixture -- which is the failure v0.6.0 actually shipped"
-      },
-      "diff": {
-        "added": [],
-        "changed": [
-          "usage/log.md"
-        ],
-        "removed": []
-      },
-      "results": [
-        {
-          "check": "raw stays append-only",
-          "passed": true,
-          "rate": 1.0,
-          "why": "an edited raw file destroys the only thing a rebuild can restore from; flipping `processed` is the one sanctioned edit, and deletion only under a declared retention obligation",
-          "detail": ""
-        },
-        {
-          "check": "usage/log.md row appended",
-          "passed": true,
-          "rate": 1.0,
-          "why": "the friction field is the whole improvement flywheel; a skill that skips it under pressure makes corp-os-improve blind",
-          "detail": ""
-        },
-        {
-          "check": "derived-layer writes have a proposal behind them",
-          "passed": true,
-          "rate": 1.0,
-          "why": "a proposal that lives only in chat dies with the session and leaves no record of what the gate saw -- the declines especially, which are the only trace of what someone chose not to know",
-          "detail": ""
-        },
-        {
-          "check": "nothing entered the derived layer",
-          "passed": true,
-          "rate": 1.0,
-          "why": "recall answers and proposes; writing entries is the gate being skipped",
-          "detail": ""
-        },
-        {
-          "check": "the hand-maintained source layer was not touched",
-          "passed": true,
-          "rate": 1.0,
-          "why": "recall reads; it has no business writing to a source layer",
-          "detail": ""
-        },
-        {
-          "check": "no raw material was written",
-          "passed": true,
-          "rate": 1.0,
-          "why": "answering a question is not capture",
-          "detail": ""
-        },
-        {
-          "check": "the run completed against an OS with no jobs layer",
-          "passed": true,
-          "rate": 1.0,
-          "why": "jobs is disabled here and an urgency-tiered open-items layer carries the priority signal instead. A skill that treats a missing jobs/ as a broken OS fails on this fixture -- which is the failure v0.6.0 actually shipped",
           "detail": ""
         }
       ]

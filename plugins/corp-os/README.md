@@ -192,6 +192,8 @@ The model itself is specified in `reference/data-model.md`. Improvement packets 
 
 ## Version history
 
+**0.25.1** — a layer that is one file was invisible to the gate, which is the shape `glossary` has.
+
 **0.25.0** — the gate is checked by `log_run.py`, the one step measurement says never gets skipped.
 
 **0.24.0** — the gate becomes a numbered step, because a rule beside a list loses to the list.
