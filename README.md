@@ -51,7 +51,7 @@ That last one is what most systems lack and what decides whether yours survives 
 
 Every skill has a conformance case, and each case runs the real skill against a throwaway copy of a fixture and scores what it did to the filesystem — not what it said about it.
 
-**203 of 208 checks, 28 cases, 23 of 23 skills** (Opus 5, one run each). Reports are committed under `evals/runs/`, so the figures here are the ones in the repo rather than the ones remembered.
+**203 of 208 checks, 28 cases, 23 of 23 skills** — Opus 5, one run each, 2026-09-10. Run it yourself with `python3 evals/run_conformance.py --workers 3 --timeout 900`; the report lands in `evals/runs/`, and a `--case` run writes beside it rather than over it, so a targeted question cannot quietly replace the suite figure.
 
 Three failures are open and named:
 

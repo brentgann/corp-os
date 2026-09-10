@@ -441,11 +441,24 @@ def main():
                     help="run with an already-dirty plugin tree. The guard "
                          "that catches a skill writing to the plugin cannot "
                          "attribute changes then, so it is skipped")
-    ap.add_argument("--out", default=os.path.join(os.path.dirname(CASES),
-                                                  "runs", "conformance.json"))
+    ap.add_argument("--out", default=None,
+                    help="where the report goes. Defaults to "
+                         "runs/conformance.json for a full suite and "
+                         "runs/conformance-partial.json for a --case run, so "
+                         "a targeted run cannot overwrite the full-suite "
+                         "figure the README and skill map cite")
     a = ap.parse_args()
 
-    cases = json.load(open(CASES, encoding="utf-8"))["cases"]
+    all_cases = json.load(open(CASES, encoding="utf-8"))["cases"]
+    cases = all_cases
+    # A --case run answers a question about one skill; the full suite is what
+    # the README and the skill map quote. Writing both to one path meant a
+    # two-case run left `13/16` sitting in the file the docs cite for
+    # `203/208`, and nothing said so.
+    if a.out is None:
+        a.out = os.path.join(os.path.dirname(CASES), "runs",
+                             "conformance-partial.json" if a.case
+                             else "conformance.json")
     if a.case:
         wanted = [s.strip() for s in a.case.split(",") if s.strip()]
         cases = [c for c in cases if any(w in c["id"] for w in wanted)]

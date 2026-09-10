@@ -185,7 +185,7 @@ The model itself is specified in `reference/data-model.md`. Improvement packets 
 | `scripts/check_citations.py` | Clusters entries by citation; refuses an export whose members disagree on sensitivity |
 | `scripts/stagger_decay.py` | Spreads a migrated corpus's decay windows so the first sweep is clearable |
 | `scripts/upgrade_os.py` | Refreshes the script copies an OS carries, stamps the version, names the migrations it will not perform |
-| `scripts/scaffold.py` | Builds an OS from the interrogation's answers, and copies the nine scripts an OS carries |
+| `scripts/scaffold.py` | Builds an OS from the interrogation's answers, and copies the sixteen scripts an OS carries |
 | `examples/fixture-os/` | A synthetic OS the build actually runs `build_index.py` against |
 | `commands/` | Eight slash commands over the daily path — see below |
 | `evals/` | Three harnesses — do the commands read distinctly, does the right skill get reached, and does it do what it says |
