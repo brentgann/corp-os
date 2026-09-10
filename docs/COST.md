@@ -107,6 +107,16 @@ Every skill declares its pass type under its title. **Mechanical** means nothing
 
 Exactly one skill of twenty-three qualifies today, and the reason is worth stating: two were reclassified in 0.18.2 after a review found them inferring tags and proposing what to keep. The saving is not in routing judgment to a cheaper model. It is in moving mechanism out of the model entirely, so what is left is small and correctly expensive.
 
+**That last sentence had no measurement behind it for seven releases. It has one now.** The full suite was run at both models on the same code (0.25.1): Sonnet 4.5 **137/163**, Opus 5 **36/40** over the seven cases repeated three times each.
+
+On the cases both models ran, they are within a check of each other — and Sonnet won one of them. The suite-level gap is not spread across the skills; it sits almost entirely in `setup` (2/9), `intake` (5/8), `connect` (3/5), `decide`, `pattern`, `redact-strips`, `guide`, `brief` and `configure`. The skills that tie are the ones running through `propose.py`, `file_raw.py`, `build_index.py`, `friction_scan.py` and `log_run.py`.
+
+**So model sensitivity tracks how much of a skill is still judgment, and the routing question answers itself release by release rather than once.** Three steps left the model in one week and three skills changed category. The way to make `intake` cheap is to keep moving its mechanism into `file_raw.py`, not to move it to a cheaper model — it is the one case that did the work and left none of the record.
+
+Nothing is pinned on the strength of that yet, deliberately: it is one Sonnet run per case. `--case recall,rebuild,pull --model claude-sonnet-4-5 --repeats 3` is the measurement that would justify pinning those three, which are the cleanest candidates.
+
+**And the field itself is only documented for one surface.** `model:` is [specified for Claude Code](https://code.claude.com/docs/en/skills.md), accepts the `/model` values plus `inherit`, and is **silently ignored** when the value is unavailable — no error, no warning, the session simply keeps its model. It is not documented for Cowork or for the Agent SDK. So a pin is a cost optimisation that may or may not apply where a given person runs this, and nothing here is allowed to depend on it.
+
 ## What does not save money
 
 **Trimming skill descriptions.** All twenty-three total 3,655 tokens per session, about two cents at Opus rates. They are what routes a request to the right skill among twenty-three siblings, and a misroute wastes a whole run. Do not cut them without running the routing harness.

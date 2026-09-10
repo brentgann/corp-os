@@ -60,9 +60,15 @@ Clean at Sonnet: `recall` ×3, `rebuild`, `pull`, `redact-external`, `reality-ch
 2. **Decide whether a run's close can be made non-optional.** A `Stop` hook is the only place genuinely outside the model, and whether Cowork honours one is unverified — the same open question as item 1 below, and the same failure mode if it does not.
 
 
-### 1. Verify `model:` frontmatter is honoured outside Claude Code
+### 1. `model:` frontmatter — answered as far as documentation goes
 
-`corp-os-upgrade` now declares `model: sonnet`. The documentation for that field is Claude Code's. **Whether Cowork honours it is unverified**, and an ignored field is a change that reaches nobody — the failure this repo is named after by now. One run of that skill in each surface settles it.
+**Claude Code: documented and supported.** [`code.claude.com/docs/en/skills.md`](https://code.claude.com/docs/en/skills.md) specifies the field, accepts the same values as `/model` plus `inherit`, and defines the fallback: a value outside the org's `availableModels` allowlist **is silently ignored** and the session keeps its current model. No error, no warning.
+
+**Cowork: not documented.** The Cowork getting-started and plugin pages say nothing about model configuration in skills or plugins. **Agent SDK: not documented either** — its skills page covers `name`, `description` and `allowed-tools` and never mentions `model:`.
+
+"Not documented" is where this stops being answerable from sources. Since the field is silently ignored by design on the one surface that does document it, an unsupported surface almost certainly ignores it too — which means a pin is safe to carry and unsafe to plan savings on.
+
+**So the rule is that nothing depends on it.** `corp-os-upgrade` keeps its pin as a cost optimisation that may or may not apply, and `COST.md` now says so where the routing table is. The empirical check is still one run of that skill on each surface, but it needs a way to observe the serving model from inside a run, which Cowork does not currently give.
 
 ### 2. Conformance: 152/163 at 0.19.11, and eleven things it found
 
@@ -94,9 +100,13 @@ First full run since 0.18.5, thirteen releases back. Was 69/79. `corp-os-guide` 
 
 3,655 tokens per session across 23 skills, roughly **two cents** at Opus rates. They are what routes among 23 siblings and a misroute wastes a whole run. The trade is bad in both directions and it stays as-is unless the routing harness says otherwise. Recorded so it is not re-proposed as an obvious win.
 
-### 4. `raw/INDEX.md` is 14,922 tokens at 661 files
+### 4. `raw/INDEX.md` — 14,943 tokens, three empty columns, and nothing read it
 
-Generated because raw crosses the file threshold, and read by anything that touches the source layer. Not yet examined. It may be correct — raw is deliberately never loaded wholesale — but nothing has looked at what reads it or what it costs them.
+**Closed in 0.25.4 at 244 tokens.** Reproduced on a generated 661-file archive: the general layer-index path emitted 661 rows of `| [file](file.md) | 0 | — |  |`. Every one of the three data columns was empty **by construction** — raw files carry no `### ` entries, no `kind:`/`confidence:`/`status:` mix and no per-file job linkage, because those are what a *derived* layer has. It also opened all 661 files to compute them.
+
+And the premise in the old entry was wrong: nothing reads it. Every skill that wants the queue is pointed at the **root** index, which carries `## Unprocessed queue` separately and correctly. Nothing in the suite names `raw/INDEX.md` at all — the only mention anywhere is a comment in `log_run.py`.
+
+A source layer's index is now a shape rather than a listing: the unprocessed files named individually, then files by period and by kind, derived from the `YYYY-MM-DD--kind--slug.md` convention without opening anything. **244 tokens against 14,943**, and the rebuild no longer reads the archive to produce it.
 
 ### 5. Unconditional reference reads — closed
 

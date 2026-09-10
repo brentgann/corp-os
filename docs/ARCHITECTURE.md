@@ -797,6 +797,25 @@ Two things follow, and the second is the one worth keeping:
 The close checks were collected into one report in the same pass, for a related reason: they ran in sequence and each returned on the first problem, so a run that tripped the queue check never saw the gate error behind it. **A check that hides another check is a measurement bug too.**
 
 
+### 4.56 A source layer is not a small derived layer
+
+**Found (0.25.4) by finally opening a file the backlog had carried unexamined for six releases.** `raw/INDEX.md` was 14,943 tokens on a 661-file archive. The backlog entry said it "may be correct — raw is deliberately never loaded wholesale — but nothing has looked at what reads it." Both halves turned out to be wrong in the same direction.
+
+It was 661 rows of this:
+
+```
+| [2025-08-10--meeting--reporting-0014](2025-08-10--meeting--reporting-0014.md) | 0 | — |  |
+```
+
+**Every data column was empty by construction, not by accident.** `write_layer_index` computes entries per file, a `kind`/`confidence`/`status` mix, and an unjobbed count — which is precisely the shape of a *derived* layer, where one topic file holds many `### ` entries each carrying those fields. A source layer is one file per item with none of them. The function read all 661 files to compute three columns that could not have had values.
+
+And nothing read the result. Every skill that wants the queue is pointed at the **root** index, which carries `## Unprocessed queue` separately and correctly; `corp-os-brief`, `corp-os-claims`, `corp-os-guide`, `corp-os-pull` and `corp-os-intake` all name `INDEX.md`. Nothing in the suite names `raw/INDEX.md`. It was generated on every rebuild, linked from nowhere, and paid for by anyone who found it.
+
+What a source layer's index is for is orientation — how far back the archive goes, what arrived when, what is still queued — and the filename convention `YYYY-MM-DD--kind--slug.md` already carries period and kind, so the shape is derivable without opening anything. **244 tokens against 14,943**, and the rebuild stopped reading the archive to produce it.
+
+The general form: **a function that generalises over layers has to know which distinctions between them are real.** `role` has been the authority on this since the beginning — `source`, `derived`, `record` are the only three things any code reads — and this function ignored it, treating a source layer as a derived layer that happened to have empty fields. §4.53's fix had the same shape one week earlier: a layer is a file or a folder, and the gate check knew about only one of those. **The config already says what a thing is; the cost of not asking is paid in tokens by everyone downstream.**
+
+
 ## 5. The skills
 
 | Skill | Job |
