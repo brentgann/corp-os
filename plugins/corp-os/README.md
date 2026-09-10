@@ -192,6 +192,15 @@ The model itself is specified in `reference/data-model.md`. Improvement packets 
 
 ## Version history
 
+**0.19.10** — most of what is left in a `note` field is not a note.
+
+`prune_config_notes.py` now also catches keys like `profile_note`, which escaped the check by not being called one, and its guidance separates the two things that live in these fields:
+
+- **A reason.** A skill does nothing differently for having read it. Move it.
+- **A rule in a field called `note`.** A rule every skill must obey has to live where every skill reads, and that cost is the rule working. Keep it, and shorten it to the instruction — drop the history, the example and the justification.
+
+Read against a real OS, most of the 844 tokens remaining after the first pass were the second kind: when to mark a person record sensitive and which script reads that field; that a topic file asserting something uncited is invisible to `corp-os-reality-check`; that any skill writing person records must check `placement_instructions` first. Moving those to a README would have been a behaviour change reported as a saving.
+
 **0.19.9** — two things `config.json` could be wrong about while looking right.
 
 **A duplicate key.** JSON keeps the last of two identical keys and reports nothing. A real OS declared `dashboards` twice — an existing layer for the rendered directory, and a new one added to declare the registry file — and the second silently replaced the first. The file the edit was made to declare stayed undeclared, the edit looked correct, and nothing anywhere would have said so.

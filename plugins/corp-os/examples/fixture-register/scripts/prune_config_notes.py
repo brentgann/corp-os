@@ -31,8 +31,10 @@ def walk(node, path=()):
     """(dotted path, note) for every `note` at any depth."""
     if isinstance(node, dict):
         for k, v in list(node.items()):
-            if k == "note" and isinstance(v, str):
-                yield ".".join(path) or "(root)", v
+            # `profile_note` and friends are notes that escaped the check by
+            # not being called one. Same content, same cost, same file.
+            if (k == "note" or k.endswith("_note")) and isinstance(v, str):
+                yield ".".join(path + ((k,) if k != "note" else ())) or "(root)", v
             else:
                 yield from walk(v, path + (str(k),))
     elif isinstance(node, list):
@@ -45,8 +47,9 @@ def strip(node, keep, path=()):
     if isinstance(node, dict):
         out = {}
         for k, v in node.items():
-            if k == "note" and isinstance(v, str):
-                if (".".join(path) or "(root)") in keep:
+            if (k == "note" or k.endswith("_note")) and isinstance(v, str):
+                where = ".".join(path + ((k,) if k != "note" else ())) or "(root)"
+                if where in keep:
                     out[k] = v
                 continue
             out[k] = strip(v, keep, path + (str(k),))
@@ -129,9 +132,14 @@ def main():
     if not a.apply:
         print("\ndry run. Re-run with --apply to move them, or narrow with "
               "--only / --except.\n\nBefore applying, ask of each: would a "
-              "skill do anything differently if it\nnever read this sentence? "
-              "If yes it is not a note — keep it, and shorten\nit into the "
-              "schema. If no, it is a reason, and it belongs in the README.")
+              "skill do anything differently if it\nnever read this sentence?"
+              "\n\n  No  — it is a reason. Move it; the README is where "
+              "reasons live.\n  Yes — it is a RULE in a field called `note`, "
+              "and a rule every skill\n        must obey has to live where "
+              "every skill reads. That cost is the\n        rule working. "
+              "Keep it, and shorten it to the instruction —\n        drop the "
+              "history, the example and the justification, keep\n        the "
+              "sentence that changes what a run does.")
         return 0
 
     block = [""] if existing.endswith("\n") else ["", ""]
