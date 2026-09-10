@@ -1,5 +1,9 @@
 # Corp-OS
 
+> **Current documentation:** https://brentgann.github.io/corp-os/
+>
+> Rebuilt from this repository on every push, so it describes the released version rather than a snapshot. It carries the quick start, the handbook, the architecture record, what a run costs, and the open backlog. `corp-os-guide` will point you there too.
+
 A portable, configurable personal work OS.
 
 Most personal knowledge systems are organized by subject: a folder per topic, a note per person. They only ever grow, nothing in them ever expires, and after a few months nobody trusts them enough to look. Corp-OS is a folder of markdown files plus twenty-three skills that operate on it, and its shape is declared rather than assumed — layer names, label vocabulary, decay windows, retention and gate strictness all live in a `config.json` that every skill reads first.
@@ -191,6 +195,8 @@ The model itself is specified in `reference/data-model.md`. Improvement packets 
 | `evals/` | Three harnesses — do the commands read distinctly, does the right skill get reached, and does it do what it says |
 
 ## Version history
+
+**0.26.5** — the published figures come from the run report instead of a literal, and the plugin says where the docs are.
 
 **0.26.4** — the shareable documents get a generator, and the handbook stops saying nine scripts.
 

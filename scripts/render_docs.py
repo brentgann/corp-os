@@ -26,8 +26,30 @@ FONT_DIR = os.path.join(HERE, "assets", "fonts")
 DATA = os.path.join(ROOT, "dist", "corp-os-docs.json")
 OUT = os.path.join(ROOT, "dist", "docs")
 
-CONF = {"passed": 203, "total": 208, "cases": 28, "skills": 23,
-        "model": "claude-opus-5", "date": "2026-09-10"}
+# Never a literal. The figures are whatever the committed run report holds,
+# and when that report covers fewer cases than the suite defines it has no
+# headline — both generators carried a hardcoded 203/208 for a day while the
+# repo's report said 13/16 over two cases, which is how a published page goes
+# on quoting a number nobody can reproduce.
+if not os.path.exists(DATA):
+    raise SystemExit("no dist/corp-os-docs.json — run "
+                     "`python3 scripts/build_docs.py --data` first")
+D = json.load(open(DATA, encoding="utf-8"))
+
+C = D.get("conformance") or {}
+PARTIAL = C.get("partial", True)
+CONF = {"passed": C.get("passed"), "total": C.get("total"),
+        "cases": C.get("cases", 0), "skills": C.get("skills_covered", 0),
+        "skills_total": C.get("skills_total", 0),
+        "defined": C.get("cases_defined", 0), "open": C.get("open_checks", 0),
+        "model": C.get("model") or "—", "date": C.get("date") or "—"}
+HEADLINE = ("—" if PARTIAL else f"{CONF['passed']}/{CONF['total']}")
+COVER_NOTE = (
+    f"No full-suite run is recorded. The last report covered {CONF['cases']} "
+    f"of {CONF['defined']} cases; run `python3 evals/run_conformance.py "
+    f"--workers 3 --timeout 900` to produce one."
+    if PARTIAL else
+    f"Measured {CONF['date']} on {CONF['model']}, one run per case")
 
 FONTS = [("Inter", 400, "inter-latin-400-normal.woff2"),
          ("Inter", 500, "inter-latin-500-normal.woff2"),
@@ -211,14 +233,14 @@ def page(doc, ver):
     body, toc = build_toc(body, doc["key"])
     strip = f"""
       <div class="strip">
-        <div class="stat ok"><b>{CONF['passed']}/{CONF['total']}</b>
+        <div class="stat {'ok' if not PARTIAL else ''}"><b>{HEADLINE}</b>
           <span>conformance</span></div>
-        <div class="stat"><b>{CONF['cases']}</b><span>cases</span></div>
-        <div class="stat"><b>{CONF['skills']}/23</b><span>skills covered</span></div>
-        <div class="stat warn"><b>4</b><span>checks open</span></div>
+        <div class="stat"><b>{CONF['cases'] or '—'}</b><span>cases</span></div>
+        <div class="stat"><b>{CONF['skills_total']}</b><span>skills</span></div>
+        <div class="stat warn"><b>{CONF['open'] if not PARTIAL else '—'}</b>
+          <span>checks open</span></div>
       </div>
-      <p class="meta">Measured {CONF['date']} on {CONF['model']}, one run per
-      case &middot; generated from {doc['source']}</p>"""
+      <p class="meta">{COVER_NOTE} &middot; generated from {doc['source']}</p>"""
     return f"""<!doctype html><html><head><meta charset="utf-8">
 <title>corp-os — {doc['label']}</title>
 <style>{face_css()}
@@ -237,10 +259,6 @@ def page(doc, ver):
 
 
 def main():
-    if not os.path.exists(DATA):
-        sys.exit(f"no {os.path.relpath(DATA, ROOT)} — run "
-                 "`python3 scripts/build_docs.py --data` first")
-    D = json.load(open(DATA, encoding="utf-8"))
     ver = D["version"]
     os.makedirs(OUT, exist_ok=True)
     try:

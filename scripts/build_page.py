@@ -25,8 +25,25 @@ if not os.path.exists(SRC):
 D = json.load(open(SRC, encoding="utf-8"))
 VER = D["version"]
 
-CONF = {"passed": 203, "total": 208, "cases": 28, "skills": 23,
-        "model": "claude-opus-5", "date": "2026-09-10"}
+# Never a literal. The figures are whatever the committed run report holds,
+# and when that report covers fewer cases than the suite defines it has no
+# headline — both generators carried a hardcoded 203/208 for a day while the
+# repo's report said 13/16 over two cases, which is how a published page goes
+# on quoting a number nobody can reproduce.
+C = D.get("conformance") or {}
+PARTIAL = C.get("partial", True)
+CONF = {"passed": C.get("passed"), "total": C.get("total"),
+        "cases": C.get("cases", 0), "skills": C.get("skills_covered", 0),
+        "skills_total": C.get("skills_total", 0),
+        "defined": C.get("cases_defined", 0), "open": C.get("open_checks", 0),
+        "model": C.get("model") or "—", "date": C.get("date") or "—"}
+HEADLINE = ("—" if PARTIAL else f"{CONF['passed']}/{CONF['total']}")
+COVER_NOTE = (
+    f"No full-suite run is recorded. The last report covered {CONF['cases']} "
+    f"of {CONF['defined']} cases; run `python3 evals/run_conformance.py "
+    f"--workers 3 --timeout 900` to produce one."
+    if PARTIAL else
+    f"Measured {CONF['date']} on {CONF['model']}, one run per case")
 
 OPEN_FAILS = [
     ("corp-os-guide", "opens a decision itself instead of handing off, and does not "
@@ -297,9 +314,9 @@ html{{scroll-behavior:smooth}}
          plugin. Every document in the repository, in one place.</p>
     </div>
     <div class="measured">
-      <div class="fig ok"><b>{CONF['passed']}/{CONF['total']}</b><span>conformance</span></div>
-      <div class="fig"><b>{CONF['cases']}</b><span>cases</span></div>
-      <div class="fig"><b>{CONF['skills']}/23</b><span>skills covered</span></div>
+      <div class="fig {'ok' if not PARTIAL else ''}"><b>{HEADLINE}</b><span>conformance</span></div>
+      <div class="fig"><b>{CONF['cases'] or '&mdash;'}</b><span>cases</span></div>
+      <div class="fig"><b>{CONF['skills_total']}</b><span>skills</span></div>
     </div>
   </div>
 </header>
@@ -323,9 +340,9 @@ html{{scroll-behavior:smooth}}
 <main class="wrap">{''.join(panels)}</main>
 
 <footer><div class="wrap">
-  Generated from the repository's own markdown at v{VER}. Conformance measured
-  {CONF['date']} on <code>{CONF['model']}</code>, one run per case.
-  Rebuild with <code>python3 scripts/build_docs.py</code>.
+  Generated from the repository's own markdown at v{VER}. {COVER_NOTE}.
+  Rebuild with <code>python3 scripts/build_docs.py --data</code> then
+  <code>scripts/build_page.py --standalone</code>.
 </div></footer>
 
 <script>

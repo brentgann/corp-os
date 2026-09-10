@@ -678,6 +678,26 @@ def main():
                 "as a numbered step. §4.52 — prose beside a procedure is "
                 "documentation; inside it, it runs")
 
+    # The published documents take their headline from the committed run
+    # report, and a report covering fewer cases than the suite defines has no
+    # headline to give. Said out loud here so the repo tells you the figure is
+    # unavailable, rather than a reader finding a dash on the page and
+    # wondering whether the build broke.
+    try:
+        _rep = json.load(open("../../evals/runs/conformance.json", encoding="utf-8")) \
+            if os.path.exists("../../evals/runs/conformance.json") else None
+    except ValueError:
+        _rep = None
+    if _rep is not None:
+        _ran = len(_rep.get("runs") or [])
+        _def = len(json.load(open("../../evals/conformance-cases.json",
+                                  encoding="utf-8"))["cases"])
+        if _ran < _def:
+            warn(f"the committed conformance report covers {_ran} of {_def} "
+                 f"cases, so the published documents have no headline figure "
+                 "and will say so. A full run restores it: "
+                 "python3 evals/run_conformance.py --workers 3 --timeout 900")
+
     PASSES = ("Mechanical pass", "Mixed pass", "Judgment pass")
     for d in sorted(names):
         path = f"skills/{d}/SKILL.md"

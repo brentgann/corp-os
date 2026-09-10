@@ -33,6 +33,7 @@ import os
 import shutil
 import subprocess
 import sys
+from datetime import date
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -185,6 +186,40 @@ def emit_data(ver, dist):
                              "blurb": blurb, "source": src, "html": body,
                              "toc": toc, "words": len(raw.split())})
 
+    # The figures come from the committed run report, never from a literal.
+    #
+    # Both page generators carried `CONF = {"passed": 203, ...}` for a day.
+    # The repo's report at the time said 13/16 over 2 cases, because a --case
+    # run had overwritten it, and the published page would have gone on
+    # saying 203/208 through every future release. That is the exact defect
+    # §4.55 and §4.56 are about, committed by the person who wrote them.
+    #
+    # A report that covers fewer cases than the suite defines is a partial,
+    # and a partial has no headline. The generators render that as "not
+    # recorded" rather than quoting a two-case run as though it were the
+    # suite, because a number nobody can reproduce is worse than no number.
+    report = os.path.join(ROOT, "evals", "runs", "conformance.json")
+    defined = len(json.load(open(os.path.join(
+        ROOT, "evals", "conformance-cases.json"), encoding="utf-8"))["cases"])
+    conf = {"cases_defined": defined, "partial": True,
+            "passed": None, "total": None, "cases": 0}
+    try:
+        r = json.load(open(report, encoding="utf-8"))
+        ran = len(r.get("runs") or [])
+        covered = len({x.get("skill") for x in (r.get("runs") or [])
+                       if x.get("skill")})
+        conf.update(model=r.get("model"), passed=r.get("passed"),
+                    total=r.get("total"), cases=ran, skills_covered=covered,
+                    partial=ran < defined,
+                    date=date.fromtimestamp(os.path.getmtime(report)).isoformat())
+        fails = sorted({c["check"] for run in (r.get("runs") or [])
+                        for c in (run.get("results") or [])
+                        if not c.get("passed")})
+        conf["open_checks"] = len(fails)
+    except (OSError, ValueError, KeyError):
+        pass
+    data["conformance"] = conf
+
     data["skills"] = []
     for sp in sorted(glob.glob(os.path.join(
             ROOT, "plugins", "corp-os", "skills", "*", "SKILL.md"))):
@@ -195,6 +230,8 @@ def emit_data(ver, dist):
             "pass": pas.group(1) if pas else "—",
             "one_line": re.search(r"^description:\s*(.+)$", b, re.M)
                           .group(1).split(".")[0].strip() + "."})
+
+    data["conformance"]["skills_total"] = len(data["skills"])
 
     os.makedirs(dist, exist_ok=True)
     out = os.path.join(dist, "corp-os-docs.json")

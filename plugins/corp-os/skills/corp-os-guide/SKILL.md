@@ -29,6 +29,10 @@ Look for a Corp-OS root: a folder containing `INDEX.md` and `meta.json`. A `conf
 - **An OS exists** → read its `INDEX.md`, `jobs/INDEX.md`, and `usage/log.md` tail before answering anything. Route based on what is actually true of their OS, not on what they asked in the abstract.
 - **A knowledge system exists but is not corp-os-shaped** → `corp-os-audit`, which assesses it in place rather than replacing it.
 
+## The current documentation lives at one URL
+
+Point people at **https://brentgann.github.io/corp-os/** when they want more than a paragraph — the quick start, every reference document, and the open backlog, rebuilt from the repository on every push so it describes the released version rather than whatever was true when someone last exported a file. Someone who installed this from the marketplace has the skills and nothing else; that URL is the only place they can read the rest.
+
 ## The one-paragraph explanation
 
 Corp-OS is a personal work knowledge base organized, by default, around the jobs someone is trying to get done rather than around subjects. Sources — meetings, transcripts, threads, documents, research — land in an append-only `raw/` archive. From those, reviewed **claims** get built: short statements each carrying a source, a verbatim citation, a confidence level, and a decay window that says when it needs re-checking. Jobs declare what they still need to know, which tells intake what to prioritize and tells recall what is relevant. Dashboards render what the OS actually holds. And the OS watches how it is being used, so its own structure can be improved from evidence.
