@@ -22,6 +22,21 @@ Items leave this list by being done or by being declined in §8, never by being 
 
 ## Open
 
+### 0e. Full suite at 0.26.1: 203/208, and what the five are
+
+All 28 cases, Opus 5, one run each. Sixteen perfect, including `setup` 10/10, `migrate` 11/11, `upgrade` 11/11 and `intake` 9/9. All four first-time assertions executed: the three new cases ran, the `is_os` inference correctly suppressed the log-row and gate checks on `audit-foreign-system`, and the repaired plugin guard passed on all 28 with no false positives.
+
+**`company-no-source` (6/7) — the skill has no floor, and now the OS does.** The run wrote `company/ardent-materials.md`, declared the layer, and indexed it, while writing no claims and inventing no raw. That is the signature of an empty stub rather than a fabrication, but the skill permits both: Step 2 says search every one of the nine areas and never answer from recalled knowledge, Step 4 says write the proposal, then the record and the claims, and **nothing in between says what to do when zero areas were established.** Every other skill got a floor this week — `improve` an arithmetic one, `dashboard` a refusal, the gate-writers a gate. This one had none.
+
+Rather than a fourth skill-specific script, the floor went in as the invariant it actually belongs to. **Provenance is the second of the five and nothing enforced it at close.** `log_run.py` now refuses a run that wrote a derived entry carrying no `Source` field at all. Deliberately narrow: not whether the source is good, not whether it resolves, not whether the grading is right. `Source: no source` passes, because an entry tracing to a summary with no retrievable original has stated its provenance. An empty one has not.
+
+The case's own assertion was also wrong, though it caught the right run. It asserted the string `Ardent` stayed out of `INDEX.md`, reasoning that a `company/` check would pass vacuously on a fixture with no company layer — but `expect_untouched` reads the run's diff, not the pre-existing tree, so an added `company/ardent-materials.md` fires it directly. The index version would also have fired on a proposal that merely named the company, which is exactly where an unestablished company belongs. Replaced.
+
+**`guide-open-fork` (6/8) — a regression.** Both checks, guide opening the decision itself and routing to `corp-os-decide`, were 7/7 after 0.18.6 landed and are failing again, at Opus and at Sonnet. Not diagnosed. This is the §4.48 shape — a fix removed by later work that never named it — and it has cost this repo four times.
+
+**`recall-load-bearing-sensitive` (6/8) — a rate, not a state.** 1-in-4, then 7/7, now failing both. Needs `--repeats 3` before anything changes, and it is the highest-stakes check in the suite: an answer computed around a load-bearing sensitive fact is wrong in the way that signals nothing.
+
+
 ### 0c. The Sonnet pin question, answered: no (0.26.0)
 
 `COST.md` said the three cleanest candidates were `recall`, `rebuild` and `pull`, and that one Sonnet run per case was not enough to pin on. Run at `--repeats 3`, they are not clean:

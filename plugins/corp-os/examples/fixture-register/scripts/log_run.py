@@ -259,6 +259,53 @@ def check_queue(root, cfg, since):
 
 
 
+
+# `no source` and its neighbours are sanctioned values (check_citations.py
+# carries the same set): an entry that traces to a summary with no retrievable
+# original says so, and that is provenance, not the absence of it.
+NOT_A_CITATION = {"no source", "no raw file", "none", "n/a", ""}
+
+
+def check_provenance(root, cfg, since):
+    """A derived entry written this run says where it came from.
+
+    Provenance is the second of the five invariants and nothing enforced it
+    at close. What that permits is the worst artefact this suite can produce:
+    a record that looks like knowledge, reaches INDEX.md, and is read and
+    believed by every later run, with nothing behind it anyone can check.
+
+    Deliberately narrow. It asks only whether a `Source` field is PRESENT --
+    not whether the source is good, not whether it resolves, not whether the
+    grading is right. An entry that says `Source: no source` passes, because
+    that is a stated provenance and this is not the skill that judges it.
+    Anything stricter would need to fetch, and a check that fetches is a
+    check that fails offline.
+    """
+    bad = []
+    for name, spec, path in _layer_paths(cfg):
+        if spec.get("role") != "derived":
+            continue
+        full = os.path.join(root, path)
+        cands = ([full] if path.endswith(".md")
+                 else glob.glob(os.path.join(full, "*.md")) + [full + ".md"])
+        for f in cands:
+            if os.path.basename(f) in ("INDEX.md", "README.md"):
+                continue
+            try:
+                if os.path.getmtime(f) <= since + 1:
+                    continue
+                body = open(f, encoding="utf-8", errors="replace").read()
+            except OSError:
+                continue
+            if not body.strip():
+                continue
+            found = re.findall(r"^[-*]?\s*\**Source\**\s*:\s*(.*?)\s*$",
+                               body, re.I | re.M)
+            if not found:
+                bad.append(os.path.relpath(f, root))
+    return sorted(bad)
+
+
 def check_index_banner(root):
     """The layer-declared-without-an-index_line signature, read off the index.
 
@@ -472,6 +519,22 @@ def main():
                      "every later scan, and\nthe person's queue "
                      "under-reports without ever looking wrong. Recount:\n"
                      f"\n  python3 scripts/build_index.py --root {a.os_root}"])
+
+            unsourced = check_provenance(root, _cfg, gate_since)
+            if unsourced:
+                problems.append(
+                    ["this run wrote derived entries that say where nothing "
+                     "came from:",
+                     unsourced,
+                     "Provenance is the second invariant. An entry with no "
+                     "`Source` at all reaches\nINDEX.md and is read and "
+                     "believed by every later run with nothing behind it\n"
+                     "anyone can check. `Source: no source` is a real answer "
+                     "— an entry tracing to\na summary with no retrievable "
+                     "original says so, and that is provenance. An\nempty "
+                     "one is not.\n\nIf nothing could be established at all, "
+                     "the entry is a question rather than a\nrecord, and the "
+                     "proposal is where a question belongs."])
 
             banner = check_index_banner(root)
             if banner:

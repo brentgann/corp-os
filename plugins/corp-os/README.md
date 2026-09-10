@@ -192,6 +192,8 @@ The model itself is specified in `reference/data-model.md`. Improvement packets 
 
 ## Version history
 
+**0.26.2** — provenance is the second invariant and nothing enforced it; a derived entry now says where it came from or the run does not close.
+
 **0.26.1** — the plugin guard reported the repo's own commit; "the directory changed" is not "this run changed it".
 
 **0.26.0** — every skill has a conformance case, and the harness watches its own plugin.
