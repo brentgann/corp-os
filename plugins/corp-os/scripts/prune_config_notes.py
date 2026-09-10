@@ -40,12 +40,19 @@ def walk(node, path=()):
             yield from walk(v, path + (str(i),))
 
 
-def strip(node):
+def strip(node, keep, path=()):
+    """Remove notes except at the paths named in `keep`."""
     if isinstance(node, dict):
-        return {k: strip(v) for k, v in node.items()
-                if not (k == "note" and isinstance(v, str))}
+        out = {}
+        for k, v in node.items():
+            if k == "note" and isinstance(v, str):
+                if (".".join(path) or "(root)") in keep:
+                    out[k] = v
+                continue
+            out[k] = strip(v, keep, path + (str(k),))
+        return out
     if isinstance(node, list):
-        return [strip(v) for v in node]
+        return [strip(v, keep, path + (str(i),)) for i, v in enumerate(node)]
     return node
 
 
@@ -53,7 +60,24 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--root", default=".")
     ap.add_argument("--apply", action="store_true")
+    ap.add_argument("--only", default="",
+                    help="comma-separated config paths to move; everything "
+                         "else stays")
+    ap.add_argument("--except", dest="keep", default="",
+                    help="comma-separated config paths to leave in place")
     a = ap.parse_args()
+
+    # A note is not automatically documentation. Some of them change how a
+    # skill behaves -- "a readable view over claims, not an independent source
+    # of truth" is a rule, not a reason -- and moving those out of the file
+    # every skill reads is a behaviour change wearing a cost fix's clothes.
+    #
+    # The test, per note: would a skill do anything differently if it never
+    # read this sentence? No, and it is a reason -- move it. Yes, and it is
+    # not a note at all; it is a field or a layer description that belongs in
+    # the schema, stated in a line rather than a paragraph.
+    #
+    # No script can make that call, so it is a flag rather than a default.
     root = os.path.abspath(a.root)
     cp = os.path.join(root, "config.json")
     if not os.path.exists(cp):
@@ -66,6 +90,14 @@ def main():
         print("no `note` fields in config.json — nothing to move.")
         return 0
 
+    only = {x.strip() for x in a.only.split(",") if x.strip()}
+    keep = {x.strip() for x in a.keep.split(",") if x.strip()}
+    if only:
+        keep |= {p for p, _ in notes if p not in only}
+    notes = [(p, v) for p, v in notes if p not in keep]
+    if not notes:
+        print("every note was excluded — nothing to move.")
+        return 0
     tok = sum(round(len(v) / 4) for _, v in notes)
     print(f"{len(notes)} note field(s), about {tok} tokens, "
           f"{tok * 100 // max(1, round(len(raw) / 4))}% of config.json.\n")
@@ -80,7 +112,11 @@ def main():
           f"{len(fresh)} to add.")
 
     if not a.apply:
-        print("\ndry run. Re-run with --apply to move them.")
+        print("\ndry run. Re-run with --apply to move them, or narrow with "
+              "--only / --except.\n\nBefore applying, ask of each: would a "
+              "skill do anything differently if it\nnever read this sentence? "
+              "If yes it is not a note — keep it, and shorten\nit into the "
+              "schema. If no, it is a reason, and it belongs in the README.")
         return 0
 
     block = [""] if existing.endswith("\n") else ["", ""]
@@ -104,7 +140,7 @@ def main():
         if s.startswith('"') and len(line) - len(s) > 0:
             indent = len(line) - len(s)
             break
-    json.dump(strip(cfg), open(cp, "w", encoding="utf-8"), indent=indent)
+    json.dump(strip(cfg, keep), open(cp, "w", encoding="utf-8"), indent=indent)
     open(cp, "a", encoding="utf-8").write("\n")
     new = round(len(open(cp, encoding="utf-8").read()) / 4)
     print(f"\nmoved {len(fresh)} to README.md. config.json is now ~{new} "

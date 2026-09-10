@@ -192,6 +192,14 @@ The model itself is specified in `reference/data-model.md`. Improvement packets 
 
 ## Version history
 
+**0.19.5** — `prune_config_notes.py` takes `--only` and `--except`, because a note is not automatically documentation.
+
+Run against a real OS, the fifteen notes were not fifteen explanations. Some were: *"Tuned to what actually rots in this work rather than left at the shipped default."* Others were rules wearing a reason's clothes — *"A readable view over claims, not an independent source of truth"* changes how a skill treats that layer, and *"Mirrored here from `sensitive.md` because `sensitive.md` sits outside the scan path"* is provenance on a load-bearing instruction.
+
+Moving those out of the file every skill reads is a behaviour change dressed as a cost fix. So the move is now per-path, and the dry run prints the test: **would a skill do anything differently if it never read this sentence?** No, and it is a reason — move it. Yes, and it is not a note at all; it is a field or a layer description that belongs in the schema, stated in a line rather than a paragraph.
+
+No script can make that call, which is why it is a flag and not a default.
+
 **0.19.4** — `note` fields move out of the file every skill reads first.
 
 A note is written once by a person to explain why the config is shaped the way it is, and then re-read by a model on every run of every skill forever. In a real OS they totalled **1,627 tokens: 42% of `config.json` and 17% of the whole pre-flight floor.**
