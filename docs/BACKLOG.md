@@ -22,6 +22,24 @@ Items leave this list by being done or by being declined in §8, never by being 
 
 ## Open
 
+### 0. The enforcement chain has one model-dependent link left
+
+**Measured 2026-09-10, full suite at `claude-sonnet-4-5`: 137/163.** The Opus figure to compare against is 152/163 and it is six releases stale, so this is not yet a clean A/B — an Opus run at 0.25.1 is the missing half.
+
+What it already settles is the design question 0.25.0 rests on. **The gate held 24 of 25 cases at Sonnet**, including the three skills that were 1/3 and 2/3 at Opus a release earlier. Moving it into `log_run.py` made it model-independent, which is the result that was hoped for.
+
+**But `usage/log.md row appended` failed 9 times.** That check was 3/3 in every case and every skill at Opus, which is the entire reason the gate was put behind it. At Sonnet it is roughly 64%. The one case that failed the gate — `intake-transcript` — is the same case that skipped the close: it wrote `claims/pricing.md`, updated `INDEX.md` and `meta.json`, and ran neither `propose.py` nor `log_run.py`. **The gate is now exactly as reliable as `log_run.py`'s invocation rate, and that rate is the only model-dependent link in the chain.**
+
+Four cases wrote nothing at all: `setup-from-empty` (12s, 0/9 of its writes, with the prompt explicitly saying "go ahead and scaffold it"), `decide-open-fork`, `connect-blind-spots`, and `pattern-adopt-refusal` closed no books. That is a different failure from skipping bookkeeping and it is not fixable by moving a step into code.
+
+Clean at Sonnet: `recall` ×3, `rebuild`, `pull`, `redact-external`, `reality-check`, `fidelity`, `dashboard-hub`, `claims`, `glossary`, `jobs`, `improve`. Mostly the read-and-regenerate skills.
+
+**So the cheap split does not survive contact.** "Sonnet where the tokens are" pointed at `intake` first, and `intake` is the one case that did the work and left none of the record. Two things worth doing before any routing decision:
+
+1. **Opus at 0.25.1**, so the comparison is same-code.
+2. **Decide whether a run's close can be made non-optional.** A `Stop` hook is the only place genuinely outside the model, and whether Cowork honours one is unverified — the same open question as item 1 below, and the same failure mode if it does not.
+
+
 ### 1. Verify `model:` frontmatter is honoured outside Claude Code
 
 `corp-os-upgrade` now declares `model: sonnet`. The documentation for that field is Claude Code's. **Whether Cowork honours it is unverified**, and an ignored field is a change that reaches nobody — the failure this repo is named after by now. One run of that skill in each surface settles it.
