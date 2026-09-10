@@ -771,6 +771,32 @@ The one thing that required care is the exemption. The hub renders the registry 
 The general form: **§4.53 said enforcement belongs at the step that always runs. This says what to do when there is no artifact to enforce against — build the branch a command, so the refusal itself becomes the artifact.** A rule whose violation leaves no trace is not being followed; it is being remembered, which is a different and much worse thing.
 
 
+### 4.55 A conditional check needs a conditional denominator
+
+**Found (0.25.3) while reading a number that had not moved in four releases.** `corp-os-glossary` reported *"unprocessed raw files are reachable from INDEX.md · 1/3 runs"* at 0.25.0, 0.25.1 and 0.25.2. It looked like the one stubborn failure left in the case. It was not a failure at all.
+
+That check is conditional — `if new_raw:` — so it only runs when a run added a source file, and glossary adds one in roughly a third of its runs. The merge collapsing repeats counted passes and divided by the **run count**:
+
+```python
+m["tally"][check] += int(x["passed"])
+...
+{"passed": v == m["runs"], "rate": v / m["runs"]}
+```
+
+A check that fired once and passed scores `1/3`. A check that ran three times and failed twice scores `1/3`. **The report cannot tell them apart, and neither could I.** The denominator is now the number of runs the check applied in, and a check that did not apply everywhere says so.
+
+The cost was not the wrong number, it was the work it bought. 0.25.2 added a queue-reachability check to `log_run.py` on the strength of it. The invariant is real and the check is worth keeping — a source file in the queue and in no index is invisible to every later scan — but it was built to chase a phantom, and the release note said the run had "failed 2 of 3" when the run had never failed.
+
+**§4.51 recorded a metric that ranked work which did not exist, and put it down to a regex.** This is the same failure one level up: not in a tool built to find work, but in the instrument that decides whether the work worked. Every `--repeats` number in this repo passed through it, and the ones that mattered — the gate going 0/3 to 3/3 — happen to involve unconditional checks and survive unchanged. That is luck, not method.
+
+Two things follow, and the second is the one worth keeping:
+
+- **A conditional check must publish its condition.** `applied in 1 of 3` costs nine characters and removes the ambiguity entirely.
+- **When a number does not move across three releases while everything around it does, suspect the number.** Four releases of this repo's own reasoning treated an unchanging 1/3 as a hard case. Nothing about it was hard. It was a division.
+
+The close checks were collected into one report in the same pass, for a related reason: they ran in sequence and each returned on the first problem, so a run that tripped the queue check never saw the gate error behind it. **A check that hides another check is a measurement bug too.**
+
+
 ## 5. The skills
 
 | Skill | Job |

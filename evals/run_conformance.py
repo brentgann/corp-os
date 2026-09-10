@@ -398,24 +398,42 @@ def main():
                   + (f"  ERROR {res['error']}" if res["error"] else ""), flush=True)
 
     # Collapse repeats into a rate per check.
+    #
+    # The denominator is the number of runs the check APPLIED in, not the
+    # number of runs. Several checks here are conditional -- the raw/INDEX.md
+    # one fires only when a run added a raw file -- and dividing those by the
+    # run count reported a check that fired once and passed as "1/3 runs",
+    # which is indistinguishable from one that ran three times and failed
+    # twice. corp-os-glossary carried that number across four releases and a
+    # release was built partly to chase it. §4.51 said a metric built to rank
+    # work will rank work that does not exist; this is the same failure in
+    # the instrument that measures the fix.
     if a.repeats > 1:
         merged = {}
         for r in out:
             m = merged.setdefault(r["id"], {"id": r["id"], "skill": r["skill"],
                                             "error": r["error"], "runs": 0,
-                                            "tally": {}, "why": {},
-                                            "diff": r["diff"]})
+                                            "tally": {}, "applied": {},
+                                            "why": {}, "diff": r["diff"]})
             m["runs"] += 1
             for x in r["results"]:
-                m["tally"][x["check"]] = m["tally"].get(x["check"], 0) + int(x["passed"])
-                m["why"][x["check"]] = x["why"]
+                k = x["check"]
+                m["tally"][k] = m["tally"].get(k, 0) + int(x["passed"])
+                m["applied"][k] = m["applied"].get(k, 0) + 1
+                m["why"][k] = x["why"]
         out = []
         for m in merged.values():
-            m["results"] = [
-                {"check": k, "passed": v == m["runs"], "rate": v / m["runs"],
-                 "why": m["why"][k],
-                 "detail": "" if v == m["runs"] else f"{v}/{m['runs']} runs"}
-                for k, v in m["tally"].items()]
+            rows = []
+            for k, v in m["tally"].items():
+                n = m["applied"][k]
+                detail = "" if v == n else f"{v}/{n} runs"
+                if n < m["runs"]:
+                    detail = (detail + " · " if detail else "") + \
+                        f"applied in {n} of {m['runs']}"
+                rows.append({"check": k, "passed": v == n, "rate": v / n,
+                             "applied": n, "why": m["why"][k],
+                             "detail": detail})
+            m["results"] = rows
             out.append(m)
 
     out.sort(key=lambda r: r["id"])

@@ -258,6 +258,25 @@ def check_queue(root, cfg, since):
     return sorted(missing)
 
 
+
+def check_index_banner(root):
+    """The layer-declared-without-an-index_line signature, read off the index.
+
+    build_index.py already renders a banner for it and lists that layer's
+    entries as bare links. Measured at 2 of 3 in `dashboard-missing-layer`,
+    where a run declares a layer to serve a rendering and skips the
+    interrogation that would have asked what an entry line says. The banner
+    is the machine-visible half of a shape mistake, so there is no reason
+    for a person to be the one who notices it.
+    """
+    try:
+        body = open(os.path.join(root, "INDEX.md"), encoding="utf-8").read()
+    except OSError:
+        return []
+    return [ln.strip() for ln in body.split("\n")
+            if "Incomplete index" in ln]
+
+
 def check_gate(root, since):
     """Returns (ungated_files, layer_hint). Empty list means nothing to say."""
     if since is None:
@@ -404,96 +423,105 @@ def main():
           + (" and meta.json history" if wrote_event else
              " (no history entry — nothing changed on disk)"))
 
-    # -- the declared write scope, checked before the gate: a skill that wrote
-    # outside where it says it writes has a worse problem than an unrecorded
-    # proposal, and "write a proposal for claims/" is the wrong instruction to
-    # give a skill whose answer is that the claim should not exist.
-    if a.scope_under and gate_since is not None:
-        stray = _changed_outside(root, a.scope_under, gate_since)
-        if stray:
-            print(f"\nERROR: corp-os declares that {a.skill} writes only "
-                  f"under {a.scope_under.rstrip('/')}/, and this run "
-                  "changed:\n", file=sys.stderr)
-            for f in stray[:8]:
-                print(f"  {f}", file=sys.stderr)
-            if len(stray) > 8:
-                print(f"  … and {len(stray) - 8} more", file=sys.stderr)
-            print("\nThose belong to whichever skill owns that layer, with "
-                  "its citation and gate\nrules. Undo them and say what you "
-                  "found instead — a run that reaches outside\nits scope has "
-                  "answered a question nobody asked.", file=sys.stderr)
-            _pin_gate(root, gate_since)
-            return 2
-
-    # -- two things that are wrong on disk rather than missing from it, and
-    # so are cheaper to catch here than to find later. Both fire only on what
-    # this run did; an OS that arrived carrying either has a migration.
+    # -- everything a close can catch, collected and reported together.
+    #
+    # These ran in sequence at first, each returning on the first problem it
+    # found. That hid the others: a run that tripped the queue check never
+    # saw the gate error behind it, fixed the index, and closed on a second
+    # call that had already lost the window. One report, one exit, every
+    # problem the run actually has.
+    problems = []
     if gate_since is not None:
         try:
             _cfg = json.load(open(os.path.join(root, "config.json"),
                                   encoding="utf-8"))
         except (OSError, ValueError):
             _cfg = None
+
+        if a.scope_under:
+            stray = _changed_outside(root, a.scope_under, gate_since)
+            if stray:
+                problems.append(
+                    [f"corp-os declares that {a.skill} writes only under "
+                     f"{a.scope_under.rstrip('/')}/, and this run changed:",
+                     stray,
+                     "Those belong to whichever skill owns that layer, with "
+                     "its citation and gate\nrules. Undo them and say what "
+                     "you found instead — a run that reaches\noutside its "
+                     "scope has answered a question nobody asked."])
+
         if _cfg:
             clash = check_shape(root, _cfg, gate_since)
             if clash:
-                print("\nERROR: a layer is a file or a folder, never both. "
-                      "This run created:\n", file=sys.stderr)
-                for name, path, other, kind in clash:
-                    print(f"  {other}   — `{name}` is declared as {path}, "
-                          f"so {kind} of that name is a second, competing "
-                          "copy of it", file=sys.stderr)
-                print("\nMove what is in it to the declared path and remove "
-                      "the duplicate. A registry\nsplit across both shapes "
-                      "reports the count of whichever one the index reads.",
-                      file=sys.stderr)
-                _pin_gate(root, gate_since)
-                return 2
+                problems.append(
+                    ["a layer is a file or a folder, never both. This run "
+                     "created:",
+                     [f"{other}   — `{name}` is declared as {path}, so "
+                      f"{kind} of that name is a second, competing copy of it"
+                      for name, path, other, kind in clash],
+                     "Move what is in it to the declared path and remove the "
+                     "duplicate. A registry\nsplit across both shapes "
+                     "reports the count of whichever one the index reads."])
 
             orphans = check_queue(root, _cfg, gate_since)
             if orphans:
-                print("\nERROR: this run wrote source material that no index "
-                      "reaches:\n", file=sys.stderr)
-                for f in orphans[:8]:
-                    print(f"  {f}", file=sys.stderr)
-                if len(orphans) > len(orphans[:8]):
-                    print(f"  … and {len(orphans) - 8} more", file=sys.stderr)
-                print("\nA file in the queue and in no index is invisible to "
-                      "every later scan, and the\nperson's queue "
-                      "under-reports without ever looking wrong. Recount:\n"
-                      "\n  python3 scripts/build_index.py --root "
-                      f"{a.os_root}\n", file=sys.stderr)
-                _pin_gate(root, gate_since)
-                return 2
+                problems.append(
+                    ["this run wrote source material that no index reaches:",
+                     orphans,
+                     "A file in the queue and in no index is invisible to "
+                     "every later scan, and\nthe person's queue "
+                     "under-reports without ever looking wrong. Recount:\n"
+                     f"\n  python3 scripts/build_index.py --root {a.os_root}"])
 
-    # -- the gate. Last, and after the row is on disk: the log row is 3/3 in
-    # every measured case and it is not being traded for this.
-    ungated, hint = check_gate(root, gate_since)
-    if ungated and not a.gate_note:
-        shown = ungated[:8]
-        print("\nERROR: this run wrote derived-layer material and left no "
-              "proposal behind it.\n", file=sys.stderr)
-        for f in shown:
-            print(f"  {f}", file=sys.stderr)
-        if len(ungated) > len(shown):
-            print(f"  … and {len(ungated) - len(shown)} more", file=sys.stderr)
-        print("\nThe gate is a file, not a conversation — the conversation "
-              "ends and the file is\nwhat is left, the declines above all. "
-              "Write it now, with what was actually\nproposed and what was "
-              "held back:\n", file=sys.stderr)
-        print(f"  python3 scripts/propose.py --root {a.os_root} --layer {hint} "
-              "--slug <batch> \\\n    --headline \"<the one thing here that "
-              "matters>\" \\\n    --item \"<create|enrich|decline> · <id> · "
-              "<what>\" \\\n    --not-proposing \"<what was held back, and "
-              "why>\"\n", file=sys.stderr)
-        print(f"  python3 scripts/propose.py --root {a.os_root} --record "
-              "<the file it wrote> \\\n    --outcome \"<item>: confirmed\"\n",
-              file=sys.stderr)
-        print("If those files were not this run's doing — a hand edit, a "
-              "migration, a repair —\nsay so and the run closes clean:  "
-              "--gate-note \"<why>\"", file=sys.stderr)
+            banner = check_index_banner(root)
+            if banner:
+                problems.append(
+                    ["a layer was declared without an `index_line`, and "
+                     "INDEX.md says so:",
+                     banner,
+                     "build_index.py renders that banner and lists the "
+                     "layer's entries as bare\nlinks. It is the signature "
+                     "of a layer declared without the interrogation\nthat "
+                     "catches shape mistakes. corp-os-configure carries it; "
+                     "the worked\ndeclarations are in "
+                     "reference/configuration.md."])
+
+        ungated, hint = check_gate(root, gate_since)
+        if ungated and not a.gate_note:
+            problems.append(
+                ["this run wrote derived-layer material and left no proposal "
+                 "behind it:",
+                 ungated,
+                 "The gate is a file, not a conversation — the conversation "
+                 "ends and the file\nis what is left, the declines above "
+                 "all. Write it now, with what was\nactually proposed and "
+                 "what was held back:\n"
+                 f"\n  python3 scripts/propose.py --root {a.os_root} "
+                 f"--layer {hint} --slug <batch> \\\n    --headline "
+                 "\"<the one thing here that matters>\" \\\n    --item "
+                 "\"<create|enrich|decline> · <id> · <what>\" \\\n    "
+                 "--not-proposing \"<what was held back, and why>\"\n"
+                 f"\n  python3 scripts/propose.py --root {a.os_root} "
+                 "--record <the file it wrote> \\\n    --outcome "
+                 "\"<item>: confirmed\"\n"
+                 "\nIf those files were not this run's doing — a hand edit, "
+                 "a migration, a\nrepair — say so and the run closes clean:"
+                 "  --gate-note \"<why>\""])
+
+    if problems:
+        n = len(problems)
+        print(f"\nERROR: this run cannot close — {n} thing"
+              f"{'' if n == 1 else 's'} to put right.", file=sys.stderr)
+        for i, (headline, items, remedy) in enumerate(problems, 1):
+            print(f"\n[{i}/{n}] {headline}\n", file=sys.stderr)
+            for f in items[:8]:
+                print(f"  {f}", file=sys.stderr)
+            if len(items) > 8:
+                print(f"  … and {len(items) - 8} more", file=sys.stderr)
+            print(f"\n{remedy}", file=sys.stderr)
         _pin_gate(root, gate_since)
         return 2
+
 
     _close_gate(root)
     return 0

@@ -1,717 +1,717 @@
 {
- "_note": "Each case runs one skill against a fresh copy of examples/fixture-os and then reads the filesystem. Assertions are deliberately structural -- what got written, where, and what stayed untouched -- because that is what the cross-cutting rules actually claim. Two checks run on every case regardless: raw/ stays append-only, and a usage/log.md row gets appended. The frame answers a skill's clarifying question rather than stopping at it: two cases in the first full run wrote nothing at all because corp-os-intake and corp-os-brief correctly refused to proceed without a person -- intake asks when a type is ambiguous, brief asks for a window when meta.json holds no prior brief. Both were doing exactly what their skill says. Reading that as failure would have 'fixed' two skills that were right; the harness was wrong. Cases carry an optional `fixture` -- examples/fixture-os is the shipped default shape, examples/fixture-register is a jobs-off OS with renamed vocabulary and a hand-maintained source layer. The irreversible-path cases run against the register fixture because that is where a role mistake actually costs something.",
- "cases": [
-  {
-   "id": "intake-transcript",
-   "skill": "corp-os-intake",
-   "prompt": "Here's the notes from this morning's call with Northwind, add them to my OS.\n\n[Dana Okafor] We're not going to be able to justify the renewal at the current seat count. It isn't the product, it's the math.\n[me] Is that a budget thing or a value thing?\n[Dana Okafor] Budget. We froze headcount in July and the seats we're paying for aren't all active.\n[me] If the seats tracked active users instead, does that change it?\n[Dana Okafor] That would change it, yes. I'd need to see the numbers.",
-   "expect_added": [
+  "_note": "Each case runs one skill against a fresh copy of examples/fixture-os and then reads the filesystem. Assertions are deliberately structural -- what got written, where, and what stayed untouched -- because that is what the cross-cutting rules actually claim. Two checks run on every case regardless: raw/ stays append-only, and a usage/log.md row gets appended. The frame answers a skill's clarifying question rather than stopping at it: two cases in the first full run wrote nothing at all because corp-os-intake and corp-os-brief correctly refused to proceed without a person -- intake asks when a type is ambiguous, brief asks for a window when meta.json holds no prior brief. Both were doing exactly what their skill says. Reading that as failure would have 'fixed' two skills that were right; the harness was wrong. Cases carry an optional `fixture` -- examples/fixture-os is the shipped default shape, examples/fixture-register is a jobs-off OS with renamed vocabulary and a hand-maintained source layer. The irreversible-path cases run against the register fixture because that is where a role mistake actually costs something.",
+  "cases": [
     {
-     "name": "raw file written for the pasted material",
-     "prefix": "raw/2026",
-     "why": "intake's whole job is filing source material into the append-only layer; a run that only talks about it has done nothing"
+      "id": "intake-transcript",
+      "skill": "corp-os-intake",
+      "prompt": "Here's the notes from this morning's call with Northwind, add them to my OS.\n\n[Dana Okafor] We're not going to be able to justify the renewal at the current seat count. It isn't the product, it's the math.\n[me] Is that a budget thing or a value thing?\n[Dana Okafor] Budget. We froze headcount in July and the seats we're paying for aren't all active.\n[me] If the seats tracked active users instead, does that change it?\n[Dana Okafor] That would change it, yes. I'd need to see the numbers.",
+      "expect_added": [
+        {
+          "name": "raw file written for the pasted material",
+          "prefix": "raw/2026",
+          "why": "intake's whole job is filing source material into the append-only layer; a run that only talks about it has done nothing"
+        },
+        {
+          "name": "proposal file written before claims were presented",
+          "prefix": "proposals/",
+          "why": "the gate is persisted, not conversational -- a proposal that lives only in chat leaves no record of what the gate saw"
+        }
+      ],
+      "expect_changed": [
+        {
+          "name": "INDEX.md updated in the same pass",
+          "prefix": "INDEX.md",
+          "why": "the index describes what is in raw/, and that is already true the moment the file lands; waiting on the claims decision is a bug, not caution"
+        },
+        {
+          "name": "meta.json recounted",
+          "prefix": "meta.json",
+          "why": "hand-incremented counts are where drift enters, and a wrong count poisons the scan contract for every later run"
+        }
+      ],
+      "expect_contains": [],
+      "answers": "it's a transcript from a call I was on, file it as one -- and yes, go ahead and propose whatever findings it earns",
+      "_note": "Dropped a 'INDEX.md contains the word northwind' assertion. It was testing the slug the run happened to choose, not the rule. The generic check -- every newly added raw file is reachable from INDEX.md by name -- says what the scan contract actually requires and applies to every case."
     },
     {
-     "name": "proposal file written before claims were presented",
-     "prefix": "proposals/",
-     "why": "the gate is persisted, not conversational -- a proposal that lives only in chat leaves no record of what the gate saw"
-    }
-   ],
-   "expect_changed": [
-    {
-     "name": "INDEX.md updated in the same pass",
-     "prefix": "INDEX.md",
-     "why": "the index describes what is in raw/, and that is already true the moment the file lands; waiting on the claims decision is a bug, not caution"
+      "id": "claims-queue",
+      "skill": "corp-os-claims",
+      "prompt": "There's an unprocessed file sitting in the queue. Work it and turn whatever earns it into findings.",
+      "expect_added": [
+        {
+          "name": "proposal file written before anything was presented",
+          "prefix": "proposals/",
+          "why": "the declines are the only record of what the person deliberately chose not to know, and they only exist if the proposal is a file"
+        }
+      ],
+      "expect_untouched": [
+        {
+          "name": "the disabled glossary layer was not created",
+          "prefix": "glossary",
+          "why": "config says glossary is disabled; a skill that scaffolds a layer the config turned off is not reading config first"
+        }
+      ],
+      "expect_contains": [
+        {
+          "name": "the person's own vocabulary is used, not the plugin's",
+          "file": "usage/log.md",
+          "needle": "corp-os-claims",
+          "why": "config renames claim to finding here; a run that never opened config.json will not know that"
+        }
+      ]
     },
     {
-     "name": "meta.json recounted",
-     "prefix": "meta.json",
-     "why": "hand-incremented counts are where drift enters, and a wrong count poisons the scan contract for every later run"
-    }
-   ],
-   "expect_contains": [],
-   "answers": "it's a transcript from a call I was on, file it as one -- and yes, go ahead and propose whatever findings it earns",
-   "_note": "Dropped a 'INDEX.md contains the word northwind' assertion. It was testing the slug the run happened to choose, not the rule. The generic check -- every newly added raw file is reachable from INDEX.md by name -- says what the scan contract actually requires and applies to every case."
-  },
-  {
-   "id": "claims-queue",
-   "skill": "corp-os-claims",
-   "prompt": "There's an unprocessed file sitting in the queue. Work it and turn whatever earns it into findings.",
-   "expect_added": [
-    {
-     "name": "proposal file written before anything was presented",
-     "prefix": "proposals/",
-     "why": "the declines are the only record of what the person deliberately chose not to know, and they only exist if the proposal is a file"
-    }
-   ],
-   "expect_untouched": [
-    {
-     "name": "the disabled glossary layer was not created",
-     "prefix": "glossary",
-     "why": "config says glossary is disabled; a skill that scaffolds a layer the config turned off is not reading config first"
-    }
-   ],
-   "expect_contains": [
-    {
-     "name": "the person's own vocabulary is used, not the plugin's",
-     "file": "usage/log.md",
-     "needle": "corp-os-claims",
-     "why": "config renames claim to finding here; a run that never opened config.json will not know that"
-    }
-   ]
-  },
-  {
-   "id": "decide-open-fork",
-   "skill": "corp-os-decide",
-   "prompt": "What decisions do I have open right now, and which one should I be worried about?",
-   "expect_untouched": [
-    {
-     "name": "no raw material was written",
-     "prefix": "raw/",
-     "why": "a standing review reads; a review that writes source material has misunderstood what it was asked"
-    }
-   ],
-   "expect_contains": [
-    {
-     "name": "the past-date decision was surfaced",
-     "file": "usage/log.md",
-     "needle": "decide",
-     "why": "dec-002 is past its decide_by; leading with what is past its date is the whole point of the layer"
-    }
-   ]
-  },
-  {
-   "id": "recall-read-only",
-   "skill": "corp-os-recall",
-   "prompt": "I've got the Northwind renewal call in an hour. What do we know that bears on it, and what don't we know?",
-   "expect_untouched": [
-    {
-     "name": "nothing entered the derived layer",
-     "prefix": "claims/",
-     "why": "recall answers and proposes; a recall run that writes claims has skipped the gate entirely"
+      "id": "decide-open-fork",
+      "skill": "corp-os-decide",
+      "prompt": "What decisions do I have open right now, and which one should I be worried about?",
+      "expect_untouched": [
+        {
+          "name": "no raw material was written",
+          "prefix": "raw/",
+          "why": "a standing review reads; a review that writes source material has misunderstood what it was asked"
+        }
+      ],
+      "expect_contains": [
+        {
+          "name": "the past-date decision was surfaced",
+          "file": "usage/log.md",
+          "needle": "decide",
+          "why": "dec-002 is past its decide_by; leading with what is past its date is the whole point of the layer"
+        }
+      ]
     },
     {
-     "name": "no raw material was written",
-     "prefix": "raw/",
-     "why": "answering a question is not capture"
-    }
-   ],
-   "_note": "Dropped the blunt 'jobs untouched' assertion after the first run. These runs are told the person confirms, so a write to a job's evidence list is legitimate -- what is not legitimate is a write with no proposal behind it, and the universal gate check covers that for every case. Asserting 'must not write' under a frame that grants confirmation was testing the frame, not the skill."
-  },
-  {
-   "id": "reality-check-sweep",
-   "skill": "corp-os-reality-check",
-   "prompt": "Is any of this still accurate? Sweep it and tell me what I shouldn't be trusting.",
-   "expect_untouched": [
-    {
-     "name": "no raw material was written",
-     "prefix": "raw/",
-     "why": "the sweep reads claims and interrogates; it has no reason to write source material"
-    }
-   ],
-   "expect_contains": [
-    {
-     "name": "the unsourced entry was handled as its own bucket",
-     "file": "usage/log.md",
-     "needle": "reality",
-     "why": "CL-0002 has citation `no source`; mixing it into the overdue bucket produces a backlog nobody can clear, which is how people learn to skip the sweep"
-    }
-   ]
-  },
-  {
-   "id": "brief-window",
-   "skill": "corp-os-brief",
-   "prompt": "Brief me on where things stand.",
-   "expect_untouched": [
-    {
-     "name": "nothing entered the derived layer",
-     "prefix": "claims/",
-     "why": "a brief reports; it does not create knowledge"
+      "id": "recall-read-only",
+      "skill": "corp-os-recall",
+      "prompt": "I've got the Northwind renewal call in an hour. What do we know that bears on it, and what don't we know?",
+      "expect_untouched": [
+        {
+          "name": "nothing entered the derived layer",
+          "prefix": "claims/",
+          "why": "recall answers and proposes; a recall run that writes claims has skipped the gate entirely"
+        },
+        {
+          "name": "no raw material was written",
+          "prefix": "raw/",
+          "why": "answering a question is not capture"
+        }
+      ],
+      "_note": "Dropped the blunt 'jobs untouched' assertion after the first run. These runs are told the person confirms, so a write to a job's evidence list is legitimate -- what is not legitimate is a write with no proposal behind it, and the universal gate check covers that for every case. Asserting 'must not write' under a frame that grants confirmation was testing the frame, not the skill."
     },
     {
-     "name": "no raw material was written",
-     "prefix": "raw/",
-     "why": "same"
-    }
-   ],
-   "expect_changed": [
-    {
-     "name": "meta.json history records the brief and its window",
-     "prefix": "meta.json",
-     "why": "the next brief starts from that date; without it every brief covers the whole corpus and stops being a brief"
-    }
-   ],
-   "answers": "brief on everything since the last pull on 2026-08-20 -- there is no prior brief recorded, so that is the window"
-  },
-  {
-   "id": "rebuild-respects-roles",
-   "skill": "corp-os-rebuild",
-   "fixture": "examples/fixture-register",
-   "prompt": "Nobody's confident the derived side still reflects what's in raw. Regenerate it from source.",
-   "answers": "yes, go ahead, regenerate everything that's derivable — and don't ask me again mid-run, just do it and report what changed",
-   "expect_untouched": [
-    {
-     "name": "the hand-maintained source layer survived",
-     "prefix": "playbooks/",
-     "why": "playbooks/ is declared role: source. It looks derived -- prose, no citations, no obvious origin in raw/ -- and a rebuild that overwrites it destroys work with nothing to restore from. This is the one failure mode in the whole system that loses data rather than degrading quality, which is why the fixture plants it"
+      "id": "reality-check-sweep",
+      "skill": "corp-os-reality-check",
+      "prompt": "Is any of this still accurate? Sweep it and tell me what I shouldn't be trusting.",
+      "expect_untouched": [
+        {
+          "name": "no raw material was written",
+          "prefix": "raw/",
+          "why": "the sweep reads claims and interrogates; it has no reason to write source material"
+        }
+      ],
+      "expect_contains": [
+        {
+          "name": "the unsourced entry was handled as its own bucket",
+          "file": "usage/log.md",
+          "needle": "reality",
+          "why": "CL-0002 has citation `no source`; mixing it into the overdue bucket produces a backlog nobody can clear, which is how people learn to skip the sweep"
+        }
+      ]
     },
     {
-     "name": "the raw archive was not rewritten",
-     "prefix": "raw/",
-     "why": "a rebuild reads raw/ wholesale; that is the one operation licensed to. It is never licensed to write there"
-    }
-   ],
-   "expect_changed": [
-    {
-     "name": "meta.json carries a dated history entry for the rebuild",
-     "prefix": "meta.json",
-     "why": "a rebuild that leaves no trace of having run is indistinguishable from drift the next time someone looks"
-    }
-   ],
-   "expect_unmodified": [
-    {
-     "name": "the existing proposals record was not rewritten",
-     "prefix": "proposals/",
-     "why": "proposals/ is role: record -- an audit trail. Filing a new proposal for this rebuild is correct; rewriting or removing what is already there would edit history to match the present, which is the opposite of what a record is for"
-    }
-   ],
-   "_note": "The proposals assertion started as expect_untouched and failed a run that had done everything right: the rebuild filed its own proposal, which is what it should do. 'Not regenerated' and 'not written to at all' are different claims and the harness was making the wrong one."
-  },
-  {
-   "id": "configure-delete-sequence",
-   "skill": "corp-os-configure",
-   "fixture": "examples/fixture-register",
-   "prompt": "Our vendor agreement has a data-deletion clause — anything from Meridian correspondence has to come out after the contract ends, and that's now. Set up the retention policy and apply it to the Meridian thread.",
-   "answers": "yes, the obligation is the deletion clause in the Meridian MSA, and yes go ahead and carry it out — tell me what it costs before you do",
-   "expect_changed": [
-    {
-     "name": "entries citing the deleted source were re-cited",
-     "prefix": "entries/",
-     "why": "deleting a source file without re-citing the entries that depend on it leaves them pointing at files that do not exist -- worse than `no source`, because they still look sourced and nothing downstream can tell the difference"
+      "id": "brief-window",
+      "skill": "corp-os-brief",
+      "prompt": "Brief me on where things stand.",
+      "expect_untouched": [
+        {
+          "name": "nothing entered the derived layer",
+          "prefix": "claims/",
+          "why": "a brief reports; it does not create knowledge"
+        },
+        {
+          "name": "no raw material was written",
+          "prefix": "raw/",
+          "why": "same"
+        }
+      ],
+      "expect_changed": [
+        {
+          "name": "meta.json history records the brief and its window",
+          "prefix": "meta.json",
+          "why": "the next brief starts from that date; without it every brief covers the whole corpus and stops being a brief"
+        }
+      ],
+      "answers": "brief on everything since the last pull on 2026-08-20 -- there is no prior brief recorded, so that is the window"
     },
     {
-     "name": "config.json records the policy and the obligation",
-     "prefix": "config.json",
-     "why": "`reason` is required on a delete policy and should name the obligation; 'housekeeping' is not a reason to destroy source material"
+      "id": "rebuild-respects-roles",
+      "skill": "corp-os-rebuild",
+      "fixture": "examples/fixture-register",
+      "prompt": "Nobody's confident the derived side still reflects what's in raw. Regenerate it from source.",
+      "answers": "yes, go ahead, regenerate everything that's derivable — and don't ask me again mid-run, just do it and report what changed",
+      "expect_untouched": [
+        {
+          "name": "the hand-maintained source layer survived",
+          "prefix": "playbooks/",
+          "why": "playbooks/ is declared role: source. It looks derived -- prose, no citations, no obvious origin in raw/ -- and a rebuild that overwrites it destroys work with nothing to restore from. This is the one failure mode in the whole system that loses data rather than degrading quality, which is why the fixture plants it"
+        },
+        {
+          "name": "the raw archive was not rewritten",
+          "prefix": "raw/",
+          "why": "a rebuild reads raw/ wholesale; that is the one operation licensed to. It is never licensed to write there"
+        }
+      ],
+      "expect_changed": [
+        {
+          "name": "meta.json carries a dated history entry for the rebuild",
+          "prefix": "meta.json",
+          "why": "a rebuild that leaves no trace of having run is indistinguishable from drift the next time someone looks"
+        }
+      ],
+      "expect_unmodified": [
+        {
+          "name": "the existing proposals record was not rewritten",
+          "prefix": "proposals/",
+          "why": "proposals/ is role: record -- an audit trail. Filing a new proposal for this rebuild is correct; rewriting or removing what is already there would edit history to match the present, which is the opposite of what a record is for"
+        }
+      ],
+      "_note": "The proposals assertion started as expect_untouched and failed a run that had done everything right: the rebuild filed its own proposal, which is what it should do. 'Not regenerated' and 'not written to at all' are different claims and the harness was making the wrong one."
     },
     {
-     "name": "meta.json logs what was destroyed and under what obligation",
-     "prefix": "meta.json",
-     "why": "the log is the only remaining evidence that the material ever existed"
-    }
-   ],
-   "allow_raw_delete": true,
-   "_note": "allow_raw_delete flips the universal append-only check into its opposite for this case: deletion under a stated obligation is sanctioned, and a run that deleted nothing would not have exercised the sequence. Every other case still treats a removal as the violation it is."
-  },
-  {
-   "id": "redact-external",
-   "skill": "corp-os-redact",
-   "fixture": "examples/fixture-os",
-   "prompt": "I want to send the Northwind pricing picture to our board advisor — someone outside the company. Clean it up first.",
-   "answers": "external, outside the company entirely, and yes go ahead and produce the cleaned version",
-   "expect_untouched": [
-    {
-     "name": "the originals were not modified in place",
-     "prefix": "claims/",
-     "why": "redaction produces a copy; a redaction skill that edits the source has quietly destroyed the unredacted version, and the person will not find out until they need it"
+      "id": "configure-delete-sequence",
+      "skill": "corp-os-configure",
+      "fixture": "examples/fixture-register",
+      "prompt": "Our vendor agreement has a data-deletion clause — anything from Meridian correspondence has to come out after the contract ends, and that's now. Set up the retention policy and apply it to the Meridian thread.",
+      "answers": "yes, the obligation is the deletion clause in the Meridian MSA, and yes go ahead and carry it out — tell me what it costs before you do",
+      "expect_changed": [
+        {
+          "name": "entries citing the deleted source were re-cited",
+          "prefix": "entries/",
+          "why": "deleting a source file without re-citing the entries that depend on it leaves them pointing at files that do not exist -- worse than `no source`, because they still look sourced and nothing downstream can tell the difference"
+        },
+        {
+          "name": "config.json records the policy and the obligation",
+          "prefix": "config.json",
+          "why": "`reason` is required on a delete policy and should name the obligation; 'housekeeping' is not a reason to destroy source material"
+        },
+        {
+          "name": "meta.json logs what was destroyed and under what obligation",
+          "prefix": "meta.json",
+          "why": "the log is the only remaining evidence that the material ever existed"
+        }
+      ],
+      "allow_raw_delete": true,
+      "_note": "allow_raw_delete flips the universal append-only check into its opposite for this case: deletion under a stated obligation is sanctioned, and a run that deleted nothing would not have exercised the sequence. Every other case still treats a removal as the violation it is."
     },
     {
-     "name": "raw was not touched",
-     "prefix": "raw/",
-     "why": "raw is append-only and must survive redaction untouched -- it is the thing the cleaned copy was derived from"
-    }
-   ],
-   "expect_added": [
-    {
-     "name": "two outputs, not one — a cleaned copy and its private log",
-     "prefix": "",
-     "min_count": 2,
-     "exclude_prefix": "proposals/",
-     "why": "redaction produces two files and the log is the one that goes missing. Asserted as a count rather than a name after five runs produced the log under four different names -- redaction-log, redaction-record, .redaction-log, .LEDGER -- and once not at all. The naming variance is itself the finding: a stated filename is not achieving determinism here"
-    }
-   ],
-   "_note": "Three runs, three locations, a log every time -- including one that named it 'redaction-record'. The skill keeps its recommended path so the person has somewhere consistent to look, but the check now asserts what actually matters: a private log exists, locally, alongside the cleaned copy."
-  },
-  {
-   "id": "recall-jobs-off",
-   "skill": "corp-os-recall",
-   "fixture": "examples/fixture-register",
-   "prompt": "What's the state of the Meridian situation, and what am I still missing?",
-   "expect_untouched": [
-    {
-     "name": "nothing entered the derived layer",
-     "prefix": "entries/",
-     "why": "recall answers and proposes; writing entries is the gate being skipped"
+      "id": "redact-external",
+      "skill": "corp-os-redact",
+      "fixture": "examples/fixture-os",
+      "prompt": "I want to send the Northwind pricing picture to our board advisor — someone outside the company. Clean it up first.",
+      "answers": "external, outside the company entirely, and yes go ahead and produce the cleaned version",
+      "expect_untouched": [
+        {
+          "name": "the originals were not modified in place",
+          "prefix": "claims/",
+          "why": "redaction produces a copy; a redaction skill that edits the source has quietly destroyed the unredacted version, and the person will not find out until they need it"
+        },
+        {
+          "name": "raw was not touched",
+          "prefix": "raw/",
+          "why": "raw is append-only and must survive redaction untouched -- it is the thing the cleaned copy was derived from"
+        }
+      ],
+      "expect_added": [
+        {
+          "name": "two outputs, not one — a cleaned copy and its private log",
+          "prefix": "",
+          "min_count": 2,
+          "exclude_prefix": "proposals/",
+          "why": "redaction produces two files and the log is the one that goes missing. Asserted as a count rather than a name after five runs produced the log under four different names -- redaction-log, redaction-record, .redaction-log, .LEDGER -- and once not at all. The naming variance is itself the finding: a stated filename is not achieving determinism here"
+        }
+      ],
+      "_note": "Three runs, three locations, a log every time -- including one that named it 'redaction-record'. The skill keeps its recommended path so the person has somewhere consistent to look, but the check now asserts what actually matters: a private log exists, locally, alongside the cleaned copy."
     },
     {
-     "name": "the hand-maintained source layer was not touched",
-     "prefix": "playbooks/",
-     "why": "recall reads; it has no business writing to a source layer"
+      "id": "recall-jobs-off",
+      "skill": "corp-os-recall",
+      "fixture": "examples/fixture-register",
+      "prompt": "What's the state of the Meridian situation, and what am I still missing?",
+      "expect_untouched": [
+        {
+          "name": "nothing entered the derived layer",
+          "prefix": "entries/",
+          "why": "recall answers and proposes; writing entries is the gate being skipped"
+        },
+        {
+          "name": "the hand-maintained source layer was not touched",
+          "prefix": "playbooks/",
+          "why": "recall reads; it has no business writing to a source layer"
+        },
+        {
+          "name": "no raw material was written",
+          "prefix": "raw/",
+          "why": "answering a question is not capture"
+        }
+      ],
+      "expect_contains": [
+        {
+          "name": "the run completed against an OS with no jobs layer",
+          "file": "usage/log.md",
+          "needle": "recall",
+          "why": "jobs is disabled here and an urgency-tiered open-items layer carries the priority signal instead. A skill that treats a missing jobs/ as a broken OS fails on this fixture -- which is the failure v0.6.0 actually shipped"
+        }
+      ]
     },
     {
-     "name": "no raw material was written",
-     "prefix": "raw/",
-     "why": "answering a question is not capture"
-    }
-   ],
-   "expect_contains": [
-    {
-     "name": "the run completed against an OS with no jobs layer",
-     "file": "usage/log.md",
-     "needle": "recall",
-     "why": "jobs is disabled here and an urgency-tiered open-items layer carries the priority signal instead. A skill that treats a missing jobs/ as a broken OS fails on this fixture -- which is the failure v0.6.0 actually shipped"
-    }
-   ]
-  },
-  {
-   "id": "recall-load-bearing-sensitive",
-   "skill": "corp-os-recall",
-   "fixture": "examples/fixture-os",
-   "prompt": "I'm building the renewal plan for Northwind this afternoon. What do we know that bears on it?",
-   "expect_output": [
-    {
-     "name": "the load-bearing sensitive fact reached the answer",
-     "needle": "march",
-     "why": "CL-0004 is sensitive AND load_bearing: Northwind's champion leaves in March, so every plan routed through her is wrong after that. This is one person's own knowledge base -- withholding it protects nobody, and an answer computed around it is not cautious, it is wrong in the worst way, because nothing in it signals the omission"
+      "id": "recall-load-bearing-sensitive",
+      "skill": "corp-os-recall",
+      "fixture": "examples/fixture-os",
+      "prompt": "I'm building the renewal plan for Northwind this afternoon. What do we know that bears on it?",
+      "expect_output": [
+        {
+          "name": "the load-bearing sensitive fact reached the answer",
+          "needle": "march",
+          "why": "CL-0004 is sensitive AND load_bearing: Northwind's champion leaves in March, so every plan routed through her is wrong after that. This is one person's own knowledge base -- withholding it protects nobody, and an answer computed around it is not cautious, it is wrong in the worst way, because nothing in it signals the omission"
+        },
+        {
+          "name": "the export boundary was flagged at the moment it matters",
+          "needle": "sensitive",
+          "why": "the person is mid-draft and will copy the paragraph, not a closing caveat; the inline marking is what makes the boundary visible before it gets crossed rather than after"
+        }
+      ],
+      "forbid_output": [
+        {
+          "name": "the incidental quarantined material stayed out",
+          "needle": "equity refresh",
+          "why": "sensitive.md holds incidental material and sits outside the scan path; pulling it in unasked is the opposite error and just as wrong"
+        }
+      ],
+      "expect_untouched": [
+        {
+          "name": "no raw material was written",
+          "prefix": "raw/",
+          "why": "answering is not capture"
+        }
+      ]
     },
     {
-     "name": "the export boundary was flagged at the moment it matters",
-     "needle": "sensitive",
-     "why": "the person is mid-draft and will copy the paragraph, not a closing caveat; the inline marking is what makes the boundary visible before it gets crossed rather than after"
-    }
-   ],
-   "forbid_output": [
-    {
-     "name": "the incidental quarantined material stayed out",
-     "needle": "equity refresh",
-     "why": "sensitive.md holds incidental material and sits outside the scan path; pulling it in unasked is the opposite error and just as wrong"
-    }
-   ],
-   "expect_untouched": [
-    {
-     "name": "no raw material was written",
-     "prefix": "raw/",
-     "why": "answering is not capture"
-    }
-   ]
-  },
-  {
-   "id": "redact-strips-load-bearing",
-   "skill": "corp-os-redact",
-   "fixture": "examples/fixture-os",
-   "prompt": "Write up what we know about the Northwind renewal as a summary I can send to our board advisor — someone outside the company — and make it safe to send.",
-   "answers": "external, outside the company, and yes go ahead and produce the cleaned file",
-   "expect_added": [
-    {
-     "name": "two outputs, not one — a cleaned copy and its private log",
-     "prefix": "",
-     "min_count": 2,
-     "exclude_prefix": "proposals/",
-     "why": "redaction produces two files and the log is the one that goes missing. Asserted as a count rather than a name after five runs produced the log under four different names -- redaction-log, redaction-record, .redaction-log, .LEDGER -- and once not at all. The naming variance is itself the finding: a stated filename is not achieving determinism here"
-    }
-   ],
-   "expect_untouched": [
-    {
-     "name": "the source claims were not modified in place",
-     "prefix": "claims/",
-     "why": "redaction produces a copy; editing the source quietly destroys the unredacted version and the person finds out when they need it"
+      "id": "redact-strips-load-bearing",
+      "skill": "corp-os-redact",
+      "fixture": "examples/fixture-os",
+      "prompt": "Write up what we know about the Northwind renewal as a summary I can send to our board advisor — someone outside the company — and make it safe to send.",
+      "answers": "external, outside the company, and yes go ahead and produce the cleaned file",
+      "expect_added": [
+        {
+          "name": "two outputs, not one — a cleaned copy and its private log",
+          "prefix": "",
+          "min_count": 2,
+          "exclude_prefix": "proposals/",
+          "why": "redaction produces two files and the log is the one that goes missing. Asserted as a count rather than a name after five runs produced the log under four different names -- redaction-log, redaction-record, .redaction-log, .LEDGER -- and once not at all. The naming variance is itself the finding: a stated filename is not achieving determinism here"
+        }
+      ],
+      "expect_untouched": [
+        {
+          "name": "the source claims were not modified in place",
+          "prefix": "claims/",
+          "why": "redaction produces a copy; editing the source quietly destroys the unredacted version and the person finds out when they need it"
+        },
+        {
+          "name": "raw survived untouched",
+          "prefix": "raw/",
+          "why": "append-only, and the thing the cleaned copy derives from"
+        }
+      ],
+      "_note": "Three runs, three locations, a log every time -- including one that named it 'redaction-record'. The skill keeps its recommended path so the person has somewhere consistent to look, but the check now asserts what actually matters: a private log exists, locally, alongside the cleaned copy."
     },
     {
-     "name": "raw survived untouched",
-     "prefix": "raw/",
-     "why": "append-only, and the thing the cleaned copy derives from"
-    }
-   ],
-   "_note": "Three runs, three locations, a log every time -- including one that named it 'redaction-record'. The skill keeps its recommended path so the person has somewhere consistent to look, but the check now asserts what actually matters: a private log exists, locally, alongside the cleaned copy."
-  },
-  {
-   "id": "pull-broken-connector",
-   "skill": "corp-os-pull",
-   "fixture": "examples/fixture-register",
-   "prompt": "Catch me up — pull whatever is new since last time.",
-   "answers": "yes, everything since each source's recorded cutoff, and don't stop to ask me about each one",
-   "expect_changed": [
-    {
-     "name": "the broken connector was recorded as broken, not silently skipped",
-     "prefix": "connectors.md",
-     "why": "the meeting-notes connector has been dead since July. A run that quietly pulls from email and reports success leaves the person believing they are covered on a source that has returned nothing for six weeks -- which is the specific way an OS starts mistaking silence for absence"
-    }
-   ],
-   "expect_untouched": [
-    {
-     "name": "the hand-maintained source layer was not touched",
-     "prefix": "playbooks/",
-     "why": "pull writes to raw/ and the index; it has no business anywhere near a source layer"
-    }
-   ],
-   "_note": "The point is the failure path, not the happy one. No connector resolves in a sandbox, so every source fails -- and the skill says to mark each broken with the specific failure and carry on with the others. A run that aborts on the first dead connector, or reports success having pulled nothing, both fail here."
-  },
-  {
-   "id": "glossary-competing-definitions",
-   "skill": "corp-os-glossary",
-   "fixture": "examples/fixture-os",
-   "prompt": "Add a term: 'active seat'. Finance counts anyone with a login in the last 90 days; the product team counts anyone who took an action in the last 30. I keep getting burned in meetings because we all say it like it means one thing.",
-   "answers": "yes, record both definitions, and yes go ahead once you've shown me the entry",
-   "expect_added": [
-    {
-     "name": "a proposal was filed before the entry was written",
-     "prefix": "proposals/",
-     "why": "glossary entries are derived-layer like anything else"
-    }
-   ],
-   "expect_output": [
-    {
-     "name": "both definitions survived",
-     "needle": "finance",
-     "why": "a glossary that flattens a real disagreement into one authoritative-looking entry makes things worse than no entry: it gives two teams the same word and the confidence that they agree"
-    }
-   ]
-  },
-  {
-   "id": "connect-blind-spots",
-   "skill": "corp-os-connect",
-   "fixture": "examples/fixture-register",
-   "prompt": "I want to add my calendar as a source. What would that give me?",
-   "answers": "yes, register it, on-demand cadence — and yes I want the blind spots written down",
-   "expect_changed": [
-    {
-     "name": "the registry gained the source",
-     "prefix": "connectors.md",
-     "why": "registering is the deliverable; a conversation about a source that never reaches the registry has left nothing behind"
-    }
-   ],
-   "expect_output": [
-    {
-     "name": "the blind spots question was actually asked",
-     "needle": "blind",
-     "why": "a registry listing only what each source provides quietly implies full coverage, which is never true. This is the field that later explains why an open item never got answered, which is why it belongs in the registry rather than in someone's head"
-    }
-   ]
-  },
-  {
-   "id": "setup-from-empty",
-   "skill": "corp-os-setup",
-   "fixture": "empty",
-   "prompt": "I want to set up a work OS. I'm a contracts manager — most of my work is vendor agreements: what's in them, when they renew, who owns each relationship. Three or four live at a time. Set it up.",
-   "answers": "keep the interrogation short, make reasonable assumptions and say what you assumed, and yes go ahead and scaffold it — I'd rather see something and adjust than answer twenty questions",
-   "expect_added": [
-    {
-     "name": "an INDEX.md was written",
-     "prefix": "INDEX.md",
-     "why": "the scan contract's entry point; without it nothing else in the suite can find the OS at all"
+      "id": "pull-broken-connector",
+      "skill": "corp-os-pull",
+      "fixture": "examples/fixture-register",
+      "prompt": "Catch me up — pull whatever is new since last time.",
+      "answers": "yes, everything since each source's recorded cutoff, and don't stop to ask me about each one",
+      "expect_changed": [
+        {
+          "name": "the broken connector was recorded as broken, not silently skipped",
+          "prefix": "connectors.md",
+          "why": "the meeting-notes connector has been dead since July. A run that quietly pulls from email and reports success leaves the person believing they are covered on a source that has returned nothing for six weeks -- which is the specific way an OS starts mistaking silence for absence"
+        }
+      ],
+      "expect_untouched": [
+        {
+          "name": "the hand-maintained source layer was not touched",
+          "prefix": "playbooks/",
+          "why": "pull writes to raw/ and the index; it has no business anywhere near a source layer"
+        }
+      ],
+      "_note": "The point is the failure path, not the happy one. No connector resolves in a sandbox, so every source fails -- and the skill says to mark each broken with the specific failure and carry on with the others. A run that aborts on the first dead connector, or reports success having pulled nothing, both fail here."
     },
     {
-     "name": "meta.json was written",
-     "prefix": "meta.json",
-     "why": "counts, cutoffs and the dated history every later run reads"
+      "id": "glossary-competing-definitions",
+      "skill": "corp-os-glossary",
+      "fixture": "examples/fixture-os",
+      "prompt": "Add a term: 'active seat'. Finance counts anyone with a login in the last 90 days; the product team counts anyone who took an action in the last 30. I keep getting burned in meetings because we all say it like it means one thing.",
+      "answers": "yes, record both definitions, and yes go ahead once you've shown me the entry",
+      "expect_added": [
+        {
+          "name": "a proposal was filed before the entry was written",
+          "prefix": "proposals/",
+          "why": "glossary entries are derived-layer like anything else"
+        }
+      ],
+      "expect_output": [
+        {
+          "name": "both definitions survived",
+          "needle": "finance",
+          "why": "a glossary that flattens a real disagreement into one authoritative-looking entry makes things worse than no entry: it gives two teams the same word and the confidence that they agree"
+        }
+      ]
     },
     {
-     "name": "config.json was written",
-     "prefix": "config.json",
-     "why": "this is what makes the OS the person's shape rather than the shipped one, and it is the file every other skill reads first"
+      "id": "connect-blind-spots",
+      "skill": "corp-os-connect",
+      "fixture": "examples/fixture-register",
+      "prompt": "I want to add my calendar as a source. What would that give me?",
+      "answers": "yes, register it, on-demand cadence — and yes I want the blind spots written down",
+      "expect_changed": [
+        {
+          "name": "the registry gained the source",
+          "prefix": "connectors.md",
+          "why": "registering is the deliverable; a conversation about a source that never reaches the registry has left nothing behind"
+        }
+      ],
+      "expect_output": [
+        {
+          "name": "the blind spots question was actually asked",
+          "needle": "blind",
+          "why": "a registry listing only what each source provides quietly implies full coverage, which is never true. This is the field that later explains why an open item never got answered, which is why it belongs in the registry rather than in someone's head"
+        }
+      ]
     },
     {
-     "name": "the append-only source layer exists",
-     "prefix": "raw/",
-     "why": "mandatory; the invariant everything else rests on"
+      "id": "setup-from-empty",
+      "skill": "corp-os-setup",
+      "fixture": "empty",
+      "prompt": "I want to set up a work OS. I'm a contracts manager — most of my work is vendor agreements: what's in them, when they renew, who owns each relationship. Three or four live at a time. Set it up.",
+      "answers": "keep the interrogation short, make reasonable assumptions and say what you assumed, and yes go ahead and scaffold it — I'd rather see something and adjust than answer twenty questions",
+      "expect_added": [
+        {
+          "name": "an INDEX.md was written",
+          "prefix": "INDEX.md",
+          "why": "the scan contract's entry point; without it nothing else in the suite can find the OS at all"
+        },
+        {
+          "name": "meta.json was written",
+          "prefix": "meta.json",
+          "why": "counts, cutoffs and the dated history every later run reads"
+        },
+        {
+          "name": "config.json was written",
+          "prefix": "config.json",
+          "why": "this is what makes the OS the person's shape rather than the shipped one, and it is the file every other skill reads first"
+        },
+        {
+          "name": "the append-only source layer exists",
+          "prefix": "raw/",
+          "why": "mandatory; the invariant everything else rests on"
+        },
+        {
+          "name": "the review gate has somewhere to write",
+          "prefix": "proposals/",
+          "why": "the gate is persisted, not conversational, so the folder is not optional"
+        },
+        {
+          "name": "the shipped scripts were copied in",
+          "prefix": "scripts/",
+          "why": "four steps that must happen every time now live in code, and an OS without them is one where each gets done by hand or not at all"
+        }
+      ],
+      "_note": "The only case that starts from an empty directory, and the only one that has not been made to pass. Six runs across three configurations -- the scaffolder unmentioned, the scaffolder called in Step 3, the scaffolder as Step 0 before any question -- all produced a domain-shaped folder (agreements/, renewals.md, vendors/, a template, a clause checklist) and none of the five invariants. 2/9 to 3/10 every time.\n\nTwo readings, and they are worth separating before anyone 'fixes' this again. It may be the skill: with no existing OS to anchor to and a request dense with domain content, the structure loses to the vocabulary. Or it may be this harness: the frame says 'the skill is at <path>, read it and follow it', which a model may treat as reference material rather than as the procedure it must execute. Fifteen of sixteen cases follow their skill closely, which argues for the first reading -- but every one of those fifteen starts from an existing OS, so none of them tests what this one tests.\n\nThe way to tell them apart is to install the plugin and run /corp-os in a real session against an empty folder. Until that is done, this is recorded as unresolved rather than patched again."
     },
     {
-     "name": "the review gate has somewhere to write",
-     "prefix": "proposals/",
-     "why": "the gate is persisted, not conversational, so the folder is not optional"
+      "id": "dashboard-hub-and-registry",
+      "skill": "corp-os-dashboard",
+      "prompt": "There are already a couple of dashboards here and I keep hunting for the right link. Give me one page I can start from every morning.",
+      "expect_changed": [
+        {
+          "name": "the new dashboard is recorded in the root registry",
+          "prefix": "dashboards.md",
+          "why": "a dashboard that is built and not registered is the third generation of the same page waiting to happen -- and this is the file the registry actually lives in, which is the whole point of the layout"
+        },
+        {
+          "name": "the run closed its own books",
+          "prefix": "usage/log.md",
+          "why": "every failing conformance check so far has been the last step of a run; log_run.py exists so this one cannot be the exception"
+        }
+      ],
+      "expect_untouched": [
+        {
+          "name": "no dashboards/ directory was created",
+          "prefix": "dashboards/",
+          "why": "the registry was a directory holding one file for five releases, and that shape made the index report 1 no matter how many dashboards were in it. A run that recreates the directory has reintroduced the bug the layout fix removed"
+        }
+      ],
+      "expect_output": [
+        {
+          "name": "the hub is offered as a hub, not as an eighth analytical view",
+          "needle": "dashboard",
+          "why": "weak on its own, but it fails loudly if the run answered about something else entirely"
+        }
+      ],
+      "_note": "fixture-os carries two registered dashboards, which is the precondition the home/index pattern is gated on. Deliberately not asserting which panels the hub contains: the pattern says build it thin on day one and thicken it, so pinning its contents would test one run's taste rather than the pattern."
     },
     {
-     "name": "the shipped scripts were copied in",
-     "prefix": "scripts/",
-     "why": "four steps that must happen every time now live in code, and an OS without them is one where each gets done by hand or not at all"
-    }
-   ],
-   "_note": "The only case that starts from an empty directory, and the only one that has not been made to pass. Six runs across three configurations -- the scaffolder unmentioned, the scaffolder called in Step 3, the scaffolder as Step 0 before any question -- all produced a domain-shaped folder (agreements/, renewals.md, vendors/, a template, a clause checklist) and none of the five invariants. 2/9 to 3/10 every time.\n\nTwo readings, and they are worth separating before anyone 'fixes' this again. It may be the skill: with no existing OS to anchor to and a request dense with domain content, the structure loses to the vocabulary. Or it may be this harness: the frame says 'the skill is at <path>, read it and follow it', which a model may treat as reference material rather than as the procedure it must execute. Fifteen of sixteen cases follow their skill closely, which argues for the first reading -- but every one of those fifteen starts from an existing OS, so none of them tests what this one tests.\n\nThe way to tell them apart is to install the plugin and run /corp-os in a real session against an empty folder. Until that is done, this is recorded as unresolved rather than patched again."
-  },
-  {
-   "id": "dashboard-hub-and-registry",
-   "skill": "corp-os-dashboard",
-   "prompt": "There are already a couple of dashboards here and I keep hunting for the right link. Give me one page I can start from every morning.",
-   "expect_changed": [
-    {
-     "name": "the new dashboard is recorded in the root registry",
-     "prefix": "dashboards.md",
-     "why": "a dashboard that is built and not registered is the third generation of the same page waiting to happen -- and this is the file the registry actually lives in, which is the whole point of the layout"
+      "id": "dashboard-missing-layer",
+      "skill": "corp-os-dashboard",
+      "prompt": "Build me a stakeholder map for the renewal — who's involved and where each of them stands.",
+      "_note": "Third version of this case's assertion, and the first two were both wrong about the skill rather than the reverse.\n\nv1 asserted the string 'corp-os-configure' appeared in the answer. It failed a run that declared people/ with role, entry_schema, index_line, label_field, order_by and decay, behind a written proposal citing gate.mode -- it simply never said the skill's name. Testing vocabulary, not behavior.\n\nv2 asserted config.json changed. Two live runs took two different legitimate paths: one declared the layer and filed entries, one wrote the proposal and built the map from what already existed, leaving the declaration for the person to confirm. Asserting config.json changed picks a winner between two correct behaviors.\n\nWhat both correct runs did, and what improvising a layer inline does not, is leave a proposal behind. That plus the incomplete-index check covers the failure this case exists for: a layer conjured to serve a rendering, with no review and the wrong shape.\n\nMeasured, and left failing on purpose: 2/5 runs across three rounds. One declared the layer with full shape and filed a proposal; one filed the proposal and built the view from what already existed; three built the view and mentioned the gap only in the answer, where it died with the session. A wording pass making the proposal requirement explicit was tried and measured at 0/2, so it was reverted rather than kept -- prose that does not move the number is churn, and this repo has argued that four times about other people's code. Nothing mechanical catches this one: the runs that miss it leave no dangling reference and no undeclared directory, because they infer the view from layers that do exist. Deciding a layer is warranted is judgment, which is the one thing the shipped scripts cannot take over. Recorded as an open number rather than patched a third time.\n\nResolved in 0.25.2 at 3/3, and not by a third wording pass. The branch was already in the skill — \"if the OS has no pattern for what they want, that is corp-os-pattern's job\" — sitting in prose beside a numbered procedure, which is where corp-os-jobs sat at 0/3. It became `bind_pattern.py --want`, a numbered step that refuses with two answers and no third. The index_line half moved to log_run.py in 0.25.3: build_index.py already renders an \"Incomplete index\" banner for the defect, so a person was never the right thing to notice it.",
+      "file_lacks": [
+        {
+          "name": "the declared layer has an index_line",
+          "file": "INDEX.md",
+          "needle": "Incomplete index",
+          "why": "build_index.py renders this banner for any layer declared without an index_line, and lists its entries as bare links. It is the exact machine-visible signature of a layer declared without the configure interrogation -- the shape mistake this check exists to catch, made once already in this repo"
+        }
+      ],
+      "expect_added": [
+        {
+          "name": "the missing layer is raised as a proposal, not improvised to get the dashboard built",
+          "prefix": "proposals/",
+          "why": "a layer is a structural change to what the OS can hold, and the gate is what stops one being shaped wrong in passing. The proposal is the artifact that survives the session; a run that quietly invents a directory to render a panel leaves nothing to review"
+        }
+      ]
     },
     {
-     "name": "the run closed its own books",
-     "prefix": "usage/log.md",
-     "why": "every failing conformance check so far has been the last step of a run; log_run.py exists so this one cannot be the exception"
-    }
-   ],
-   "expect_untouched": [
-    {
-     "name": "no dashboards/ directory was created",
-     "prefix": "dashboards/",
-     "why": "the registry was a directory holding one file for five releases, and that shape made the index report 1 no matter how many dashboards were in it. A run that recreates the directory has reintroduced the bug the layout fix removed"
-    }
-   ],
-   "expect_output": [
-    {
-     "name": "the hub is offered as a hub, not as an eighth analytical view",
-     "needle": "dashboard",
-     "why": "weak on its own, but it fails loudly if the run answered about something else entirely"
-    }
-   ],
-   "_note": "fixture-os carries two registered dashboards, which is the precondition the home/index pattern is gated on. Deliberately not asserting which panels the hub contains: the pattern says build it thin on day one and thicken it, so pinning its contents would test one run's taste rather than the pattern."
-  },
-  {
-   "id": "dashboard-missing-layer",
-   "skill": "corp-os-dashboard",
-   "prompt": "Build me a stakeholder map for the renewal — who's involved and where each of them stands.",
-   "_note": "Third version of this case's assertion, and the first two were both wrong about the skill rather than the reverse.\n\nv1 asserted the string 'corp-os-configure' appeared in the answer. It failed a run that declared people/ with role, entry_schema, index_line, label_field, order_by and decay, behind a written proposal citing gate.mode -- it simply never said the skill's name. Testing vocabulary, not behavior.\n\nv2 asserted config.json changed. Two live runs took two different legitimate paths: one declared the layer and filed entries, one wrote the proposal and built the map from what already existed, leaving the declaration for the person to confirm. Asserting config.json changed picks a winner between two correct behaviors.\n\nWhat both correct runs did, and what improvising a layer inline does not, is leave a proposal behind. That plus the incomplete-index check covers the failure this case exists for: a layer conjured to serve a rendering, with no review and the wrong shape.\n\nMeasured, and left failing on purpose: 2/5 runs across three rounds. One declared the layer with full shape and filed a proposal; one filed the proposal and built the view from what already existed; three built the view and mentioned the gap only in the answer, where it died with the session. A wording pass making the proposal requirement explicit was tried and measured at 0/2, so it was reverted rather than kept -- prose that does not move the number is churn, and this repo has argued that four times about other people's code. Nothing mechanical catches this one: the runs that miss it leave no dangling reference and no undeclared directory, because they infer the view from layers that do exist. Deciding a layer is warranted is judgment, which is the one thing the shipped scripts cannot take over. Recorded as an open number rather than patched a third time.",
-   "file_lacks": [
-    {
-     "name": "the declared layer has an index_line",
-     "file": "INDEX.md",
-     "needle": "Incomplete index",
-     "why": "build_index.py renders this banner for any layer declared without an index_line, and lists its entries as bare links. It is the exact machine-visible signature of a layer declared without the configure interrogation -- the shape mistake this check exists to catch, made once already in this repo"
-    }
-   ],
-   "expect_added": [
-    {
-     "name": "the missing layer is raised as a proposal, not improvised to get the dashboard built",
-     "prefix": "proposals/",
-     "why": "a layer is a structural change to what the OS can hold, and the gate is what stops one being shaped wrong in passing. The proposal is the artifact that survives the session; a run that quietly invents a directory to render a panel leaves nothing to review"
-    }
-   ]
-  },
-  {
-   "id": "upgrade-stale-os",
-   "skill": "corp-os-upgrade",
-   "fixture": "examples/fixture-stale",
-   "prompt": "I updated the corp-os plugin this morning. Can you bring this folder in line with it?",
-   "expect_added": [
-    {
-     "name": "the shipped script this OS predates is installed",
-     "prefix": "scripts/delete_source.py",
-     "why": "corp-os-configure's retention path calls this at the OS path and fails against an OS that does not have it. An upgrade run that leaves it missing has not upgraded anything"
-    }
-   ],
-   "expect_changed": [
-    {
-     "name": "the stale counter copy was replaced",
-     "prefix": "scripts/build_index.py",
-     "why": "this is the copy that counts a single-file layer wrong. It is the entire reason the upgrade path exists, and it differs by content while looking fine by date"
+      "id": "upgrade-stale-os",
+      "skill": "corp-os-upgrade",
+      "fixture": "examples/fixture-stale",
+      "prompt": "I updated the corp-os plugin this morning. Can you bring this folder in line with it?",
+      "expect_added": [
+        {
+          "name": "the shipped script this OS predates is installed",
+          "prefix": "scripts/delete_source.py",
+          "why": "corp-os-configure's retention path calls this at the OS path and fails against an OS that does not have it. An upgrade run that leaves it missing has not upgraded anything"
+        }
+      ],
+      "expect_changed": [
+        {
+          "name": "the stale counter copy was replaced",
+          "prefix": "scripts/build_index.py",
+          "why": "this is the copy that counts a single-file layer wrong. It is the entire reason the upgrade path exists, and it differs by content while looking fine by date"
+        },
+        {
+          "name": "the recorded version moved",
+          "prefix": "config.json",
+          "why": "an OS that does not record which version it is on cannot be told it is behind, so the next run has to rediscover everything from disk shape alone"
+        },
+        {
+          "name": "the run closed its own books",
+          "prefix": "usage/log.md",
+          "why": "every failing conformance check in this suite has been the last step of a run; log_run.py exists so this one is not the exception"
+        }
+      ],
+      "expect_untouched": [
+        {
+          "name": "the registry migration was NOT performed",
+          "prefix": "dashboards/",
+          "why": "moving someone's files is a migration, not bookkeeping. upgrade_os.py names it and refuses; corp-os-configure enumerates and asks first. A run that quietly moves the registry has collapsed the one distinction this skill is built around -- and it is more tempting here than anywhere, because the fix is one mv and the person did say to bring the folder in line"
+        },
+        {
+          "name": "no source material was touched",
+          "prefix": "raw/",
+          "why": "an upgrade has no business in the append-only layer"
+        }
+      ],
+      "expect_output": [
+        {
+          "name": "the outstanding migration is named rather than silently left",
+          "needle": "dashboard",
+          "why": "leaving the migration alone is a legitimate answer; leaving it alone without saying so is not, because the person now believes their OS is current when its index is still under-counting"
+        }
+      ],
+      "_note": "Runs against examples/fixture-stale, the only fixture that is deliberately wrong: version 0.9.0, an older build_index.py, no delete_source.py, and the pre-0.10.1 dashboards layout. validate.py asserts all four of those are still broken, because repairing the fixture would leave this case passing against an OS with nothing to upgrade -- which reads as coverage and is not.\n\nThe expect_untouched on dashboards/ is the real assertion here. Everything else this case checks is a script invocation, and the script does its own refusing."
     },
     {
-     "name": "the recorded version moved",
-     "prefix": "config.json",
-     "why": "an OS that does not record which version it is on cannot be told it is behind, so the next run has to rediscover everything from disk shape alone"
+      "id": "migrate-cohort-and-cliff",
+      "skill": "corp-os-migrate",
+      "prompt": "There's a folder called `_incoming` in this OS with old material I want brought in. Have a look at what's there and migrate it.",
+      "answers": "The notetaker that produced the summaries is still paid for, so those transcripts can still be fetched. The tool behind the reconstructions was cancelled and the originals are gone for good.",
+      "expect_added": [
+        {
+          "name": "raw files written for the material that should come across",
+          "prefix": "raw/",
+          "min_count": 3,
+          "why": "the migration's actual work. A run that plans and files nothing has produced a conversation, not an OS"
+        },
+        {
+          "name": "the disposition record exists",
+          "prefix": "usage/MIGRATION",
+          "contains": "migration",
+          "why": "the only artifact that makes a migration auditable rather than trusted, and the only place the calendar log's exclusion is recoverable six months later. In the corpus that surfaced this, the operator happened to write one and it was the sole reason an audit could verify the migration at all"
+        },
+        {
+          "name": "the batch went through the gate as a persisted proposal",
+          "prefix": "proposals/",
+          "why": "a migration mints many entries at once, which is exactly when a gate degrades into a formality. The proposal file is what makes the batch reviewable after the session that produced it"
+        }
+      ],
+      "expect_changed": [
+        {
+          "name": "a cohort ceiling was recorded before minting",
+          "prefix": "meta.json",
+          "why": "a migrated corpus is structurally weaker in a way per-claim judgment cannot catch, because every claim in the batch looks equally plausible alone"
+        },
+        {
+          "name": "the run closed its own books",
+          "prefix": "usage/log.md",
+          "why": "every failing conformance check in this suite has been the last step of a run, and a migration is the most informative run an OS ever has"
+        }
+      ],
+      "expect_output": [
+        {
+          "name": "the calendar log is declined rather than filed",
+          "needle": "calendar",
+          "why": "a record that meetings happened is not source material, and filing it is how a prior system's headline count came to be inflated by roughly a fifth with meeting logs sitting in its resolved tier. Uses the material's own word rather than one I picked, so it tests the judgment and not the vocabulary"
+        }
+      ],
+      "_note": "Second version. The first described the material in the prompt instead of staging it, then asserted raw files would be written — incoherent, because there was nothing on disk to file, and it failed 0/2 for that reason rather than any of the skill's. The material now lives in fixture-os/_incoming/, which the generator ignores because of the leading underscore.\n\nThe first version also checked the answer for the string 'retriev', which is the vocabulary mistake this suite has now made three times — a run can distinguish the two populations perfectly while saying 'fetchable' or 'still have access to'. What replaced it is the calendar log, which has to be declined, named with the material's own word.\n\nThe expect_untouched on claims/ stays as the assertion most likely to be wrong: Step 4 says mint in batches through the gate, so a run that goes on to mint with a proposal is also defensible. If it fails that way, the check changes and the reason gets written here.\n\nThird version, and the flagged assertion was the one that broke. expect_untouched on claims/ encoded 'a first pass files source and stops', which the skill does not say — Step 4 says mint in batches through the gate. Both runs did exactly that: they filed source, then minted with a proposal, and the universal gate check passed on both. The rule I asserted was stricter than the rule that exists, which is the seventh time an assertion in this suite has been wrong about a skill rather than the reverse. Replaced with the property that actually matters at a migration's scale: the batch left a persisted proposal behind."
     },
     {
-     "name": "the run closed its own books",
-     "prefix": "usage/log.md",
-     "why": "every failing conformance check in this suite has been the last step of a run; log_run.py exists so this one is not the exception"
-    }
-   ],
-   "expect_untouched": [
-    {
-     "name": "the registry migration was NOT performed",
-     "prefix": "dashboards/",
-     "why": "moving someone's files is a migration, not bookkeeping. upgrade_os.py names it and refuses; corp-os-configure enumerates and asks first. A run that quietly moves the registry has collapsed the one distinction this skill is built around -- and it is more tempting here than anywhere, because the fix is one mv and the person did say to bring the folder in line"
+      "id": "pattern-adopt-refusal",
+      "skill": "corp-os-pattern",
+      "fixture": "examples/fixture-register",
+      "prompt": "A teammate sent me their pattern pack. I copied `dashboard-job-board.md` into patterns/. Can you set it up so I can build that board here?",
+      "expect_output": [
+        {
+          "name": "the refusal is reported rather than worked around",
+          "needle": "job",
+          "why": "this OS has jobs disabled, so a job board genuinely cannot be built here. The right outcome is naming that, not rendering a board with an empty panel"
+        }
+      ],
+      "expect_changed": [
+        {
+          "name": "the run closed its own books",
+          "prefix": "usage/log.md",
+          "why": "every failing conformance check in this suite has been the last step of a run"
+        }
+      ],
+      "_note": "fixture-register is the right target precisely because the pattern cannot bind there: jobs is disabled and the vocabulary is renamed. Two things are being tested at once — that the claims requirement binds anyway despite claim being renamed to entry, which is the portability thesis, and that the jobs requirement refuses out loud rather than degrading into an empty panel.\n\nDeliberately not asserting that config.json is untouched: declaring the missing layer through corp-os-configure is one of the two legitimate answers, and asserting against it would test the frame rather than the skill. That mistake has been made seven times in this suite.\n\nSecond version. The first asserted nothing under patterns/ was touched at all, and it failed at 50% because a run added patterns/pack.json — recording which pack and version the OS is on, which is Step 4 of the skill in as many words. The check forbade what the skill instructs. Eighth time in this suite that an assertion has been wrong about a skill rather than the reverse.\n\nexpect_unmodified on the teammate's file is the right shape: it catches editing theirs to fit, which is the real failure, and permits adding a local file, which is forking visibly rather than silently.",
+      "expect_unmodified": [
+        {
+          "name": "the teammate's pattern was not edited to make it bind",
+          "prefix": "patterns/dashboard-job-board.md",
+          "why": "weakening a requirement to make a refusal go away produces an output that renders an empty panel, which reads as a state rather than a defect. Editing an adopted pattern also forks the pack silently, so the next update reports drift nobody chose"
+        }
+      ]
     },
     {
-     "name": "no source material was touched",
-     "prefix": "raw/",
-     "why": "an upgrade has no business in the append-only layer"
-    }
-   ],
-   "expect_output": [
-    {
-     "name": "the outstanding migration is named rather than silently left",
-     "needle": "dashboard",
-     "why": "leaving the migration alone is a legitimate answer; leaving it alone without saying so is not, because the person now believes their OS is current when its index is still under-counting"
-    }
-   ],
-   "_note": "Runs against examples/fixture-stale, the only fixture that is deliberately wrong: version 0.9.0, an older build_index.py, no delete_source.py, and the pre-0.10.1 dashboards layout. validate.py asserts all four of those are still broken, because repairing the fixture would leave this case passing against an OS with nothing to upgrade -- which reads as coverage and is not.\n\nThe expect_untouched on dashboards/ is the real assertion here. Everything else this case checks is a script invocation, and the script does its own refusing."
-  },
-  {
-   "id": "migrate-cohort-and-cliff",
-   "skill": "corp-os-migrate",
-   "prompt": "There's a folder called `_incoming` in this OS with old material I want brought in. Have a look at what's there and migrate it.",
-   "answers": "The notetaker that produced the summaries is still paid for, so those transcripts can still be fetched. The tool behind the reconstructions was cancelled and the originals are gone for good.",
-   "expect_added": [
-    {
-     "name": "raw files written for the material that should come across",
-     "prefix": "raw/",
-     "min_count": 3,
-     "why": "the migration's actual work. A run that plans and files nothing has produced a conversation, not an OS"
+      "id": "fidelity-backlog",
+      "skill": "corp-os-reality-check",
+      "prompt": "Run the sweep. I want to know what's actually weak in here and what I can do about it.",
+      "expect_output": [
+        {
+          "name": "unrecoverable entries are separated from decay candidates",
+          "needle": "no source",
+          "why": "nothing can ever re-confirm them, so carrying them as overdue produces a permanently unresolvable backlog, and a sweep that always ends in failure is a sweep people stop running"
+        }
+      ],
+      "expect_changed": [
+        {
+          "name": "the run closed its own books",
+          "prefix": "usage/log.md",
+          "why": "every failing check in this suite has been the last step of a run"
+        }
+      ],
+      "forbid_output": [
+        {
+          "name": "nothing was promoted without an actual fetch",
+          "needle": "promoted to confirmed",
+          "why": "the entire point of making the route visible is that someone takes it, not that a number goes up. Promoting without the fetch raises confidence and lowers the corpus's honesty, which is the failure the ceilings exist to prevent"
+        }
+      ],
+      "_note": "fixture-os carries a Granola connector with `Verbatim fetch: yes` and one summary-fidelity entry sourced from it, plus entries whose citation is the sanctioned `no source` literal. The two populations are the whole test: one is one call from stronger, the other can never be re-confirmed, and collapsing them is the failure this release exists to fix.\n\nThe needle is `fetch` rather than a phrase I chose, because it is the word the connector record itself uses — the vocabulary mistake this suite has made three times is checking for language the run had no reason to pick.\n\nTwo things came out of running this, and they went opposite ways.\n\n**A real defect, found and fixed.** The cross-cutting check that every derived-layer write has a proposal behind it failed on three of the first four runs — one of them rewriting fourteen files and filing nothing. corp-os-reality-check had no gate step at all, which is a serious gap in the one skill whose whole job is removing things: the declines are the valuable part of the record, and a retirement that happened in conversation and nowhere else is indistinguishable six months later from something that was never there. Step 1.5 was added, and the check went to 2/2.\n\n**A needle that measured nothing, removed.** `fetch` in the answer scored 1/2, then 2/2, then 0/2 across three batches. That spread is a coin flip on a word choice, not a skill behaving inconsistently — a run can treat the promotion backlog as entirely actionable while writing 'pull the transcript' or 'the original is still available'. It is the fourth time this suite has checked for vocabulary and called it behaviour. The safety-critical half of the same property is kept as a forbid_output, because 'nothing was promoted without an actual fetch' is checkable and has held every run.\n\nWhat is left unmeasured, and stated rather than papered over: whether the backlog is *framed* as actionable. That is a quality judgment about an answer, and this harness cannot see it."
     },
     {
-     "name": "the disposition record exists",
-     "prefix": "usage/MIGRATION",
-     "contains": "migration",
-     "why": "the only artifact that makes a migration auditable rather than trusted, and the only place the calendar log's exclusion is recoverable six months later. In the corpus that surfaced this, the operator happened to write one and it was the sole reason an audit could verify the migration at all"
+      "id": "guide-open-fork",
+      "skill": "corp-os-guide",
+      "prompt": "We still haven't landed on whether to keep the legacy importer or rewrite it. Can you get that into my OS?",
+      "expect_output": [
+        {
+          "name": "routes an undecided fork to corp-os-decide",
+          "needle": "corp-os-decide",
+          "why": "the skill's own rule is to read the tense: a choice still open is a decision record, a choice already made is a claim. Filed as anything else, nothing ever forces the date and the fork sits open for months"
+        }
+      ],
+      "expect_untouched": [
+        {
+          "name": "guide did not open the decision itself",
+          "prefix": "decisions",
+          "why": "guide orients and hands off; a run that does the work skips the skill that has the rules for doing it properly"
+        },
+        {
+          "name": "guide did not file it as a claim",
+          "prefix": "claims",
+          "why": "an undecided fork written as a claim is the exact misfiling this routing rule exists to prevent"
+        },
+        {
+          "name": "guide wrote nothing to the source layer",
+          "prefix": "raw",
+          "why": "routing is not capture"
+        }
+      ],
+      "_note": "The phrasing 'get that into my OS' reads like intake or claims, and the tense is the only thing that says otherwise. Assertions are on the answer and on what stayed untouched, because a routing skill's whole deliverable is the answer plus a log row."
     },
     {
-     "name": "the batch went through the gate as a persisted proposal",
-     "prefix": "proposals/",
-     "why": "a migration mints many entries at once, which is exactly when a gate degrades into a formality. The proposal file is what makes the batch reviewable after the session that produced it"
-    }
-   ],
-   "expect_changed": [
-    {
-     "name": "a cohort ceiling was recorded before minting",
-     "prefix": "meta.json",
-     "why": "a migrated corpus is structurally weaker in a way per-claim judgment cannot catch, because every claim in the batch looks equally plausible alone"
+      "id": "jobs-artifact-as-motivation",
+      "skill": "corp-os-jobs",
+      "prompt": "I want a dashboard for renewal risk. Add that as a job.",
+      "answers": "the reason I want it is that I keep finding out an account is in trouble at the QBR instead of before it",
+      "expect_added": [
+        {
+          "name": "a job file was written",
+          "prefix": "jobs/",
+          "why": "the jobs layer is enabled in this fixture and the person asked for a job; a run that only discusses the shape has filed nothing"
+        }
+      ],
+      "expect_untouched": [
+        {
+          "name": "the dashboard they asked for was not built",
+          "prefix": "dashboards.md",
+          "why": "the request names an artifact; this skill converts it into an outcome rather than satisfying it. Building the dashboard here is how the malformation gets baked in instead of repaired"
+        }
+      ],
+      "expect_added_contains": [
+        {
+          "name": "the job written carries an outcome clause",
+          "prefix": "jobs/",
+          "needle": "so I can",
+          "why": "artifact-as-motivation is the most common malformation: 'I want a dashboard' names a thing, not a motivation, and a job with no outcome cannot be closed. The required form is `When <situation>, I want to <motivation>, so I can <outcome>`, so the clause is schema rather than phrasing — checked in the file the run wrote, not in what it said about it"
+        }
+      ],
+      "_note": "The first version asserted 'so I can' against the answer, which tested narration rather than the record. The cases file already carries one note about dropping an assertion for testing the slug a run happened to choose; this was the same mistake."
     },
     {
-     "name": "the run closed its own books",
-     "prefix": "usage/log.md",
-     "why": "every failing conformance check in this suite has been the last step of a run, and a migration is the most informative run an OS ever has"
+      "id": "improve-thin-evidence",
+      "skill": "corp-os-improve",
+      "prompt": "Take a look at how I've been using this and tell me what to change.",
+      "expect_untouched": [
+        {
+          "name": "no improvement packet written from one occurrence",
+          "prefix": "usage/improvement-packet",
+          "why": "a packet is the model-change deliverable and the most expensive thing to act on; writing one off a single friction row sends someone to edit the plugin over an n of 1"
+        },
+        {
+          "name": "no proposals written from one occurrence",
+          "prefix": "usage/proposals.md",
+          "why": "the bar is more than one real occurrence. Proposing from a single one is manufacturing findings from noise, and this skill is the most prone to it because a person who asked for changes wants changes"
+        },
+        {
+          "name": "improve wrote no claims",
+          "prefix": "claims",
+          "why": "this skill studies how the OS is used and proposes changes to it. Writing a claim means it answered a question nobody asked with material it was reviewing, and it is corp-os-claims that has the rules for doing that properly"
+        }
+      ],
+      "_note": "Asserts the refusal structurally. The first version looked for the word 'once' in the answer, which tests narration; the run that failed it had written claims/pricing.md, which is the defect worth catching and which no wording check would have named."
     }
-   ],
-   "expect_output": [
-    {
-     "name": "the calendar log is declined rather than filed",
-     "needle": "calendar",
-     "why": "a record that meetings happened is not source material, and filing it is how a prior system's headline count came to be inflated by roughly a fifth with meeting logs sitting in its resolved tier. Uses the material's own word rather than one I picked, so it tests the judgment and not the vocabulary"
-    }
-   ],
-   "_note": "Second version. The first described the material in the prompt instead of staging it, then asserted raw files would be written — incoherent, because there was nothing on disk to file, and it failed 0/2 for that reason rather than any of the skill's. The material now lives in fixture-os/_incoming/, which the generator ignores because of the leading underscore.\n\nThe first version also checked the answer for the string 'retriev', which is the vocabulary mistake this suite has now made three times — a run can distinguish the two populations perfectly while saying 'fetchable' or 'still have access to'. What replaced it is the calendar log, which has to be declined, named with the material's own word.\n\nThe expect_untouched on claims/ stays as the assertion most likely to be wrong: Step 4 says mint in batches through the gate, so a run that goes on to mint with a proposal is also defensible. If it fails that way, the check changes and the reason gets written here.\n\nThird version, and the flagged assertion was the one that broke. expect_untouched on claims/ encoded 'a first pass files source and stops', which the skill does not say — Step 4 says mint in batches through the gate. Both runs did exactly that: they filed source, then minted with a proposal, and the universal gate check passed on both. The rule I asserted was stricter than the rule that exists, which is the seventh time an assertion in this suite has been wrong about a skill rather than the reverse. Replaced with the property that actually matters at a migration's scale: the batch left a persisted proposal behind."
-  },
-  {
-   "id": "pattern-adopt-refusal",
-   "skill": "corp-os-pattern",
-   "fixture": "examples/fixture-register",
-   "prompt": "A teammate sent me their pattern pack. I copied `dashboard-job-board.md` into patterns/. Can you set it up so I can build that board here?",
-   "expect_output": [
-    {
-     "name": "the refusal is reported rather than worked around",
-     "needle": "job",
-     "why": "this OS has jobs disabled, so a job board genuinely cannot be built here. The right outcome is naming that, not rendering a board with an empty panel"
-    }
-   ],
-   "expect_changed": [
-    {
-     "name": "the run closed its own books",
-     "prefix": "usage/log.md",
-     "why": "every failing conformance check in this suite has been the last step of a run"
-    }
-   ],
-   "_note": "fixture-register is the right target precisely because the pattern cannot bind there: jobs is disabled and the vocabulary is renamed. Two things are being tested at once — that the claims requirement binds anyway despite claim being renamed to entry, which is the portability thesis, and that the jobs requirement refuses out loud rather than degrading into an empty panel.\n\nDeliberately not asserting that config.json is untouched: declaring the missing layer through corp-os-configure is one of the two legitimate answers, and asserting against it would test the frame rather than the skill. That mistake has been made seven times in this suite.\n\nSecond version. The first asserted nothing under patterns/ was touched at all, and it failed at 50% because a run added patterns/pack.json — recording which pack and version the OS is on, which is Step 4 of the skill in as many words. The check forbade what the skill instructs. Eighth time in this suite that an assertion has been wrong about a skill rather than the reverse.\n\nexpect_unmodified on the teammate's file is the right shape: it catches editing theirs to fit, which is the real failure, and permits adding a local file, which is forking visibly rather than silently.",
-   "expect_unmodified": [
-    {
-     "name": "the teammate's pattern was not edited to make it bind",
-     "prefix": "patterns/dashboard-job-board.md",
-     "why": "weakening a requirement to make a refusal go away produces an output that renders an empty panel, which reads as a state rather than a defect. Editing an adopted pattern also forks the pack silently, so the next update reports drift nobody chose"
-    }
-   ]
-  },
-  {
-   "id": "fidelity-backlog",
-   "skill": "corp-os-reality-check",
-   "prompt": "Run the sweep. I want to know what's actually weak in here and what I can do about it.",
-   "expect_output": [
-    {
-     "name": "unrecoverable entries are separated from decay candidates",
-     "needle": "no source",
-     "why": "nothing can ever re-confirm them, so carrying them as overdue produces a permanently unresolvable backlog, and a sweep that always ends in failure is a sweep people stop running"
-    }
-   ],
-   "expect_changed": [
-    {
-     "name": "the run closed its own books",
-     "prefix": "usage/log.md",
-     "why": "every failing check in this suite has been the last step of a run"
-    }
-   ],
-   "forbid_output": [
-    {
-     "name": "nothing was promoted without an actual fetch",
-     "needle": "promoted to confirmed",
-     "why": "the entire point of making the route visible is that someone takes it, not that a number goes up. Promoting without the fetch raises confidence and lowers the corpus's honesty, which is the failure the ceilings exist to prevent"
-    }
-   ],
-   "_note": "fixture-os carries a Granola connector with `Verbatim fetch: yes` and one summary-fidelity entry sourced from it, plus entries whose citation is the sanctioned `no source` literal. The two populations are the whole test: one is one call from stronger, the other can never be re-confirmed, and collapsing them is the failure this release exists to fix.\n\nThe needle is `fetch` rather than a phrase I chose, because it is the word the connector record itself uses — the vocabulary mistake this suite has made three times is checking for language the run had no reason to pick.\n\nTwo things came out of running this, and they went opposite ways.\n\n**A real defect, found and fixed.** The cross-cutting check that every derived-layer write has a proposal behind it failed on three of the first four runs — one of them rewriting fourteen files and filing nothing. corp-os-reality-check had no gate step at all, which is a serious gap in the one skill whose whole job is removing things: the declines are the valuable part of the record, and a retirement that happened in conversation and nowhere else is indistinguishable six months later from something that was never there. Step 1.5 was added, and the check went to 2/2.\n\n**A needle that measured nothing, removed.** `fetch` in the answer scored 1/2, then 2/2, then 0/2 across three batches. That spread is a coin flip on a word choice, not a skill behaving inconsistently — a run can treat the promotion backlog as entirely actionable while writing 'pull the transcript' or 'the original is still available'. It is the fourth time this suite has checked for vocabulary and called it behaviour. The safety-critical half of the same property is kept as a forbid_output, because 'nothing was promoted without an actual fetch' is checkable and has held every run.\n\nWhat is left unmeasured, and stated rather than papered over: whether the backlog is *framed* as actionable. That is a quality judgment about an answer, and this harness cannot see it."
-  },
-  {
-   "id": "guide-open-fork",
-   "skill": "corp-os-guide",
-   "prompt": "We still haven't landed on whether to keep the legacy importer or rewrite it. Can you get that into my OS?",
-   "expect_output": [
-    {
-     "name": "routes an undecided fork to corp-os-decide",
-     "needle": "corp-os-decide",
-     "why": "the skill's own rule is to read the tense: a choice still open is a decision record, a choice already made is a claim. Filed as anything else, nothing ever forces the date and the fork sits open for months"
-    }
-   ],
-   "expect_untouched": [
-    {
-     "name": "guide did not open the decision itself",
-     "prefix": "decisions",
-     "why": "guide orients and hands off; a run that does the work skips the skill that has the rules for doing it properly"
-    },
-    {
-     "name": "guide did not file it as a claim",
-     "prefix": "claims",
-     "why": "an undecided fork written as a claim is the exact misfiling this routing rule exists to prevent"
-    },
-    {
-     "name": "guide wrote nothing to the source layer",
-     "prefix": "raw",
-     "why": "routing is not capture"
-    }
-   ],
-   "_note": "The phrasing 'get that into my OS' reads like intake or claims, and the tense is the only thing that says otherwise. Assertions are on the answer and on what stayed untouched, because a routing skill's whole deliverable is the answer plus a log row."
-  },
-  {
-   "id": "jobs-artifact-as-motivation",
-   "skill": "corp-os-jobs",
-   "prompt": "I want a dashboard for renewal risk. Add that as a job.",
-   "answers": "the reason I want it is that I keep finding out an account is in trouble at the QBR instead of before it",
-   "expect_added": [
-    {
-     "name": "a job file was written",
-     "prefix": "jobs/",
-     "why": "the jobs layer is enabled in this fixture and the person asked for a job; a run that only discusses the shape has filed nothing"
-    }
-   ],
-   "expect_untouched": [
-    {
-     "name": "the dashboard they asked for was not built",
-     "prefix": "dashboards.md",
-     "why": "the request names an artifact; this skill converts it into an outcome rather than satisfying it. Building the dashboard here is how the malformation gets baked in instead of repaired"
-    }
-   ],
-   "expect_added_contains": [
-    {
-     "name": "the job written carries an outcome clause",
-     "prefix": "jobs/",
-     "needle": "so I can",
-     "why": "artifact-as-motivation is the most common malformation: 'I want a dashboard' names a thing, not a motivation, and a job with no outcome cannot be closed. The required form is `When <situation>, I want to <motivation>, so I can <outcome>`, so the clause is schema rather than phrasing — checked in the file the run wrote, not in what it said about it"
-    }
-   ],
-   "_note": "The first version asserted 'so I can' against the answer, which tested narration rather than the record. The cases file already carries one note about dropping an assertion for testing the slug a run happened to choose; this was the same mistake."
-  },
-  {
-   "id": "improve-thin-evidence",
-   "skill": "corp-os-improve",
-   "prompt": "Take a look at how I've been using this and tell me what to change.",
-   "expect_untouched": [
-    {
-     "name": "no improvement packet written from one occurrence",
-     "prefix": "usage/improvement-packet",
-     "why": "a packet is the model-change deliverable and the most expensive thing to act on; writing one off a single friction row sends someone to edit the plugin over an n of 1"
-    },
-    {
-     "name": "no proposals written from one occurrence",
-     "prefix": "usage/proposals.md",
-     "why": "the bar is more than one real occurrence. Proposing from a single one is manufacturing findings from noise, and this skill is the most prone to it because a person who asked for changes wants changes"
-    },
-    {
-     "name": "improve wrote no claims",
-     "prefix": "claims",
-     "why": "this skill studies how the OS is used and proposes changes to it. Writing a claim means it answered a question nobody asked with material it was reviewing, and it is corp-os-claims that has the rules for doing that properly"
-    }
-   ],
-   "_note": "Asserts the refusal structurally. The first version looked for the word 'once' in the answer, which tests narration; the run that failed it had written claims/pricing.md, which is the defect worth catching and which no wording check would have named."
-  }
- ]
+  ]
 }
