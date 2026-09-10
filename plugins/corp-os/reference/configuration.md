@@ -119,6 +119,12 @@ Getting a role wrong is the one configuration error that destroys data. A `sourc
 
 The rule has a useful side effect: it forces the question "what is one entry, and what does one line of it look like in `INDEX.md`" to be answered before the folder exists, rather than discovered at forty entries.
 
+**One exemption, and it is narrower than it looks.** A layer whose `role` is `record` and whose shape is specified by this plugin rather than by the OS — `connectors`, `dashboards`, `proposals`, `sensitive`, `patterns` — declares `role` and `path` and nothing else. The rule exists so that no layer fills with whatever shape the writing session chose, and for these the shape is already fixed in `${CLAUDE_PLUGIN_ROOT}/reference/records.md`. `build_index.py` skips `record` layers when rendering entries, so an `index_line` there would never be read.
+
+**A custom `record` layer gets no exemption.** Nothing in the plugin says what one of its entries contains, which is exactly the case the rule is for. Declare `entry_schema` and `index_line`, or put the material in an existing declared layer.
+
+The failure this ambiguity produced, in a real OS: three files sat with no role at all for months — `connectors.md` among them, holding the only copy of the source registry. `build_index.py` names them on every run and says what to do, and the report was read as advice because the rule looked like it demanded a schema nobody had for a file that plainly did not need one.
+
 ### Custom layers
 
 A layer Corp-OS never imagined is declared the same way as a shipped one:

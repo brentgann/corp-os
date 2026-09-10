@@ -192,6 +192,14 @@ The model itself is specified in `reference/data-model.md`. Improvement packets 
 
 ## Version history
 
+**0.19.8** — the schema rule states its exemption.
+
+*"A layer may only be enabled if it declares an `entry_schema` and an `index_line`. This applies to shipped layers and custom ones alike."* The shipped fixture declares `connectors` and `dashboards` with neither, and `build_index.py` skips `record` layers when rendering entries, so an `index_line` there is never read.
+
+The rule is right and its scope was wrong. A `record` layer whose shape is fixed in `reference/records.md` declares `role` and `path` and nothing else. A **custom** `record` layer gets no exemption, because nothing in the plugin says what one of its entries contains — which is the case the rule exists for.
+
+In a real OS three files sat roleless for months, `connectors.md` among them, holding the only copy of the source registry. The undeclared-files report names them on every run; the rule as written made declaring them look like it required a schema nobody had, for files that plainly did not need one.
+
 **0.19.7** — an entry whose path is the slug of its name no longer spells the path out.
 
 Measured on a real OS: across 82 entry lines, the label cost 720 tokens and **the path cost 1,004** — 24% of `INDEX.md`, for a string that restates the name in a form that tokenizes worse than the name. `<layer>/<name-lowercased-and-hyphenated>.md` is a lookup, and a document that restates a lookup is a cache.
