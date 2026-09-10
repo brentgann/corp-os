@@ -113,7 +113,7 @@ On the cases both models ran, they are within a check of each other — and Sonn
 
 **So model sensitivity tracks how much of a skill is still judgment, and the routing question answers itself release by release rather than once.** Three steps left the model in one week and three skills changed category. The way to make `intake` cheap is to keep moving its mechanism into `file_raw.py`, not to move it to a cheaper model — it is the one case that did the work and left none of the record.
 
-Nothing is pinned on the strength of that yet, deliberately: it is one Sonnet run per case. `--case recall,rebuild,pull --model claude-sonnet-4-5 --repeats 3` is the measurement that would justify pinning those three, which are the cleanest candidates.
+**That measurement was run, and it came back negative.** `recall`, `rebuild` and `pull` all scored perfectly at one run each and none of them held at three. The `usage/log.md` row — the step the entire enforcement chain depends on — landed in 1 of 3, 1 of 3 and 2 of 3 across the `recall` cases, and `rebuild` wrote to `raw/` in 2 of 3. **Nothing is pinned.** A skill that reads mechanical can still be the one deciding what reaches an answer, and the single-run suite could not see the difference. Details in `BACKLOG.md` §0c.
 
 **And the field itself is only documented for one surface.** `model:` is [specified for Claude Code](https://code.claude.com/docs/en/skills.md), accepts the `/model` values plus `inherit`, and is **silently ignored** when the value is unavailable — no error, no warning, the session simply keeps its model. It is not documented for Cowork or for the Agent SDK. So a pin is a cost optimisation that may or may not apply where a given person runs this, and nothing here is allowed to depend on it.
 

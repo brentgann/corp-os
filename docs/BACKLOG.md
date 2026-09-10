@@ -22,6 +22,32 @@ Items leave this list by being done or by being declined in §8, never by being 
 
 ## Open
 
+### 0c. The Sonnet pin question, answered: no (0.26.0)
+
+`COST.md` said the three cleanest candidates were `recall`, `rebuild` and `pull`, and that one Sonnet run per case was not enough to pin on. Run at `--repeats 3`, they are not clean:
+
+| | run 1 | run 2 | run 3 | in the single-run suite |
+|---|---|---|---|---|
+| `recall-read-only` | 4/5 | 4/5 | 5/5 | 5/5 |
+| `recall-jobs-off` | 5/7 | 5/7 | 7/7 | 7/7 |
+| `recall-load-bearing-sensitive` | 7/7 | 6/7 | 5/7 | 7/7 |
+| `pull-broken-connector` | 5/5 | 5/5 | 4/5 | 5/5 |
+
+**Every one of them looked perfect at n=1.** The failure underneath is the same one the full Sonnet suite showed and the same one the whole enforcement chain rests on: `usage/log.md row appended` at **1/3, 1/3 and 2/3** across the three `recall` cases. Sonnet does the work and skips the close, so the gate never runs.
+
+Two more are worth naming on their own. `recall-load-bearing-sensitive` dropped the load-bearing fact in 1 of 3 and the export-boundary marking in 1 of 3 — that check exists because an answer computed around a sensitive fact is wrong in the worst way, since nothing in it signals the omission. And `rebuild` **wrote to `raw/` in 2 of 3 runs**, which is the one invariant everything else rests on.
+
+So: nothing is pinned, and the reason is recorded rather than the conclusion. The routing rule from §0 stands — model sensitivity tracks how much of a skill is still judgment — and `recall` reads as mechanical while still being the skill that decides what reaches an answer.
+
+### 0d. The plugin guard was wrong on its first run
+
+It reported `rebuild-respects-roles` as having modified the plugin source, three runs running, listing `.claude-plugin/plugin.json`, `README.md` and the new `fixture-foreign` files — which is exactly the 0.26.0 commit. The working tree moved under a suite that was already running.
+
+The digest was right and the inference was not: **"the plugin directory changed" is not "this run changed it."** Git separates them exactly — a skill's write leaves a file dirty relative to HEAD, and a checkout or a sync landing committed content leaves it clean — so the guard now reports only what is dirty afterwards, and the suite refuses to start on an already-dirty plugin, where that inference does not hold. `--allow-dirty-plugin` runs anyway with the check off and says so.
+
+Worth keeping in view: the guard found a real defect in itself on its first outing, which is what a new assertion is for. `rebuild`'s three scores above include that false failure and should be read as 6/8, 8/8, 7/8 minus it.
+
+
 ### 0b. Coverage closed: 23 of 23 skills have a case (0.26.0)
 
 `audit`, `company` and `contribute` had never been measured. Each was a fixture problem and each turned out to be a different one.

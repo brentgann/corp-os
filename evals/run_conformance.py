@@ -68,6 +68,44 @@ Their request:
 """
 
 
+
+GUARD_OFF = False        # set by --allow-dirty-plugin
+
+
+def plugin_dirty(paths=None):
+    """Files under PLUGIN that differ from what git has committed.
+
+    The first version of the plugin guard compared a digest before the run to
+    one after it, and flagged its own repo's commit: the working tree moved to
+    0.26.0 while a suite was running and three consecutive runs reported the
+    release's own files as "modified by the run". The digest was right and the
+    inference was not -- "the plugin directory changed" is not "this run
+    changed it".
+
+    Git separates the two exactly. A skill that writes to the plugin leaves
+    the file DIRTY relative to HEAD; a checkout, a pull or a folder sync
+    landing committed content leaves it CLEAN. So the guard reports only what
+    is dirty afterwards, and the suite refuses to start on an already-dirty
+    plugin, where that inference does not hold.
+    """
+    cmd = ["git", "-C", ROOT, "status", "--porcelain", "--", PLUGIN]
+    try:
+        r = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+    except (OSError, subprocess.SubprocessError):
+        return None                      # no git: caller keeps every change
+    if r.returncode != 0:
+        return None
+    out = set()
+    for ln in r.stdout.splitlines():
+        rel = ln[3:].strip().strip('"')
+        if " -> " in rel:
+            rel = rel.split(" -> ")[-1]
+        full = os.path.join(ROOT, rel)
+        if full.startswith(PLUGIN):
+            out.add(os.path.relpath(full, PLUGIN))
+    return out
+
+
 def digest(root):
     """path -> sha256, for every file under root. Cheap way to see what moved."""
     out = {}
@@ -351,6 +389,14 @@ def run(case, model, timeout, keep, fixture):
         | (set(plugin_before) - set(plugin_after)))
     touched_plugin = [f for f in touched_plugin
                       if "__pycache__" not in f and not f.endswith(".pyc")]
+    # Keep only what the run actually dirtied. Without this the guard reports
+    # the repo's own commits whenever the tree moves mid-suite, which is how
+    # it failed on the first run it ever did.
+    dirty = None if GUARD_OFF else plugin_dirty()
+    if GUARD_OFF:
+        touched_plugin = []
+    elif dirty is not None:
+        touched_plugin = [f for f in touched_plugin if f in dirty]
     results, diff = check(case, before, after, work, transcript)
     # Always emitted, not only on failure: a check that appears when it fails
     # and vanishes when it passes has no denominator, which is the bug §4.55
@@ -391,6 +437,10 @@ def main():
                     help="runs per case. A close-out step that lands 3 times in "
                          "5 is not a pass and not a failure -- it is a rate, and "
                          "a single run cannot tell those apart")
+    ap.add_argument("--allow-dirty-plugin", action="store_true",
+                    help="run with an already-dirty plugin tree. The guard "
+                         "that catches a skill writing to the plugin cannot "
+                         "attribute changes then, so it is skipped")
     ap.add_argument("--out", default=os.path.join(os.path.dirname(CASES),
                                                   "runs", "conformance.json"))
     a = ap.parse_args()
@@ -402,6 +452,34 @@ def main():
     if not cases:
         print("no cases matched --case")
         return 1
+
+    # The plugin guard tells a skill's write apart from a checkout by whether
+    # the file is dirty afterwards. That inference needs a clean tree to start
+    # from, so say so rather than reporting a suite whose guard is guessing.
+    global GUARD_OFF
+    GUARD_OFF = a.allow_dirty_plugin
+    pre_dirty = plugin_dirty()
+    if pre_dirty:
+        print(("NOTE: the plugin tree is dirty and --allow-dirty-plugin was "
+               "given, so the guard\nthat catches a skill writing to the "
+               "plugin is OFF for this run. Already dirty:\n")
+              if GUARD_OFF else
+              ("REFUSING: the plugin tree is already dirty, so the guard that "
+               "catches a skill\nwriting to it cannot tell your edits from "
+               "its. Commit or stash first:\n"), flush=True)
+        for f in sorted(pre_dirty)[:10]:
+            print(f"  plugins/corp-os/{f}", flush=True)
+        if len(pre_dirty) > 10:
+            print(f"  … and {len(pre_dirty) - 10} more", flush=True)
+        if not GUARD_OFF:
+            print("\n  --allow-dirty-plugin runs anyway and disables that "
+                  "check.", flush=True)
+            return 1
+        print("", flush=True)
+    elif pre_dirty is None:
+        print("NOTE: no git here, so the plugin guard reports every change to "
+              "the plugin\ndirectory, including one the working tree made "
+              "on its own.\n", flush=True)
 
     print(f"{len(cases)} cases, {a.workers} at a time, model {a.model}\n", flush=True)
     out = []
