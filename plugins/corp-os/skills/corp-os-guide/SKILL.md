@@ -83,7 +83,11 @@ Common collisions, and how to settle them:
 
 ## Step 4 — answer with a next action
 
-Name the one thing worth doing next, say which skill does it, and offer to start that skill. The offer is to hand off; the work happens there, under that skill's rules. If the OS has an unprocessed queue, that is almost always the answer.
+Name the one thing worth doing next, say which skill does it, and offer to start that skill.
+
+**Say whether it wants a fresh session.** This is the one moment the person can act on it, and it is the largest cost lever they control. Filing and regeneration — `corp-os-intake`, `corp-os-pull`, `corp-os-migrate`, `corp-os-rebuild`, `corp-os-upgrade`, `corp-os-brief`, `corp-os-recall`, `corp-os-dashboard` — should start in a new one: they are volume or mechanical work, nothing earlier in the conversation improves them, and every turn pays for whatever else is loaded. `corp-os-redact` should too, for a second reason: an export assembled in a session full of unrelated material is the one place a leak has somewhere to come from.
+
+The conversational ones — `corp-os-setup`'s interrogation, the gate loop in `corp-os-claims`, `corp-os-jobs`, `corp-os-glossary` and `corp-os-decide`, and the diagnosis in `corp-os-audit`, `corp-os-improve` and `corp-os-contribute` — are worth staying in, because the earlier turns are what the run is made of. Do not tell someone to clear mid-gate: a proposal is only half-recorded until they answer. The offer is to hand off; the work happens there, under that skill's rules. If the OS has an unprocessed queue, that is almost always the answer.
 
 End on one named skill rather than a menu.
 

@@ -196,6 +196,8 @@ The model itself is specified in `reference/data-model.md`. Improvement packets 
 
 ## Version history
 
+**0.27.0** — which skills want a fresh session and which want continuity, cited to Anthropic's own guidance.
+
 **0.26.5** — the published figures come from the run report instead of a literal, and the plugin says where the docs are.
 
 **0.26.4** — the shareable documents get a generator, and the handbook stops saying nine scripts.

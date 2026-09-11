@@ -22,6 +22,8 @@ Three things follow, and they are the whole of this document.
 
 The same session that is right for `corp-os-recall` — connectors, browser, whatever else — is the wrong one for a backlog pull.
 
+**Which skills want a fresh session and which want continuity is in [`QUICKSTART.md`](QUICKSTART.md#when-to-start-a-fresh-session-and-when-to-stay-in-one)**, with Anthropic's own guidance cited. The short version: caching makes an active session cheap to continue, so the rule is not "always start fresh" — it is that a session carrying context you have stopped using is the expensive one, and changing what is loaded mid-session invalidates the cache that was making it cheap.
+
 ## Cap what comes in, deliberately
 
 The `capture` block (`reference/capture.md`) is what decides a run's cost:
